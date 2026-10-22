@@ -3,12 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-[#FAF7F2] text-[#2D0C1E];
+    @apply bg-[#FAF7F2] text-[#2D0C1E] antialiased selection:bg-[#C5A059]/25 selection:text-[#1A0611];
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+
+  /* Accessibility focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-gold ring-offset-2 ring-offset-brand-ivory;
   }
 }
 
@@ -20,5 +30,23 @@
 
   .text-shadow-subtle {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .text-shadow-luxury {
+    text-shadow: 0 4px 12px rgba(26, 6, 17, 0.4);
+  }
+
+  .bg-radial-glow {
+    background: radial-gradient(circle at center, rgba(197, 160, 89, 0.15) 0%, rgba(45, 12, 30, 0) 70%);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -1,11 +1,37 @@
-// Prisma Seed Script: Initial seed data for Preeti Makeover
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('--- Starting Preeti Makeover Database Seed ---');
 
-  // 1. Business Settings
+  // 1. Initial Admin User (if not already existing)
+  const defaultAdminEmail = (process.env.INITIAL_ADMIN_EMAIL || 'admin@preetimakeover.com').trim().toLowerCase();
+  const existingAdmin = await prisma.adminUser.findUnique({ where: { email: defaultAdminEmail } });
+  
+  if (!existingAdmin) {
+    const adminPassword = process.env.INITIAL_ADMIN_PASSWORD;
+    if (!adminPassword && process.env.NODE_ENV === 'production') {
+      console.warn('⚠️ WARNING: INITIAL_ADMIN_PASSWORD not provided in production. Skipping admin user creation.');
+      console.warn('Run "npm run admin:setup" to set up administrator credentials securely.');
+    } else {
+      const passToUse = adminPassword || 'PreetiMakeover@2026'; // development fallback only
+      const passwordHash = await bcrypt.hash(passToUse, 12);
+      await prisma.adminUser.create({
+        data: {
+          email: defaultAdminEmail,
+          passwordHash,
+          name: 'Preeti Mandal',
+          role: 'admin'
+        }
+      });
+      console.log(`Seeded Initial Admin User: ${defaultAdminEmail}`);
+    }
+  } else {
+    console.log(`Admin User ${defaultAdminEmail} already exists.`);
+  }
+
+  // 2. Business Settings
   const settings = await prisma.businessSettings.upsert({
     where: { id: 'default' },
     update: {},

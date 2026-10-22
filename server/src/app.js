@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const apiRoutes = require('./routes/api');
 
 const app = express();
 
@@ -51,7 +52,7 @@ const apiLimiter = rateLimit({
 
 app.use('/api/', apiLimiter);
 
-// Health Check Endpoint
+// Health Check Endpoint (public, unauthenticated)
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
@@ -62,6 +63,9 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Mount Core REST API Endpoints
+app.use('/api', apiRoutes);
 
 // Root Info Endpoint
 app.get('/', (req, res) => {

@@ -1,0 +1,121 @@
+// Prisma Schema for Preeti Makeover Salon & Portfolio
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         String    @default("admin")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model ServiceCategory {
+  id           String    @id @default(uuid())
+  name         String    @unique
+  slug         String    @unique
+  description  String?
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  services     Service[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([slug, isActive])
+}
+
+model Service {
+  id              String          @id @default(uuid())
+  categoryId      String
+  category        ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name            String
+  slug            String          @unique
+  description     String?
+  startingPrice   Decimal?        @db.Decimal(10, 2)
+  durationMinutes Int?
+  isFeatured      Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  displayOrder    Int             @default(0)
+  appointments    Appointment[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([categoryId, isActive])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONTACTED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  customerName  String
+  phone         String
+  serviceId     String?
+  service       Service?          @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  serviceName   String
+  preferredDate DateTime          @db.Date
+  preferredTime String?
+  message       String?
+  status        AppointmentStatus @default(PENDING)
+  adminNotes    String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([preferredDate, status])
+  @@index([phone])
+}
+
+model GalleryImage {
+  id           String   @id @default(uuid())
+  title        String
+  category     String   // e.g. "Bridal", "Hair", "Facials", "Nails", "Studio"
+  imageUrl     String
+  altText      String
+  displayOrder Int      @default(0)
+  isFeatured   Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Testimonial {
+  id           String   @id @default(uuid())
+  clientName   String
+  serviceName  String?
+  rating       Int      @default(5)
+  reviewText   String
+  isApproved   Boolean  @default(false) // Verified moderation workflow
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model BusinessSettings {
+  id             String   @id @default("default")
+  businessName   String   @default("Preeti Makeover")
+  tagline        String   @default("Your Beauty Is Our Duty.")
+  ownerName      String   @default("Preeti Mandal")
+  phone          String   @default("+918810359438")
+  whatsapp       String   @default("+918810359438")
+  email          String   @default("preetimakeoverpm@gmail.com")
+  address        String   @default("D/109, Gali No. 5, Prince Colony, Harinagar, Jaitpur, Badarpur, New Delhi – 110044")
+  openingHour    String   @default("10:00 AM")
+  closingHour    String   @default("09:00 PM")
+  weeklyOffDay   String   @default("Tuesday")
+  googleMapsUrl  String?
+  updatedAt      DateTime @updatedAt
+}

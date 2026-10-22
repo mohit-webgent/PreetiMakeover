@@ -313,9 +313,11 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite })
       <header className="bg-white border-b border-brand-blush/60 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-brand-plum text-brand-gold flex items-center justify-center font-serif text-lg font-bold">
-              PM
-            </div>
+            <img
+              src="/pm_logo.png"
+              alt="Preeti Makeover Crest"
+              className="h-10 w-auto object-contain filter drop-shadow-sm"
+            />
             <div>
               <span className="font-serif text-xl font-bold tracking-tight text-brand-plum block leading-tight">
                 Preeti Makeover <span className="text-xs font-sans font-semibold text-brand-gold-dark bg-brand-blush/40 px-2 py-0.5 rounded-full ml-1">Admin</span>

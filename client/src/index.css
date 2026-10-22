@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-[#FAF7F2] text-[#2D0C1E] antialiased selection:bg-[#C5A059]/25 selection:text-[#1A0611];
+    @apply bg-salon-blush text-salon-text antialiased selection:bg-salon-gold/30 selection:text-salon-maroon font-sans;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -18,7 +18,7 @@
 
   /* Accessibility focus styles */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-gold ring-offset-2 ring-offset-brand-ivory;
+    @apply outline-none ring-2 ring-salon-gold ring-offset-2 ring-offset-salon-blush;
   }
 }
 
@@ -29,16 +29,74 @@
   }
 
   .text-shadow-subtle {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
   }
 
   .text-shadow-luxury {
-    text-shadow: 0 4px 12px rgba(26, 6, 17, 0.4);
+    text-shadow: 0 4px 14px rgba(71, 18, 34, 0.4);
   }
 
   .bg-radial-glow {
-    background: radial-gradient(circle at center, rgba(197, 160, 89, 0.15) 0%, rgba(45, 12, 30, 0) 70%);
+    background: radial-gradient(circle at center, rgba(197, 161, 90, 0.18) 0%, rgba(100, 28, 50, 0) 70%);
   }
+
+  .bg-rose-glow {
+    background: radial-gradient(circle at center, rgba(217, 140, 163, 0.22) 0%, rgba(255, 247, 249, 0) 70%);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-maroon {
+    background: rgba(100, 28, 50, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(197, 161, 90, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(197, 161, 90, 0.5);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-pulse-gold {
+  animation: pulseGold 3s infinite ease-in-out;
 }
 
 /* Reduced motion support */

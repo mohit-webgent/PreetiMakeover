@@ -51,8 +51,12 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
 
         {/* Brand Icon & Heading */}
         <div className="text-center">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-plum to-brand-plum-deep text-brand-gold flex items-center justify-center font-serif text-2xl font-bold mx-auto mb-4 shadow-luxury">
-            PM
+          <div className="flex items-center justify-center mb-4">
+            <img
+              src="/pm_logo.png"
+              alt="Preeti Makeover Crest"
+              className="h-16 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(197,161,90,0.45)]"
+            />
           </div>
           <h2 className="font-serif text-3xl font-bold text-brand-plum tracking-tight">
             Salon Management Portal

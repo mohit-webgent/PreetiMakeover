@@ -1,23 +1,143 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import MobileQuickBar from './components/layout/MobileQuickBar';
-import Hero from './components/sections/Hero';
-import ServicesSection from './components/sections/ServicesSection';
-import BridalFeature from './components/sections/BridalFeature';
-import BrandsShowcase from './components/sections/BrandsShowcase';
-import GallerySection from './components/sections/GallerySection';
-import AboutSection from './components/sections/AboutSection';
-import TestimonialsSection from './components/sections/TestimonialsSection';
-import BookingSection from './components/sections/BookingSection';
-import AdminLogin from './components/admin/AdminLogin';
-import AdminDashboard from './components/admin/AdminDashboard';
+import ScrollToTop from './components/common/ScrollToTop';
+
+// Multi-Page Routes
+import HomePage from './pages/HomePage';
+import ServicesPage from './pages/ServicesPage';
+import BridalPage from './pages/BridalPage';
+import GalleryPage from './pages/GalleryPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import AdminPage from './pages/AdminPage';
+
 import { api } from './services/api';
 
-export default function App() {
-  // Navigation / View State ('public' or 'admin')
-  const [currentView, setCurrentView] = useState('public');
+function AppLayout({ 
+  categories, 
+  servicesLoading, 
+  servicesError, 
+  testimonials, 
+  galleryImages, 
+  selectedService, 
+  setSelectedService,
+  adminToken,
+  adminUser,
+  handleLoginSuccess,
+  handleLogout
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
+  // Handle legacy hash migration (#admin -> /admin)
+  useEffect(() => {
+    if (window.location.hash === '#admin') {
+      window.location.hash = '';
+      navigate('/admin');
+    }
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-salon-blush text-salon-text font-sans antialiased selection:bg-salon-gold/30 selection:text-salon-maroon">
+      <ScrollToTop />
+
+      {/* Public Header Navigation (Hidden on Admin portal for clean workspace) */}
+      {!isAdminRoute && <Navbar />}
+
+      {/* Main Multi-page Routes */}
+      <main className="flex-1 pb-20 md:pb-0">
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <HomePage 
+                categories={categories} 
+                testimonials={testimonials} 
+                galleryImages={galleryImages} 
+                onSelectService={(s) => setSelectedService(s)} 
+              />
+            } 
+          />
+
+          <Route 
+            path="/services" 
+            element={
+              <ServicesPage 
+                categories={categories} 
+                loading={servicesLoading} 
+                error={servicesError} 
+                onSelectService={(s) => setSelectedService(s)} 
+              />
+            } 
+          />
+
+          <Route 
+            path="/bridal-makeup" 
+            element={
+              <BridalPage 
+                onSelectService={(s) => setSelectedService(s)} 
+              />
+            } 
+          />
+
+          <Route 
+            path="/gallery" 
+            element={
+              <GalleryPage 
+                galleryImages={galleryImages} 
+              />
+            } 
+          />
+
+          <Route 
+            path="/about" 
+            element={<AboutPage />} 
+          />
+
+          <Route 
+            path="/contact" 
+            element={
+              <ContactPage 
+                categories={categories} 
+                selectedService={selectedService} 
+                onClearSelectedService={() => setSelectedService(null)} 
+              />
+            } 
+          />
+
+          <Route 
+            path="/admin/*" 
+            element={
+              <AdminPage 
+                adminToken={adminToken} 
+                adminUser={adminUser} 
+                onLoginSuccess={handleLoginSuccess} 
+                onLogout={handleLogout} 
+              />
+            } 
+          />
+
+          {/* Catch-all redirect to Home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      {/* Public Footer & Floating Mobile Bar */}
+      {!isAdminRoute && (
+        <>
+          <Footer />
+          <MobileQuickBar />
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function App() {
   // Admin Auth State
   const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem('pm_admin_token'));
   const [adminUser, setAdminUser] = useState(() => {
@@ -38,21 +158,6 @@ export default function App() {
   const [galleryImages, setGalleryImages] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
 
-  // Sync view with URL hash (e.g. #admin)
-  useEffect(() => {
-    const handleHash = () => {
-      if (window.location.hash === '#admin') {
-        setCurrentView('admin');
-      } else {
-        setCurrentView('public');
-      }
-    };
-
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
-
   // Validate existing admin token on mount
   useEffect(() => {
     if (adminToken) {
@@ -71,7 +176,7 @@ export default function App() {
     }
   }, [adminToken]);
 
-  // Fetch Public Data
+  // Fetch Public Catalog Data from API
   useEffect(() => {
     let isMounted = true;
 
@@ -99,7 +204,7 @@ export default function App() {
       })
       .catch((err) => console.log('Testimonials fetch:', err.message));
 
-    // Load Gallery
+    // Load Active Gallery Images
     api.getGallery()
       .then((res) => {
         if (isMounted && res?.data) {
@@ -119,8 +224,6 @@ export default function App() {
     setAdminUser(user);
     sessionStorage.setItem('pm_admin_token', token);
     sessionStorage.setItem('pm_admin_user', JSON.stringify(user));
-    window.location.hash = '#admin';
-    setCurrentView('admin');
   };
 
   const handleLogout = () => {
@@ -128,119 +231,23 @@ export default function App() {
     setAdminUser(null);
     sessionStorage.removeItem('pm_admin_token');
     sessionStorage.removeItem('pm_admin_user');
-    window.location.hash = '';
-    setCurrentView('public');
   };
 
-  const navigateToAdmin = () => {
-    window.location.hash = '#admin';
-    setCurrentView('admin');
-  };
-
-  const navigateToPublic = () => {
-    window.location.hash = '';
-    setCurrentView('public');
-  };
-
-  // Smooth scroll to booking
-  const scrollToBooking = () => {
-    if (currentView !== 'public') {
-      navigateToPublic();
-      setTimeout(() => {
-        const el = document.getElementById('contact');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      return;
-    }
-    const el = document.getElementById('contact');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleSelectService = (service) => {
-    setSelectedService(service);
-    scrollToBooking();
-  };
-
-  const handleBridalEnquiry = () => {
-    setSelectedService({
-      id: null,
-      name: 'Signature Bridal HD Makeup'
-    });
-    scrollToBooking();
-  };
-
-  // If Admin View is active
-  if (currentView === 'admin') {
-    if (adminToken && adminUser) {
-      return (
-        <AdminDashboard
-          token={adminToken}
-          admin={adminUser}
-          onLogout={handleLogout}
-          onBackToSite={navigateToPublic}
-        />
-      );
-    }
-    return (
-      <AdminLogin
-        onLoginSuccess={handleLoginSuccess}
-        onBackToSite={navigateToPublic}
-      />
-    );
-  }
-
-  // Public Website View
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-brand-plum selection:bg-brand-gold/30 selection:text-brand-plum-deep flex flex-col font-sans">
-      {/* Top Sticky Navigation */}
-      <Navbar onBookClick={scrollToBooking} />
-
-      {/* Main Public Website Sections */}
-      <main className="flex-1 pb-16 md:pb-0">
-        {/* 1. Hero Section matching PDF wireframe */}
-        <Hero onBookClick={scrollToBooking} />
-
-        {/* 2. Services Grid connected to Database Catalog */}
-        <ServicesSection
-          categories={categories}
-          loading={servicesLoading}
-          error={servicesError}
-          onSelectService={handleSelectService}
-        />
-
-        {/* 3. Bridal & Occasion Makeover Banner */}
-        <BridalFeature onBridalEnquiry={handleBridalEnquiry} />
-
-        {/* 4. Confirmed Product Brands Showcase */}
-        <BrandsShowcase />
-
-        {/* 5. Salon Work Portfolio Gallery */}
-        <GallerySection
-          galleryImages={galleryImages}
-          onBookClick={scrollToBooking}
-        />
-
-        {/* 6. About the Salon & Preeti Mandal Story */}
-        <AboutSection />
-
-        {/* 7. Client Reviews / Salon Standards */}
-        <TestimonialsSection testimonials={testimonials} />
-
-        {/* 8. Interactive Appointment Booking & Location */}
-        <BookingSection
-          categories={categories}
-          selectedService={selectedService}
-          onClearSelectedService={() => setSelectedService(null)}
-        />
-      </main>
-
-      {/* Footer matching PDF wireframe with discrete Admin link */}
-      <Footer onAdminClick={navigateToAdmin} />
-
-      {/* Mobile Sticky Quick Action Bar */}
-      <MobileQuickBar onBookClick={scrollToBooking} />
-    </div>
+    <BrowserRouter>
+      <AppLayout 
+        categories={categories}
+        servicesLoading={servicesLoading}
+        servicesError={servicesError}
+        testimonials={testimonials}
+        galleryImages={galleryImages}
+        selectedService={selectedService}
+        setSelectedService={setSelectedService}
+        adminToken={adminToken}
+        adminUser={adminUser}
+        handleLoginSuccess={handleLoginSuccess}
+        handleLogout={handleLogout}
+      />
+    </BrowserRouter>
   );
 }

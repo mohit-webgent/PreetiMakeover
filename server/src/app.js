@@ -10,24 +10,56 @@ const app = express();
 // Security Headers
 app.use(helmet());
 
-// CORS configuration (allow Vite client during development)
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'http://127.0.0.1:5173'
-];
+// CORS configuration: resolve and normalize allowed origins
+function getAllowedOrigins() {
+  const localDevOrigins = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5000',
+    'http://127.0.0.1:5000'
+  ];
+
+  const clientUrlEnv = process.env.CLIENT_URL;
+  if (!clientUrlEnv) {
+    return localDevOrigins;
+  }
+
+  // Parse single or comma-separated origins, strip surrounding quotes and trailing slashes
+  const configuredOrigins = clientUrlEnv
+    .split(',')
+    .map(url => url.trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, ''))
+    .filter(Boolean)
+    .map(url => (/^https?:\/\//i.test(url) ? url : `https://${url}`));
+
+  return [...new Set([...localDevOrigins, ...configuredOrigins])];
+}
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Blocked by CORS policy'));
+    // Allow requests with no origin (such as mobile apps, curl, server-to-server, Render health checks)
+    if (!origin) {
+      return callback(null, true);
     }
+
+    const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+    const allowedOrigins = getAllowedOrigins();
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    // Reject disallowed origins cleanly without throwing a 500 Unhandled Server Error
+    return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  optionsSuccessStatus: 200
 }));
+
+app.getAllowedOrigins = getAllowedOrigins;
 
 // Request Logging
 if (process.env.NODE_ENV !== 'test') {

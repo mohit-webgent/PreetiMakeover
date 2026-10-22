@@ -382,6 +382,58 @@ async function runTests() {
     assert(thrownInProduction,
       'Security Audit: getJwtSecret fails safely with fatal error in production when JWT_SECRET is missing');
 
+    // ==========================================
+    // Phase 4.1 CORS Hardening Tests
+    // ==========================================
+
+    // Test 33: Request without Origin (Healthchecks, curl, server-to-server) succeeds
+    const res33 = await request('GET', '/api/health');
+    assert(res33.status === 200 && res33.body.status === 'healthy',
+      'CORS: Request without Origin header succeeds with HTTP 200 for health checks and server calls');
+
+    // Test 34: Request from local development Origin receives CORS allow header
+    const res34 = await request('GET', '/api/health', null, {
+      'Origin': 'http://localhost:5173'
+    });
+    assert(res34.status === 200 && res34.headers['access-control-allow-origin'] === 'http://localhost:5173',
+      'CORS: Request from local development Origin (http://localhost:5173) sets Access-Control-Allow-Origin');
+
+    // Test 35: Configured production origin with trailing slash in env matches clean incoming Origin
+    const savedClientUrl = process.env.CLIENT_URL;
+    try {
+      process.env.CLIENT_URL = 'https://preeti-makeover.vercel.app/, https://custom-salon.com';
+      const res35 = await request('GET', '/api/health', null, {
+        'Origin': 'https://preeti-makeover.vercel.app'
+      });
+      assert(res35.status === 200 && res35.headers['access-control-allow-origin'] === 'https://preeti-makeover.vercel.app',
+        'CORS: Matches configured Vercel production origin even when CLIENT_URL contains trailing slashes or comma lists');
+    } finally {
+      process.env.CLIENT_URL = savedClientUrl;
+    }
+
+    // Test 36: Unauthorized origin does NOT receive allow header and does NOT trigger 500 error
+    const res36 = await request('GET', '/api/health', null, {
+      'Origin': 'https://unauthorized-malicious-domain.com'
+    });
+    assert(res36.headers['access-control-allow-origin'] === undefined && res36.status !== 500,
+      'CORS: Unauthorized origin is denied access-control-allow-origin without throwing 500 unhandled server error');
+
+    // Test 37: OPTIONS preflight from allowed origin returns 200/204 with CORS headers
+    const res37 = await request('OPTIONS', '/api/appointments', null, {
+      'Origin': 'http://localhost:5173',
+      'Access-Control-Request-Method': 'POST'
+    });
+    assert((res37.status === 200 || res37.status === 204) && res37.headers['access-control-allow-origin'] === 'http://localhost:5173',
+      'CORS: OPTIONS preflight from allowed origin succeeds with Access-Control-Allow-Origin');
+
+    // Test 38: OPTIONS preflight from unauthorized origin does NOT set allow header
+    const res38 = await request('OPTIONS', '/api/appointments', null, {
+      'Origin': 'https://unauthorized-malicious-domain.com',
+      'Access-Control-Request-Method': 'POST'
+    });
+    assert(res38.headers['access-control-allow-origin'] === undefined,
+      'CORS: OPTIONS preflight from unauthorized origin does not receive Access-Control-Allow-Origin');
+
   } catch (err) {
     console.error('Test execution error:', err);
     failed++;

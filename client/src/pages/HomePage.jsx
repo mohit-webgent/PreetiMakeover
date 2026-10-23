@@ -455,41 +455,29 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         </div>
       </section>
 
-      {/* 9. Grand Booking Call-to-Action Banner (Full Width, Edge-to-Edge) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#230412] via-[#1A030E] to-[#2B0618] text-white py-20 sm:py-28 border-y border-salon-gold/30">
+      {/* 9. Grand Booking Call-to-Action Banner (Compact, Full-Width & Clean) */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#230412] via-[#1A030E] to-[#2B0618] text-white py-12 sm:py-14 border-y border-salon-gold/30">
         
         {/* Full-width Ambient Glows */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-rose/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-96 h-64 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-64 bg-salon-rose/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          {/* Sparkle Icon Badge */}
-          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-salon-gold/30 flex items-center justify-center mx-auto mb-4 text-salon-gold shadow-inner backdrop-blur-sm">
-            <Sparkles className="w-5 h-5" />
-          </div>
-
-          {/* Eyebrow */}
-          <span className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-gold font-bold block mb-3">
-            APPOINTMENTS & CONSULTATIONS
-          </span>
-
-          {/* Minimal Punchy Title */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight mb-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          {/* Main Title */}
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight mb-2 sm:mb-3">
             Ready for Your Transformation?
           </h2>
 
-          <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-salon-gold to-transparent mx-auto mb-5" />
-
-          {/* Minimal Clean Subtext */}
-          <p className="text-sm sm:text-base lg:text-lg text-white/80 font-light max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-            Book your appointment online in seconds, or connect directly on WhatsApp.
+          {/* Clean Subtext */}
+          <p className="text-sm sm:text-base text-white/80 font-light max-w-xl mx-auto mb-6 sm:mb-7 leading-relaxed">
+            Book your appointment online in seconds, or contact directly on WhatsApp.
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
             <Link
               to="/contact"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
             >
               <Calendar className="w-4 h-4 text-salon-maroon" />
               <span>Book Appointment Online</span>
@@ -499,24 +487,11 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               href="https://wa.me/918810359438"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-emerald-400/60 backdrop-blur-md hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-emerald-400/60 backdrop-blur-md hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"
             >
               <Phone className="w-4 h-4 text-emerald-400" />
               <span>Message on WhatsApp</span>
             </a>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="mt-10 pt-8 border-t border-white/10 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-white/70">
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-salon-gold" /> Instant Confirmation
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-salon-gold" /> 100% Genuine Sealed Products
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4 text-salon-gold" /> Personal Diagnosis
-            </span>
           </div>
         </div>
       </section>

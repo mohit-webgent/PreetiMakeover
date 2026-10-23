@@ -226,7 +226,6 @@ export default function TestimonialsSection({ testimonials = [] }) {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
             What Our Clients Say About Us
           </h2>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-salon-gold to-transparent mx-auto mb-4"></div>
         </div>
 
         {/* Artistic Editorial Testimonial Card */}
@@ -372,8 +371,8 @@ export default function TestimonialsSection({ testimonials = [] }) {
                       }}
                       aria-label={`Go to review ${idx + 1}`}
                       className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${currentIndex === idx
-                          ? 'w-7 sm:w-8 bg-salon-maroon'
-                          : 'w-2 sm:w-2.5 bg-salon-gold/40 hover:bg-salon-gold'
+                        ? 'w-7 sm:w-8 bg-salon-maroon'
+                        : 'w-2 sm:w-2.5 bg-salon-gold/40 hover:bg-salon-gold'
                         }`}
                     />
                   ))}
@@ -393,28 +392,6 @@ export default function TestimonialsSection({ testimonials = [] }) {
 
           </div>
 
-        </div>
-
-        {/* Client Feedback Invitation Callout */}
-        <div className="mt-10 sm:mt-12 max-w-lg mx-auto rounded-2xl bg-white/70 backdrop-blur-sm p-5 border border-salon-gold/30 text-center shadow-sm">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Heart className="w-4 h-4 text-salon-gold fill-salon-gold" />
-            <h4 className="font-serif font-bold text-sm text-salon-maroon">
-              Loved Your Visit to Preeti Makeover?
-            </h4>
-          </div>
-          <p className="text-xs text-salon-maroon/70 mb-3">
-            Your honest feedback inspires our artistry and helps other women find trusted salon care.
-          </p>
-          <a
-            href="https://wa.me/918810359438?text=Hello%20Preeti%20Makeover,%20I%20would%20like%20to%20share%20my%20salon%20feedback."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-salon-maroon hover:text-white bg-salon-gold/20 hover:bg-salon-gold px-4 py-2 rounded-full border border-salon-gold/50 transition-all shadow-sm"
-          >
-            <MessageSquare className="w-3.5 h-3.5 text-salon-gold group-hover:text-white" />
-            <span>Share Feedback on WhatsApp</span>
-          </a>
         </div>
 
       </div>

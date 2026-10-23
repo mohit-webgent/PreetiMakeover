@@ -364,7 +364,7 @@ export default function Hero() {
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-[56px] lg:text-[62px] font-serif font-bold text-salon-maroon leading-[1.06] tracking-tight">
               <span className="hero-heading-line block opacity-0">Look good.</span>
-              <span className="hero-heading-line block opacity-0 italic font-normal text-salon-gold-dark">
+              <span className="hero-heading-line block opacity-0">
                 Feel even better.
               </span>
             </h1>

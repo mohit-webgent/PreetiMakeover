@@ -4,16 +4,16 @@ import Hero from '../components/sections/Hero';
 import BrandsShowcase from '../components/sections/BrandsShowcase';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
 import BotanicalLeaves from '../components/common/BotanicalLeaves';
-import { 
+import {
   Star,
-  Sparkles, 
-  ArrowRight, 
-  Scissors, 
-  HeartHandshake, 
-  Clock, 
-  MapPin, 
-  ShieldCheck, 
-  Check, 
+  Sparkles,
+  ArrowRight,
+  Scissors,
+  HeartHandshake,
+  Clock,
+  MapPin,
+  ShieldCheck,
+  Check,
   Calendar,
   Phone,
   Eye,
@@ -179,14 +179,10 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               <span className="font-cinzel text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-gold-dark font-bold block mb-2">
                 CLIENT FAVORITES & TOP PICKS
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-cinzel font-bold text-salon-maroon tracking-tight">
-                Our Most Loved <span className="font-cormorant italic font-normal text-salon-gold-dark">Services</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
+                Our Most Loved Services
               </h2>
-              <div className="flex items-center gap-2 mt-3.5">
-                <div className="w-12 h-[2px] bg-salon-gold"></div>
-                <div className="w-1.5 h-1.5 rotate-45 bg-salon-gold"></div>
-                <div className="w-6 h-px bg-salon-gold/50"></div>
-              </div>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3.5"></div>
             </div>
 
             <Link
@@ -260,11 +256,6 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-salon-gold/20 border border-salon-gold/30 text-salon-gold text-xs font-semibold uppercase tracking-widest">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Specialized Bridal & Occasion Studio</span>
-                </div>
-
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
                   High-Definition Bridal Artistry
                 </h2>
@@ -312,81 +303,86 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <BrandsShowcase />
 
       {/* 6. Portfolio Preview Section */}
-      <section className="py-24 bg-salon-blush relative overflow-hidden">
+      <section className="py-16 sm:py-24 bg-salon-blush relative overflow-hidden">
         <BotanicalLeaves variant="right" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4 sm:gap-6">
             <div>
-              <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
+              <span className="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-salon-gold-dark font-semibold block mb-2">
                 PORTFOLIO SNAPSHOT
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
                 Salon Work Gallery
               </h2>
-              <div className="w-16 h-0.5 bg-salon-gold mt-3"></div>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3"></div>
             </div>
 
             <Link
               to="/gallery"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-salon-maroon hover:text-salon-gold-dark transition-colors group"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-cinzel font-semibold tracking-wider text-salon-maroon hover:text-salon-gold-dark transition-colors group"
             >
               <span>View Full Gallery With Filter & Zoom</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform text-salon-gold-dark" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Visual Transformation Photo Cards - Clean, Pure Photography, No Bulky Text */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {[
               {
                 title: 'Royal Indian Bridal HD Glam',
                 category: 'Bridal Makeover',
-                desc: 'Flawless foundation with gold accents and bespoke floral hairdo.'
+                image: '/gallery-bridal.jpg'
               },
               {
                 title: 'Nanoplastia & Hair Botox Glow',
                 category: 'Hair Treatments',
-                desc: 'Mirror shine, silk smooth rejuvenation with Schwarzkopf therapy.'
+                image: '/gallery-hair.jpg'
               },
               {
                 title: 'Cocktail & Evening Glam Makeup',
                 category: 'Occasion Artistry',
-                desc: 'Smokey sculpted eyes with soft contour and nude lip finish.'
+                image: '/gallery-makeup.jpg'
               },
               {
                 title: 'Bespoke Gel Nail Extensions',
                 category: 'Nail Artistry',
-                desc: 'Elegant French almond tips with subtle chrome shimmer.'
+                image: '/gallery-nails.jpg'
               }
             ].map((p, idx) => (
-              <div
+              <Link
                 key={idx}
-                className="group relative rounded-3xl overflow-hidden bg-white border border-salon-babypink/70 shadow-sm hover:shadow-luxury transition-all duration-300 p-6 flex flex-col justify-between"
+                to="/gallery"
+                className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-sm hover:shadow-luxury-lg transition-all duration-500 hover:-translate-y-1 block select-none bg-black/5"
               >
-                <div>
-                  <div className="w-12 h-12 rounded-2xl bg-salon-babypink text-salon-maroon flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                    <Camera className="w-6 h-6 text-salon-gold-dark" />
-                  </div>
-                  <span className="text-[10px] uppercase tracking-widest text-salon-gold-dark font-bold block mb-1">
+                {/* Full-Bleed Photograph with Smooth Zoom */}
+                <img
+                  src={p.image}
+                  alt={p.title}
+                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out pointer-events-none"
+                  loading="lazy"
+                />
+
+                {/* Subtle Contrast Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 pointer-events-none"></div>
+
+                {/* Top Category Badge */}
+                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-[8.5px] sm:text-[9.5px] font-cinzel font-semibold uppercase tracking-wider text-white">
                     {p.category}
                   </span>
-                  <h4 className="font-serif text-lg font-bold text-salon-maroon mb-2">
-                    {p.title}
-                  </h4>
-                  <p className="text-xs text-salon-text/70 leading-relaxed font-light">
-                    {p.desc}
-                  </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-salon-babypink/50">
-                  <Link
-                    to="/gallery"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-salon-maroon hover:text-salon-gold-dark transition-colors"
-                  >
+                {/* Bottom Title & Eye Icon Overlay */}
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-10 flex items-end justify-between gap-2 pointer-events-none">
+                  <span className="font-cinzel text-xs sm:text-[13.5px] font-bold text-white leading-tight drop-shadow-md line-clamp-2 group-hover:text-salon-gold-light transition-colors">
+                    {p.title}
+                  </span>
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center shrink-0 group-hover:bg-salon-maroon group-hover:border-salon-gold group-hover:text-salon-gold transition-all duration-300 shadow-sm">
                     <Eye className="w-3.5 h-3.5" />
-                    <span>View in Lightbox</span>
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -5,10 +5,8 @@ import BrandsShowcase from '../components/sections/BrandsShowcase';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
 import BotanicalLeaves from '../components/common/BotanicalLeaves';
 import {
-  Star,
   Sparkles,
   ArrowRight,
-  Scissors,
   HeartHandshake,
   Clock,
   MapPin,
@@ -16,8 +14,7 @@ import {
   Check,
   Calendar,
   Phone,
-  Eye,
-  Camera
+  Eye
 } from 'lucide-react';
 
 export default function HomePage({ categories = [], testimonials = [], galleryImages = [], onSelectService }) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, MessageSquare, Heart } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Reusable Matisse-style Abstract Continuous Line-Art Face with Organic Blobs
 function FaceArtSvg({ className = "w-full h-full" }) {

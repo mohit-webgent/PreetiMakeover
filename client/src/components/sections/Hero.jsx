@@ -202,11 +202,11 @@ export default function Hero() {
               <div className="hero-image-glow absolute inset-0 -inset-x-6 -inset-y-4 bg-[radial-gradient(ellipse_at_center,rgba(197,161,90,0.15)_0%,rgba(217,140,163,0.08)_40%,transparent_70%)] pointer-events-none blur-xl opacity-0"></div>
 
               {/* Decorative arch border */}
-              <div className="absolute -inset-3 rounded-t-[195px] rounded-b-3xl border border-salon-gold/20 pointer-events-none"></div>
+              <div className="absolute -inset-3 rounded-t-[195px] rounded-b-3xl border border-salon-gold/30 pointer-events-none"></div>
 
-              {/* Main Image Container */}
+              {/* Main Image Container with Rich Luxury Box Shadow */}
               <motion.div
-                className="relative rounded-t-[185px] rounded-b-3xl overflow-hidden shadow-luxury-lg border border-salon-gold/20"
+                className="relative rounded-t-[185px] rounded-b-3xl overflow-hidden shadow-[0_25px_60px_-12px_rgba(71,18,34,0.38),0_12px_28px_-8px_rgba(0,0,0,0.22)] border border-salon-gold/35 ring-1 ring-salon-gold/20"
                 whileHover={{ scale: 1.015 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               >

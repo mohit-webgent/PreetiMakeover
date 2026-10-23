@@ -164,14 +164,14 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 3. Curated Signature Offerings Section */}
-      <section className="py-24 bg-salon-blush relative overflow-hidden">
+      <section className="py-10 sm:py-14 bg-salon-blush relative overflow-hidden">
         <BotanicalLeaves variant="corners" />
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/5 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-babypink/25 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 lg:mb-16 gap-4 sm:gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4 sm:gap-6">
             <div>
               <span className="font-cinzel text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-gold-dark font-bold block mb-2">
                 CLIENT FAVORITES & TOP PICKS
@@ -246,7 +246,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 4. Dedicated Bridal Feature Spotlight */}
-      <section className="py-20 bg-salon-blush">
+      <section className="py-8 sm:py-12 bg-salon-blush">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-[36px] bg-gradient-to-br from-salon-maroon-deep via-salon-maroon to-salon-maroon-light text-salon-blush p-8 sm:p-14 relative overflow-hidden shadow-luxury-lg border border-salon-gold/30">
             <div className="absolute right-0 top-0 w-96 h-96 bg-salon-gold/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -300,10 +300,10 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <BrandsShowcase />
 
       {/* 6. Portfolio Preview Section */}
-      <section className="py-16 sm:py-24 bg-salon-blush relative overflow-hidden">
+      <section className="py-10 sm:py-14 bg-salon-blush relative overflow-hidden">
         <BotanicalLeaves variant="right" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4 sm:gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4 sm:gap-6">
             <div>
               <span className="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-salon-gold-dark font-semibold block mb-2">
                 PORTFOLIO SNAPSHOT
@@ -389,7 +389,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <TestimonialsSection testimonials={testimonials} />
 
       {/* 8. Studio Story & Values Teaser */}
-      <section className="py-20 bg-salon-blush border-t border-salon-babypink/60 relative overflow-hidden">
+      <section className="py-10 sm:py-14 bg-salon-blush border-t border-salon-babypink/60 relative overflow-hidden">
         <BotanicalLeaves variant="left" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -453,7 +453,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 9. Grand Booking Call-to-Action Banner (Compact, Full-Width & Clean) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#230412] via-[#1A030E] to-[#2B0618] text-white py-12 sm:py-14 border-y border-salon-gold/30">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#230412] via-[#1A030E] to-[#2B0618] text-white py-9 sm:py-11 border-y border-salon-gold/30">
         
         {/* Full-width Ambient Glows */}
         <div className="absolute top-0 right-1/4 w-96 h-64 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none" />

@@ -94,7 +94,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative pt-24 pb-20 sm:pb-24 md:pt-22 md:pb-20 overflow-hidden bg-gradient-to-br from-[#FCEBF1] via-[#FCE3EC] to-[#FDF2F7]"
+      className="relative pt-20 sm:pt-22 pb-10 sm:pb-12 md:pb-12 overflow-hidden bg-gradient-to-br from-[#FCEBF1] via-[#FCE3EC] to-[#FDF2F7]"
     >
       {/* ── Soft Background ── */}
       <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(197,161,90,0.1)_0%,transparent_60%)] pointer-events-none"></div>

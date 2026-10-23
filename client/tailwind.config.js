@@ -33,8 +33,8 @@ export default {
             subtle: '#FAF4E8'
           },
           blush: {
-            DEFAULT: '#FFF7F9',
-            light: '#FFFFFF',
+            DEFAULT: '#F8DDE5',
+            light: '#FCEBF1',
             accent: '#FDEEF2'
           },
           text: {
@@ -58,13 +58,13 @@ export default {
             subtle: '#FAF4E8'
           },
           ivory: {
-            DEFAULT: '#FFF7F9',
+            DEFAULT: '#FCEBF1',
             warm: '#F8DDE5',
             pure: '#FFFFFF'
           },
           blush: {
             DEFAULT: '#F8DDE5',
-            light: '#FFF7F9',
+            light: '#FCEAEF',
             rose: '#D98CA3'
           }
         }

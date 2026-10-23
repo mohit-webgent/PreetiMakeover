@@ -94,7 +94,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative pt-24 pb-20 sm:pb-24 md:pt-22 md:pb-20 overflow-hidden bg-gradient-to-br from-salon-blush via-salon-babypink-light to-[#FBF3E8]"
+      className="relative pt-24 pb-20 sm:pb-24 md:pt-22 md:pb-20 overflow-hidden bg-gradient-to-br from-[#FCEBF1] via-[#FCE3EC] to-[#FDF2F7]"
     >
       {/* ── Soft Background ── */}
       <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(197,161,90,0.1)_0%,transparent_60%)] pointer-events-none"></div>
@@ -353,7 +353,7 @@ export default function Hero() {
       </div>
 
       {/* ── Main Content ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
 
           {/* Left Column */}
@@ -434,7 +434,7 @@ export default function Hero() {
           {/* Right Column: Hero Image */}
           <motion.div
             style={{ y: isDesktop ? imageY : 0 }}
-            className="lg:col-span-5 flex justify-center lg:justify-end pb-8 sm:pb-10 lg:pb-0"
+            className="lg:col-span-5 flex justify-center lg:justify-center pb-8 sm:pb-10 lg:pb-0"
           >
             <div className="hero-image-container opacity-0 relative w-full max-w-[380px] sm:max-w-[420px]">
 

@@ -6,7 +6,7 @@ export default function BrandsShowcase() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section className="py-20 bg-white border-y border-salon-babypink/60">
+    <section className="py-20 bg-salon-blush border-y border-salon-babypink/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}

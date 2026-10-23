@@ -1,3 +1,4 @@
+import BotanicalLeaves from '../components/common/BotanicalLeaves';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -68,7 +69,8 @@ export default function BridalPage({ onSelectService }) {
     <div className="pt-28 pb-24 bg-salon-blush min-h-screen">
       
       {/* 1. Bridal Editorial Header */}
-      <div className="bg-gradient-to-b from-white to-salon-blush border-b border-salon-babypink/60 py-16">
+      <div className="bg-salon-blush border-b border-salon-babypink/60 py-16 relative overflow-hidden">
+        <BotanicalLeaves variant="top-right" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <nav className="flex items-center gap-2 text-xs text-salon-text/60 mb-4" aria-label="Breadcrumb">

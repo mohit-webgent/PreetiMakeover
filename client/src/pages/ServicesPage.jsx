@@ -1,3 +1,4 @@
+import BotanicalLeaves from '../components/common/BotanicalLeaves';
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -61,7 +62,8 @@ export default function ServicesPage({ categories = [], loading = false, error =
     <div className="pt-28 pb-24 bg-salon-blush min-h-screen">
       
       {/* 1. Page Header */}
-      <div className="bg-white border-b border-salon-babypink/60 py-14">
+      <div className="bg-salon-blush border-b border-salon-babypink/60 py-14 relative overflow-hidden">
+        <BotanicalLeaves variant="top-right" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Breadcrumb */}
@@ -144,7 +146,8 @@ export default function ServicesPage({ categories = [], loading = false, error =
       </div>
 
       {/* 2. Main Services List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative overflow-hidden">
+        <BotanicalLeaves variant="top-right" />
         {loading ? (
           <div className="text-center py-20">
             <div className="w-12 h-12 rounded-full border-2 border-salon-gold border-t-transparent animate-spin mx-auto mb-4"></div>

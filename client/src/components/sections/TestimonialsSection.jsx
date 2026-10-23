@@ -30,7 +30,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
   ];
 
   return (
-    <section id="reviews" className="py-24 bg-white border-t border-brand-blush/40">
+    <section id="reviews" className="py-24 bg-salon-blush border-t border-salon-babypink/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header matching PDF Page 2 */}

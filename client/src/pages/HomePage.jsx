@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import Hero from '../components/sections/Hero';
 import BrandsShowcase from '../components/sections/BrandsShowcase';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
+import BotanicalLeaves from '../components/common/BotanicalLeaves';
 import { 
+  Star,
   Sparkles, 
   ArrowRight, 
   Scissors, 
@@ -26,28 +28,32 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       category: 'Bridal Studio',
       desc: 'Flawless high-definition bridal glam with bespoke hair draping and long-wear waterproof skin prep.',
       badge: 'Most Requested',
-      link: '/bridal-makeup'
+      link: '/bridal-makeup',
+      image: '/signature-bridal.jpg'
     },
     {
       name: 'Casmara Luxury Algae Facial',
       category: 'Clinical Skincare',
       desc: 'Spanish peel-off algae mask delivering intense hydration, firming and luminous radiance.',
       badge: 'Skin Glow',
-      link: '/services'
+      link: '/services',
+      image: '/signature-facial.jpg'
     },
     {
       name: 'Hair Botox & Nanoplastia Restoration',
       category: 'Hair Treatments',
       desc: 'Advanced structural realignment and keratin sealing for mirror-shine, frizz-free hair.',
       badge: 'Restorative',
-      link: '/services'
+      link: '/services',
+      image: '/signature-hair.jpg'
     },
     {
       name: 'Italian Rica Liposoluble Waxing',
       category: 'Hygienic Care',
       desc: 'Gentle, 98% natural origin colophony-free wax designed for sensitive and delicate skin.',
       badge: 'Painless Care',
-      link: '/services'
+      link: '/services',
+      image: '/signature-waxing.jpg'
     }
   ];
 
@@ -161,61 +167,86 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 3. Curated Signature Offerings Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <section className="py-24 bg-salon-blush relative overflow-hidden">
+        <BotanicalLeaves variant="corners" />
+        {/* Subtle Ambient Background Gradients */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-babypink/25 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 lg:mb-16 gap-4 sm:gap-6">
             <div>
-              <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
-                EXQUISITE CRAFTSMANSHIP
+              <span className="font-cinzel text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-gold-dark font-bold block mb-2">
+                CLIENT FAVORITES & TOP PICKS
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
-                Signature Transformations
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-cinzel font-bold text-salon-maroon tracking-tight">
+                Our Most Loved <span className="font-cormorant italic font-normal text-salon-gold-dark">Services</span>
               </h2>
-              <div className="w-16 h-0.5 bg-salon-gold mt-3"></div>
+              <div className="flex items-center gap-2 mt-3.5">
+                <div className="w-12 h-[2px] bg-salon-gold"></div>
+                <div className="w-1.5 h-1.5 rotate-45 bg-salon-gold"></div>
+                <div className="w-6 h-px bg-salon-gold/50"></div>
+              </div>
             </div>
 
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-salon-maroon hover:text-salon-gold-dark transition-colors group"
+              className="inline-flex items-center gap-2.5 text-xs sm:text-sm font-cinzel font-semibold tracking-wider text-salon-maroon hover:text-salon-gold-dark transition-colors group"
             >
               <span>Explore All 27 Salon Services</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform text-salon-gold-dark" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-3">
             {signatureTreatments.map((item, idx) => (
-              <div
+              <Link
                 key={idx}
-                className="group relative bg-salon-blush rounded-3xl p-7 border border-salon-babypink/70 hover:border-salon-gold/60 hover:shadow-luxury transition-all duration-300 flex flex-col justify-between"
+                to={item.link}
+                className="group relative aspect-square rounded-none overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-luxury hover:shadow-luxury-lg p-3 sm:p-4 lg:p-5 flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 cursor-pointer block select-none"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-salon-babypink text-salon-maroon border border-salon-rose/30">
-                      {item.badge}
-                    </span>
-                    <span className="text-xs font-serif text-salon-gold-dark">0{idx + 1}</span>
-                  </div>
+                {/* Background Image with Zoom on Hover */}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
+                  loading="lazy"
+                />
 
-                  <span className="text-[11px] uppercase tracking-widest text-salon-gold-dark font-medium block mb-1">
-                    {item.category}
+                {/* Luxury Gradient Dark Overlay for Ultra Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1A030D]/95 via-[#2A0617]/75 to-[#1A030D]/40 transition-colors duration-500 group-hover:from-[#14020A]/98 group-hover:via-[#220412]/70 pointer-events-none"></div>
+
+                {/* Ambient Gold Radial Glow on Card Corner */}
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-salon-gold/15 rounded-full blur-2xl pointer-events-none group-hover:bg-salon-gold/30 transition-all duration-500"></div>
+
+                {/* Top Badge & Number */}
+                <div className="relative z-10 flex items-center justify-between">
+                  <span className="px-1.5 sm:px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9.5px] font-sans font-bold uppercase tracking-wider bg-black/45 backdrop-blur-md text-salon-gold-light border border-salon-gold/35 shadow-sm">
+                    {item.badge}
                   </span>
-                  <h3 className="font-serif text-xl font-bold text-salon-maroon mb-2.5 leading-snug group-hover:text-salon-maroon-light transition-colors">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs text-salon-text/75 font-light leading-relaxed mb-6">
-                    {item.desc}
-                  </p>
+                  <span className="font-cinzel text-[10px] sm:text-xs font-semibold tracking-widest text-salon-gold/85 drop-shadow-sm">
+                    0{idx + 1}
+                  </span>
                 </div>
 
-                <Link
-                  to={item.link}
-                  className="inline-flex items-center justify-between w-full pt-4 border-t border-salon-babypink/60 text-xs font-semibold text-salon-maroon group-hover:text-salon-gold-dark transition-colors"
-                >
-                  <span>Learn Details & Book</span>
-                  <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
+                {/* Bottom Content & Action */}
+                <div className="relative z-10">
+                  <span className="text-[8px] sm:text-[9.5px] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-cinzel font-bold text-salon-gold block mb-0.5 sm:mb-1 drop-shadow-sm">
+                    {item.category}
+                  </span>
+                  <h3 className="font-cinzel text-[11.5px] sm:text-[14px] lg:text-[16px] font-bold text-white mb-0.5 sm:mb-1 leading-snug group-hover:text-salon-gold-light transition-colors line-clamp-2 drop-shadow-md">
+                    {item.name}
+                  </h3>
+                  <p className="text-[9.5px] sm:text-[11px] text-white/75 font-sans font-light leading-snug line-clamp-1 sm:line-clamp-2 mb-1.5 sm:mb-2.5 drop-shadow-sm">
+                    {item.desc}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-1 sm:pt-2 border-t border-white/15 text-[9px] sm:text-[10.5px] lg:text-[11px] font-cinzel font-semibold tracking-wider text-salon-gold group-hover:text-white transition-colors">
+                    <span>Explore & Book</span>
+                    <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1.5 transition-transform text-salon-gold" />
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -281,7 +312,8 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <BrandsShowcase />
 
       {/* 6. Portfolio Preview Section */}
-      <section className="py-24 bg-salon-blush">
+      <section className="py-24 bg-salon-blush relative overflow-hidden">
+        <BotanicalLeaves variant="right" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
             <div>
@@ -364,7 +396,8 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <TestimonialsSection testimonials={testimonials} />
 
       {/* 8. Studio Story & Values Teaser */}
-      <section className="py-20 bg-salon-blush border-t border-salon-babypink/60">
+      <section className="py-20 bg-salon-blush border-t border-salon-babypink/60 relative overflow-hidden">
+        <BotanicalLeaves variant="left" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-5">
@@ -427,7 +460,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 9. Grand Booking Call-to-Action Banner */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-salon-blush">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="rounded-[36px] bg-gradient-to-r from-salon-babypink/80 via-salon-blush to-salon-babypink/60 border border-salon-rose/30 p-10 sm:p-14 shadow-luxury">
             <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-bold block mb-2">

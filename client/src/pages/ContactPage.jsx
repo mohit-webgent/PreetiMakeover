@@ -1,3 +1,4 @@
+import BotanicalLeaves from '../components/common/BotanicalLeaves';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -147,7 +148,8 @@ export default function ContactPage({ categories = [], selectedService, onClearS
     <div className="pt-28 pb-24 bg-salon-blush min-h-screen">
       
       {/* 1. Page Header */}
-      <div className="bg-white border-b border-salon-babypink/60 py-14">
+      <div className="bg-salon-blush border-b border-salon-babypink/60 py-14 relative overflow-hidden">
+        <BotanicalLeaves variant="top-right" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <nav className="flex items-center gap-2 text-xs text-salon-text/60 mb-4" aria-label="Breadcrumb">
@@ -173,7 +175,8 @@ export default function ContactPage({ categories = [], selectedService, onClearS
       </div>
 
       {/* 2. Main Form & Location Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative overflow-hidden">
+        <BotanicalLeaves variant="top-right" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
           {/* Left Column: Booking Form */}

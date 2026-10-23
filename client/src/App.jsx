@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer';
 import MobileQuickBar from './components/layout/MobileQuickBar';
 import ScrollToTop from './components/common/ScrollToTop';
 import FloatingWhatsApp from './components/common/FloatingWhatsApp';
+import BotanicalLeaves from './components/common/BotanicalLeaves';
 
 // Multi-Page Routes
 import HomePage from './pages/HomePage';
@@ -45,6 +46,8 @@ function AppLayout({
   return (
     <div className="min-h-screen flex flex-col bg-salon-blush text-salon-text font-sans antialiased selection:bg-salon-gold/30 selection:text-salon-maroon">
       <ScrollToTop />
+      {/* Global Botanical Watermarks across all pages */}
+      <BotanicalLeaves variant="corners" className="fixed inset-0 pointer-events-none z-0 opacity-70" />
 
       {/* Public Header Navigation (Hidden on Admin portal for clean workspace) */}
       {!isAdminRoute && <Navbar />}

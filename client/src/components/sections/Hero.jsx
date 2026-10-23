@@ -107,7 +107,7 @@ export default function Hero({ content = {} }) {
   return (
     <section
       ref={heroRef}
-      className="relative pt-22 sm:pt-24 pb-14 sm:pb-16 md:pb-16 overflow-hidden bg-gradient-to-br from-[#FCEBF1] via-[#FCE3EC] to-[#FDF2F7]"
+      className="relative pt-28 sm:pt-28 lg:pt-32 pb-14 sm:pb-16 md:pb-16 overflow-hidden bg-gradient-to-br from-[#FCEBF1] via-[#FCE3EC] to-[#FDF2F7]"
     >
       {/* ── Soft Background ── */}
       <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(197,161,90,0.1)_0%,transparent_60%)] pointer-events-none"></div>
@@ -131,7 +131,7 @@ export default function Hero({ content = {} }) {
 
           {/* Left Column */}
           <motion.div
-            style={{ y: textY }}
+            style={{ y: isDesktop ? textY : 0 }}
             className="lg:col-span-7 space-y-4 text-center lg:text-left"
           >
             {/* Main Heading */}

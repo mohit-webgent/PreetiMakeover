@@ -99,6 +99,11 @@
   animation: pulseGold 3s infinite ease-in-out;
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-200px); }
+  100% { transform: translateX(calc(100vw + 200px)); }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

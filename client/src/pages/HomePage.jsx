@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Hero from '../components/sections/Hero';
 import BrandsShowcase from '../components/sections/BrandsShowcase';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
-import BotanicalLeaves from '../components/common/BotanicalLeaves';
+
 import {
   Sparkles,
   ArrowRight,
@@ -165,7 +165,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
 
       {/* 3. Curated Signature Offerings Section */}
       <section className="py-14 sm:py-18 bg-salon-blush relative overflow-hidden">
-        <BotanicalLeaves variant="corners" />
+        
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/5 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-babypink/25 rounded-full blur-3xl pointer-events-none"></div>
@@ -301,7 +301,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
 
       {/* 6. Portfolio Preview Section */}
       <section className="py-14 sm:py-18 bg-salon-blush relative overflow-hidden">
-        <BotanicalLeaves variant="right" />
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4 sm:gap-6">
             <div>
@@ -390,7 +390,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
 
       {/* 8. Studio Story & Values Teaser */}
       <section className="py-14 sm:py-18 bg-salon-blush border-t border-salon-babypink/60 relative overflow-hidden">
-        <BotanicalLeaves variant="left" />
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-5">

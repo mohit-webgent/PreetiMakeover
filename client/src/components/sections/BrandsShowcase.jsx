@@ -10,7 +10,7 @@ import {
   Award,
   ArrowRight
 } from 'lucide-react';
-import BotanicalLeaves from '../common/BotanicalLeaves';
+
 
 export default function BrandsShowcase() {
   const [activeTab, setActiveTab] = useState(0);
@@ -61,7 +61,7 @@ export default function BrandsShowcase() {
   return (
     <section className="py-14 sm:py-18 bg-salon-blush border-y border-salon-babypink/60 relative overflow-hidden">
       {/* Background Botanical Leaves */}
-      <BotanicalLeaves variant="corners" />
+      
 
       {/* Subtle Ambient Background Glows */}
       <div className="absolute top-1/2 left-10 w-80 h-80 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>

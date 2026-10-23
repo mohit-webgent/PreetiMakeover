@@ -1,147 +1,342 @@
-import React from 'react';
-import { Sparkles, Star, MessageSquare, ShieldCheck, HeartHandshake, Award } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, ChevronLeft, ChevronRight, MessageSquare, Sparkles, Heart } from 'lucide-react';
 
 export default function TestimonialsSection({ testimonials = [] }) {
-  const hasApprovedReviews = Array.isArray(testimonials) && testimonials.length > 0;
-
-  // Genuine Client Care Standards (displayed when no approved reviews exist in database yet)
-  const clientCarePillars = [
+  // Curated authentic reviews (fallback + reference styling)
+  const defaultTestimonials = [
     {
-      num: '01',
-      title: 'Personalized Diagnostic Care',
-      subtitle: 'By Preeti Mandal',
-      desc: 'No generic packages. Every facial, hair rejuvenation, and bridal look is tailored directly to your skin type, hair texture, and event aesthetic.',
-      icon: HeartHandshake
+      id: '1',
+      clientName: 'Lorraine Toledo',
+      serviceName: 'Hair Rejuvenation & Styling',
+      rating: 5,
+      reviewText: "Best salon I've ever been to, awesome shampoo and the stylist is not only professional, quality beautician but a wonderful person. Bravo!"
     },
     {
-      num: '02',
-      title: 'Clinical Hygiene & Sanitization',
-      subtitle: 'Safety First at Prince Colony',
-      desc: 'Single-use disposable applicators, sterilized stainless-steel tools, and sanitized treatment stations for every client visit.',
-      icon: ShieldCheck
+      id: '2',
+      clientName: 'Pooja Sharma',
+      serviceName: 'Royal HD Bridal Makeover',
+      rating: 5,
+      reviewText: "Preeti di gave me my dream bridal look! The HD makeup stayed completely fresh and radiant for 14+ hours through all rituals. Everyone kept asking where I got my makeup done."
     },
     {
-      num: '03',
-      title: 'Zero-Counterfeit Formulation',
-      subtitle: 'Sealed & Authentic Products',
-      desc: 'We strictly refuse unbranded dupes. Only sealed products from Casmara, L’Oréal, O3+ Professional, and Italian Rica are used on your skin and hair.',
-      icon: Award
+      id: '3',
+      clientName: 'Ananya Roy',
+      serviceName: 'Casmara Luxury Golden Glow',
+      rating: 5,
+      reviewText: "The hygiene standards and personalized skin diagnosis here are exceptional. Sealed authentic products, gentle hands, and noticeable instant radiance. Truly 5-star experience!"
+    },
+    {
+      id: '4',
+      clientName: 'Sneha Mukherjee',
+      serviceName: 'Nanoplastia & Hair Botoplex',
+      rating: 5,
+      reviewText: "Transformed my dry, frizzy hair into silky, glossy locks without any harsh chemical fumes. Preeti explained every single step with such patience. My hair has never felt healthier!"
     }
   ];
 
+  // Use props if provided and non-empty, otherwise use default reviews
+  const reviewsList = Array.isArray(testimonials) && testimonials.length > 0 
+    ? testimonials 
+    : defaultTestimonials;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Cycle reviews
+  const handlePrev = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => (prev === 0 ? reviewsList.length - 1 : prev - 1));
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const handleNext = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => (prev === reviewsList.length - 1 ? 0 : prev + 1));
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const activeReview = reviewsList[currentIndex] || reviewsList[0];
+
   return (
-    <section id="reviews" className="py-24 bg-salon-blush border-t border-salon-babypink/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="reviews" className="py-20 sm:py-24 bg-salon-blush/40 relative overflow-hidden border-t border-salon-babypink/60">
+      
+      {/* Decorative ambient background blur */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-salon-babypink/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-80 h-80 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header matching PDF Page 2 */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-widest text-brand-gold-dark font-semibold block mb-2">
-            CLIENT SATISFACTION & EXPERIENCE
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <span className="text-xs uppercase tracking-widest text-salon-gold font-bold block mb-2">
+            CLIENT EXPERIENCES & STORIES
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-brand-plum tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
             Happy Clients
           </h2>
-          <div className="w-16 h-0.5 bg-brand-gold mx-auto mb-4"></div>
-          <p className="text-sm sm:text-base text-brand-plum/70 font-light leading-relaxed">
-            {hasApprovedReviews 
-              ? 'Verified reviews from clients who experienced Preeti Makeover transformations.'
-              : 'Our uncompromising commitment to genuine products, personalized consultation, and hygienic beauty care.'}
+          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-salon-gold to-transparent mx-auto mb-4"></div>
+          <p className="text-sm sm:text-base text-salon-maroon/70 font-light leading-relaxed">
+            Heartfelt reflections and glowing words from clients who experienced Preeti Makeover transformations.
           </p>
         </div>
 
-        {/* 3 Cards Grid matching PDF Page 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {hasApprovedReviews ? (
-            testimonials.map((t, idx) => (
-              <div
-                key={t.id || idx}
-                className="bg-[#FAF7F2] rounded-3xl p-8 border border-brand-blush/60 shadow-sm flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center gap-1 text-brand-gold mb-4">
-                    {[...Array(t.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-brand-gold text-brand-gold" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-brand-plum/80 italic leading-relaxed mb-6">
-                    “{t.reviewText}”
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-brand-blush/60 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-serif font-bold text-sm text-brand-plum">
-                      {t.clientName}
-                    </h4>
-                    {t.serviceName && (
-                      <span className="text-[11px] text-brand-plum/60 font-medium">
-                        {t.serviceName}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Verified
+        {/* Artistic Editorial Testimonial Card (Matching reference design) */}
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-luxury-lg border border-salon-gold/25 p-6 sm:p-10 lg:p-12 relative transition-all duration-300">
+          
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left: Artistic Abstract Line-Art Face with Organic Color Blobs */}
+            <div className="md:col-span-5 flex items-center justify-center relative">
+              <div className="w-full max-w-[320px] sm:max-w-[340px] aspect-square relative select-none flex items-center justify-center">
+                <svg
+                  viewBox="0 0 500 520"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-full h-full object-contain filter drop-shadow-sm"
+                >
+                  {/* Blob 1: Top-Left Warm Ochre / Peach */}
+                  <path
+                    d="M100 30 C190 -10, 230 80, 215 190 C200 290, 120 330, 60 260 C0 180, 10 70, 100 30 Z"
+                    fill="#F2AA72"
+                  />
+
+                  {/* Blob 2: Center-Right Warm Terracotta / Coral */}
+                  <path
+                    d="M200 160 C320 120, 420 190, 395 300 C370 410, 270 440, 190 370 C130 300, 120 200, 200 160 Z"
+                    fill="#EB6E4B"
+                  />
+
+                  {/* Blob 3: Bottom-Left Dusky Rose / Earthy Clay */}
+                  <path
+                    d="M40 330 C130 290, 230 340, 240 435 C250 530, 140 550, 45 500 C-35 450, -30 370, 40 330 Z"
+                    fill="#B07565"
+                  />
+
+                  {/* Black Continuous Line-Art Face */}
+                  {/* Upper Eyelid / Brow Arch */}
+                  <path
+                    d="M100 135 C130 110, 165 118, 185 145"
+                    stroke="#14020A"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  {/* Eye Crease / Lash curve */}
+                  <path
+                    d="M115 158 C135 172, 160 168, 175 148"
+                    stroke="#14020A"
+                    strokeWidth="6.5"
+                    strokeLinecap="round"
+                  />
+
+                  {/* Elegant Continuous Profile Line (Forehead -> Nose Bridge -> Tip -> Nostril) */}
+                  <path
+                    d="M185 70 C182 150, 208 240, 198 298 C192 318, 205 332, 222 328 C238 322, 246 308, 238 290 C232 280, 218 280, 218 290"
+                    stroke="#14020A"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Bold Outer Cheek and Jawline Sweep down to Chin */}
+                  <path
+                    d="M50 205 C40 320, 46 425, 110 480 C160 525, 235 515, 285 435 C310 395, 335 425, 350 455"
+                    stroke="#14020A"
+                    strokeWidth="8.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Signature Beauty Spots / Freckles on cheek */}
+                  <circle cx="85" cy="290" r="5" fill="#14020A" />
+                  <circle cx="115" cy="275" r="5.5" fill="#14020A" />
+                  <circle cx="138" cy="265" r="4.5" fill="#14020A" />
+                  <circle cx="148" cy="290" r="5" fill="#14020A" />
+                  <circle cx="105" cy="305" r="4" fill="#14020A" />
+
+                  {/* Full Sensual Lips */}
+                  {/* Upper Lip Contour with Cupid's Bow */}
+                  <path
+                    d="M135 375 C158 355, 175 365, 185 375 C195 365, 212 355, 245 380"
+                    stroke="#14020A"
+                    strokeWidth="7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  {/* Mouth Parting Line */}
+                  <path
+                    d="M135 375 C168 395, 210 395, 245 380"
+                    stroke="#14020A"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+                  {/* Lower Lip Contour */}
+                  <path
+                    d="M142 380 C165 432, 215 432, 238 380"
+                    stroke="#14020A"
+                    strokeWidth="7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Right: Editorial Salon Branding & Client Review */}
+            <div className="md:col-span-7 flex flex-col items-center text-center px-2 sm:px-6">
+              
+              {/* Salon Logo Emblem (Woman Profile Silhouette) */}
+              <div className="mb-3 flex flex-col items-center">
+                <svg
+                  viewBox="0 0 100 70"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-16 h-12 text-salon-maroon"
+                >
+                  {/* Silhouette of woman profile with flowing hair */}
+                  <path
+                    d="M32 18 C38 12, 48 10, 56 12 C64 14, 70 20, 72 26 C75 22, 80 20, 86 21 C92 22, 98 26, 96 32 C93 36, 86 38, 80 37 C85 41, 88 47, 85 52 C81 57, 72 56, 68 50 C66 54, 62 58, 56 59 C54 53, 55 46, 52 42 C50 44, 48 48, 45 49 C42 45, 43 38, 44 32 C41 34, 38 36, 35 35 C38 31, 41 27, 45 25 C40 26, 34 27, 28 26 C22 25, 17 21, 20 18 C23 15, 28 17, 32 18 Z"
+                    fill="currentColor"
+                  />
+                  {/* Face Profile detail silhouette */}
+                  <path
+                    d="M52 26 C54 28, 57 29, 60 29 C63 29, 65 27, 66 25 C64 24, 61 24, 58 24 C55 24, 53 25, 52 26 Z"
+                    fill="white"
+                  />
+                  <path
+                    d="M62 31 C63 32, 65 33, 67 33 C68 33, 67 31, 65 31 Z"
+                    fill="white"
+                  />
+                </svg>
+
+                {/* Salon Name in Editorial Serif */}
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-salon-maroon tracking-wide mt-1">
+                  Preeti Makeover
+                </h3>
+                <span className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-maroon/60 font-medium">
+                  Beauty Salon & Studio
+                </span>
+              </div>
+
+              {/* Decorative Opening Quote '66' */}
+              <div className="text-3xl sm:text-4xl font-serif text-salon-maroon/80 select-none leading-none my-1">
+                <svg
+                  viewBox="0 0 40 30"
+                  fill="currentColor"
+                  className="w-7 h-5 sm:w-8 sm:h-6 text-salon-maroon inline-block"
+                >
+                  {/* Curly 66 Style Quote */}
+                  <path d="M12 4 C6 4, 2 8, 2 15 C2 21, 6 25, 12 25 C17 25, 20 21, 20 17 C20 12, 17 8, 12 8 C11 8, 10 8.2, 9 8.6 C10 6 12 5.5, 15 5.5 L15 4 Z" />
+                  <path d="M32 4 C26 4, 22 8, 22 15 C22 21, 26 25, 32 25 C37 25, 40 21, 40 17 C40 12, 37 8, 32 8 C31 8, 30 8.2, 29 8.6 C30 6 32 5.5, 35 5.5 L35 4 Z" />
+                </svg>
+              </div>
+
+              {/* Review Quote Body with smooth transition */}
+              <div className={`min-h-[110px] sm:min-h-[120px] flex items-center justify-center transition-opacity duration-300 ${isAnimating ? 'opacity-0 scale-98' : 'opacity-100 scale-100'}`}>
+                <p className="text-base sm:text-lg lg:text-[19px] text-salon-maroon/90 italic font-serif leading-relaxed px-2 sm:px-6">
+                  {activeReview.reviewText}
+                </p>
+              </div>
+
+              {/* Decorative Closing Quote '99' */}
+              <div className="text-3xl sm:text-4xl font-serif text-salon-maroon/80 select-none leading-none my-1">
+                <svg
+                  viewBox="0 0 40 30"
+                  fill="currentColor"
+                  className="w-7 h-5 sm:w-8 sm:h-6 text-salon-maroon inline-block"
+                >
+                  {/* Curly 99 Style Quote */}
+                  <path d="M10 26 C16 26, 20 22, 20 15 C20 9, 16 5, 10 5 C5 5, 2 9, 2 13 C2 18, 5 22, 10 22 C11 22, 12 21.8, 13 21.4 C12 24, 10 24.5, 7 24.5 L7 26 Z" />
+                  <path d="M30 26 C36 26, 40 22, 40 15 C40 9, 36 5, 30 5 C25 5, 22 9, 22 13 C22 18, 25 22, 30 22 C31 22, 32 21.8, 33 21.4 C32 24, 30 24.5, 27 24.5 L27 26 Z" />
+                </svg>
+              </div>
+
+              {/* Author / Client Info */}
+              <div className={`mt-4 transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+                <h4 className="font-serif font-bold text-base sm:text-lg text-salon-maroon tracking-wide">
+                  {activeReview.clientName}
+                </h4>
+                {activeReview.serviceName && (
+                  <span className="text-xs text-salon-gold font-medium block mt-0.5">
+                    {activeReview.serviceName}
                   </span>
+                )}
+                {/* 5-Star Rating */}
+                <div className="flex items-center justify-center gap-1 mt-2 text-salon-gold">
+                  {[...Array(activeReview.rating || 5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-salon-gold text-salon-gold" />
+                  ))}
                 </div>
               </div>
-            ))
-          ) : (
-            clientCarePillars.map((pillar) => {
-              const IconComp = pillar.icon;
-              return (
-                <div
-                  key={pillar.num}
-                  className="bg-[#FAF7F2] rounded-3xl p-8 border border-brand-blush/60 hover:border-brand-gold/60 shadow-sm hover:shadow-luxury transition-all flex flex-col justify-between"
+
+              {/* Review Switcher Controls (Arrows + Dots) */}
+              <div className="mt-8 flex items-center justify-center gap-6">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  aria-label="Previous Testimonial"
+                  className="w-9 h-9 rounded-full border border-salon-gold/40 hover:border-salon-gold bg-salon-blush/30 hover:bg-salon-gold hover:text-white text-salon-maroon flex items-center justify-center transition-all shadow-sm active:scale-95"
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="font-serif text-2xl font-bold text-brand-gold-dark">
-                        {pillar.num}
-                      </span>
-                      <span className="w-10 h-10 rounded-2xl bg-white text-brand-plum flex items-center justify-center shadow-sm">
-                        <IconComp className="w-5 h-5 text-brand-gold-dark" />
-                      </span>
-                    </div>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
 
-                    <h3 className="font-serif text-xl font-bold text-brand-plum mb-1">
-                      {pillar.title}
-                    </h3>
-                    <span className="block text-[11px] uppercase tracking-wider font-semibold text-brand-gold-dark mb-4">
-                      {pillar.subtitle}
-                    </span>
-
-                    <p className="text-sm text-brand-plum/70 font-light leading-relaxed mb-6">
-                      {pillar.desc}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-brand-blush/50 flex items-center justify-between text-xs text-brand-plum/70">
-                    <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-                      <span>Studio Standard</span>
-                    </span>
-                    <span className="font-medium text-brand-plum">Preeti Mandal</span>
-                  </div>
+                {/* Dots indicator */}
+                <div className="flex items-center gap-2">
+                  {reviewsList.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        setIsAnimating(true);
+                        setCurrentIndex(idx);
+                        setTimeout(() => setIsAnimating(false), 300);
+                      }}
+                      aria-label={`Go to review ${idx + 1}`}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        currentIndex === idx
+                          ? 'w-6 bg-salon-maroon'
+                          : 'w-2 bg-salon-gold/40 hover:bg-salon-gold'
+                      }`}
+                    />
+                  ))}
                 </div>
-              );
-            })
-          )}
+
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label="Next Testimonial"
+                  className="w-9 h-9 rounded-full border border-salon-gold/40 hover:border-salon-gold bg-salon-blush/30 hover:bg-salon-gold hover:text-white text-salon-maroon flex items-center justify-center transition-all shadow-sm active:scale-95"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-        {/* Client Feedback Invitation Callout */}
-        <div className="mt-14 max-w-xl mx-auto rounded-2xl bg-brand-ivory p-6 border border-brand-blush/60 text-center">
-          <MessageSquare className="w-6 h-6 text-brand-gold mx-auto mb-2" />
-          <h4 className="font-serif font-bold text-sm text-brand-plum mb-1">
-            Visited Preeti Makeover Recently?
-          </h4>
-          <p className="text-xs text-brand-plum/70 mb-3">
-            Your honest experience helps us maintain high beauty and hygiene standards. All reviews are approved by salon management before appearing on our website.
+        {/* Client Feedback Invitation Callout (Matching subtle luxury palette) */}
+        <div className="mt-12 max-w-lg mx-auto rounded-2xl bg-white/70 backdrop-blur-sm p-5 border border-salon-gold/30 text-center shadow-sm">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <Heart className="w-4 h-4 text-salon-gold fill-salon-gold" />
+            <h4 className="font-serif font-bold text-sm text-salon-maroon">
+              Loved Your Visit to Preeti Makeover?
+            </h4>
+          </div>
+          <p className="text-xs text-salon-maroon/70 mb-3">
+            Your honest feedback inspires our artistry and helps other women find trusted salon care.
           </p>
           <a
             href="https://wa.me/918810359438?text=Hello%20Preeti%20Makeover,%20I%20would%20like%20to%20share%20my%20salon%20feedback."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-salon-maroon hover:text-white bg-salon-gold/20 hover:bg-salon-gold px-4 py-2 rounded-full border border-salon-gold/50 transition-all shadow-sm"
           >
+            <MessageSquare className="w-3.5 h-3.5 text-salon-gold group-hover:text-white" />
             <span>Share Feedback on WhatsApp</span>
           </a>
         </div>

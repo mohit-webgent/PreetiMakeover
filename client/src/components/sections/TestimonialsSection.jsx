@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, MessageSquare, Sparkles, Heart } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, MessageSquare, Heart, Pause, Play } from 'lucide-react';
 
 export default function TestimonialsSection({ testimonials = [] }) {
   // Curated authentic reviews (fallback + reference styling)
@@ -31,6 +31,13 @@ export default function TestimonialsSection({ testimonials = [] }) {
       serviceName: 'Nanoplastia & Hair Botoplex',
       rating: 5,
       reviewText: "Transformed my dry, frizzy hair into silky, glossy locks without any harsh chemical fumes. Preeti explained every single step with such patience. My hair has never felt healthier!"
+    },
+    {
+      id: '5',
+      clientName: 'Riya Sengupta',
+      serviceName: 'Signature Hydra Facial & Care',
+      rating: 5,
+      reviewText: "From pain-free gentle waxing to the most soothing hydrating facial massage, Preeti Makeover is unmatched in hygiene and care. Love visiting every month!"
     }
   ];
 
@@ -41,20 +48,40 @@ export default function TestimonialsSection({ testimonials = [] }) {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Cycle reviews
+  // Auto-play: Rotate testimonials continuously every 4.5 seconds
+  useEffect(() => {
+    if (isPaused || reviewsList.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev === reviewsList.length - 1 ? 0 : prev + 1));
+        setIsAnimating(false);
+      }, 250);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [isPaused, reviewsList.length]);
+
+  // Manual navigation handlers
   const handlePrev = () => {
     if (isAnimating) return;
     setIsAnimating(true);
-    setCurrentIndex((prev) => (prev === 0 ? reviewsList.length - 1 : prev - 1));
-    setTimeout(() => setIsAnimating(false), 300);
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev === 0 ? reviewsList.length - 1 : prev - 1));
+      setIsAnimating(false);
+    }, 250);
   };
 
   const handleNext = () => {
     if (isAnimating) return;
     setIsAnimating(true);
-    setCurrentIndex((prev) => (prev === reviewsList.length - 1 ? 0 : prev + 1));
-    setTimeout(() => setIsAnimating(false), 300);
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev === reviewsList.length - 1 ? 0 : prev + 1));
+      setIsAnimating(false);
+    }, 250);
   };
 
   const activeReview = reviewsList[currentIndex] || reviewsList[0];
@@ -68,23 +95,33 @@ export default function TestimonialsSection({ testimonials = [] }) {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header */}
+        {/* Customer-friendly Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
           <span className="text-xs uppercase tracking-widest text-salon-gold font-bold block mb-2">
-            CLIENT EXPERIENCES & STORIES
+            HEARTFELT EXPERIENCES • REAL STORIES
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
-            Happy Clients
+            What Our Clients Say About Us
           </h2>
           <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-salon-gold to-transparent mx-auto mb-4"></div>
-          <p className="text-sm sm:text-base text-salon-maroon/70 font-light leading-relaxed">
-            Heartfelt reflections and glowing words from clients who experienced Preeti Makeover transformations.
+          <p className="text-sm sm:text-base text-salon-maroon/70 font-light leading-relaxed max-w-xl mx-auto">
+            Real experiences and lovely words from women who trusted Preeti Makeover for their bridal celebrations, hair transformations, and routine salon care.
           </p>
         </div>
 
-        {/* Artistic Editorial Testimonial Card (Matching reference design) */}
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-luxury-lg border border-salon-gold/25 p-6 sm:p-10 lg:p-12 relative transition-all duration-300">
+        {/* Artistic Editorial Testimonial Card (Auto-rotating with Pause on Hover) */}
+        <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className="max-w-4xl mx-auto bg-white rounded-3xl shadow-luxury-lg border border-salon-gold/25 p-6 sm:p-10 lg:p-12 relative transition-all duration-300 group"
+        >
           
+          {/* Subtle Live Auto-rotate Pulse badge */}
+          <div className="absolute top-4 right-5 sm:top-6 sm:right-8 flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-salon-maroon/50 bg-salon-blush/60 px-2.5 py-1 rounded-full border border-salon-gold/20 select-none">
+            <span className={`w-2 h-2 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
+            <span>{isPaused ? 'Paused' : 'Auto Playing'}</span>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left: Artistic Abstract Line-Art Face with Organic Color Blobs */}
@@ -234,9 +271,13 @@ export default function TestimonialsSection({ testimonials = [] }) {
               </div>
 
               {/* Review Quote Body with smooth transition */}
-              <div className={`min-h-[110px] sm:min-h-[120px] flex items-center justify-center transition-opacity duration-300 ${isAnimating ? 'opacity-0 scale-98' : 'opacity-100 scale-100'}`}>
-                <p className="text-base sm:text-lg lg:text-[19px] text-salon-maroon/90 italic font-serif leading-relaxed px-2 sm:px-6">
-                  {activeReview.reviewText}
+              <div className="min-h-[120px] sm:min-h-[130px] flex items-center justify-center">
+                <p
+                  className={`text-base sm:text-lg lg:text-[19px] text-salon-maroon/90 italic font-serif leading-relaxed px-2 sm:px-4 transition-all duration-300 transform ${
+                    isAnimating ? 'opacity-0 scale-95 translate-y-1' : 'opacity-100 scale-100 translate-y-0'
+                  }`}
+                >
+                  “{activeReview.reviewText}”
                 </p>
               </div>
 
@@ -253,8 +294,8 @@ export default function TestimonialsSection({ testimonials = [] }) {
                 </svg>
               </div>
 
-              {/* Author / Client Info */}
-              <div className={`mt-4 transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+              {/* Author / Client Info with smooth transition */}
+              <div className={`mt-4 transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`}>
                 <h4 className="font-serif font-bold text-base sm:text-lg text-salon-maroon tracking-wide">
                   {activeReview.clientName}
                 </h4>
@@ -272,7 +313,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
               </div>
 
               {/* Review Switcher Controls (Arrows + Dots) */}
-              <div className="mt-8 flex items-center justify-center gap-6">
+              <div className="mt-8 flex items-center justify-center gap-4 sm:gap-6">
                 <button
                   type="button"
                   onClick={handlePrev}
@@ -289,14 +330,17 @@ export default function TestimonialsSection({ testimonials = [] }) {
                       key={idx}
                       type="button"
                       onClick={() => {
+                        if (currentIndex === idx) return;
                         setIsAnimating(true);
-                        setCurrentIndex(idx);
-                        setTimeout(() => setIsAnimating(false), 300);
+                        setTimeout(() => {
+                          setCurrentIndex(idx);
+                          setIsAnimating(false);
+                        }, 250);
                       }}
                       aria-label={`Go to review ${idx + 1}`}
                       className={`h-2 rounded-full transition-all duration-300 ${
                         currentIndex === idx
-                          ? 'w-6 bg-salon-maroon'
+                          ? 'w-7 bg-salon-maroon'
                           : 'w-2 bg-salon-gold/40 hover:bg-salon-gold'
                       }`}
                     />
@@ -319,7 +363,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
 
         </div>
 
-        {/* Client Feedback Invitation Callout (Matching subtle luxury palette) */}
+        {/* Client Feedback Invitation Callout */}
         <div className="mt-12 max-w-lg mx-auto rounded-2xl bg-white/70 backdrop-blur-sm p-5 border border-salon-gold/30 text-center shadow-sm">
           <div className="flex items-center justify-center gap-2 mb-1">
             <Heart className="w-4 h-4 text-salon-gold fill-salon-gold" />

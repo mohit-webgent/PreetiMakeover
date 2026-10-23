@@ -151,35 +151,46 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Navigation Links - Solid Bold White / Gold, No Borders, Clean Editorial Spacing */}
-          <nav className="flex flex-col space-y-3 sm:space-y-4 my-auto py-3" aria-label="Mobile Navigation">
-            {navLinks.map((link) => (
+          {/* Navigation Links - Solid Bold White / Gold, Cinzel Luxury Font, No Borders, Clean Spacing */}
+          <nav className="flex flex-col space-y-2.5 sm:space-y-3.5 my-auto py-2" aria-label="Mobile Navigation">
+            {navLinks.map((link, idx) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 end={link.path === '/'}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between py-2 text-left transition-colors duration-200 border-none outline-none ${
+                  `group flex items-center justify-between py-2.5 text-left transition-all duration-200 border-none outline-none ${
                     isActive
-                      ? 'text-salon-gold font-serif font-bold text-2xl sm:text-3xl'
-                      : 'text-white hover:text-salon-gold font-serif font-semibold text-xl sm:text-2xl'
+                      ? 'text-salon-gold'
+                      : 'text-white/95 hover:text-salon-gold-light'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <span className="w-2 h-2 rounded-full bg-salon-gold shadow-gold-glow shrink-0 animate-pulse" />
-                      )}
-                      <span>{link.label}</span>
+                    <div className="flex items-center gap-3.5">
+                      <span className={`font-cinzel text-xs tracking-widest ${
+                        isActive ? 'text-salon-gold font-bold' : 'text-salon-gold/50 font-medium'
+                      }`}>
+                        0{idx + 1}
+                      </span>
+                      <span className={`font-cinzel tracking-[0.08em] uppercase transition-colors ${
+                        isActive 
+                          ? 'font-bold text-lg sm:text-xl text-salon-gold' 
+                          : 'font-semibold text-base sm:text-lg text-white group-hover:text-salon-gold-light'
+                      }`}>
+                        {link.label}
+                      </span>
                     </div>
-                    <ChevronRight
-                      className={`w-5 h-5 transition-transform ${
-                        isActive ? 'text-salon-gold translate-x-1' : 'text-white/30'
-                      }`}
-                    />
+
+                    <div className="flex items-center">
+                      <ChevronRight
+                        className={`w-4 h-4 transition-transform ${
+                          isActive ? 'text-salon-gold translate-x-1' : 'text-white/30 group-hover:text-salon-gold/70'
+                        }`}
+                      />
+                    </div>
                   </>
                 )}
               </NavLink>
@@ -191,7 +202,7 @@ export default function Navbar() {
             <Link
               to="/contact"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-3.5 rounded-full text-center font-serif font-bold text-sm tracking-wide text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] shadow-luxury transition-transform active:scale-95"
+              className="w-full py-3.5 rounded-full text-center font-cinzel font-bold text-xs sm:text-sm tracking-[0.12em] uppercase text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold shadow-luxury transition-all active:scale-95"
             >
               Book an Appointment
             </Link>

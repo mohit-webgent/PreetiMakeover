@@ -4,6 +4,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import MobileQuickBar from './components/layout/MobileQuickBar';
 import ScrollToTop from './components/common/ScrollToTop';
+import FloatingWhatsApp from './components/common/FloatingWhatsApp';
 
 // Multi-Page Routes
 import HomePage from './pages/HomePage';
@@ -131,6 +132,7 @@ function AppLayout({
         <>
           <Footer />
           <MobileQuickBar />
+          <FloatingWhatsApp />
         </>
       )}
     </div>

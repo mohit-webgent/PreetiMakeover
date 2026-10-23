@@ -57,48 +57,105 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <Hero />
 
       {/* 2. Philosophy & Commitments Ribbon */}
-      <section className="bg-salon-maroon text-white py-8 border-y border-salon-gold/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-serif font-bold text-sm text-salon-gold">100% Genuine Brands</h4>
-                <p className="text-[11px] text-salon-blush/80">Sealed L’Oréal, Casmara & Rica</p>
-              </div>
-            </div>
+      <section className="bg-salon-maroon text-white py-4 md:py-8 border-y border-salon-gold/30 overflow-hidden relative">
+        {/* Edge Gradient Fades for Mobile Ticker */}
+        <div className="md:hidden pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-salon-maroon to-transparent z-10" />
+        <div className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-salon-maroon to-transparent z-10" />
 
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                <HeartHandshake className="w-5 h-5" />
+        {/* Desktop View: Clean 4-Column Grid */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-4 gap-6 text-left">
+            {[
+              {
+                icon: ShieldCheck,
+                title: '100% Genuine Brands',
+                desc: 'Sealed L’Oréal, Casmara & Rica',
+              },
+              {
+                icon: HeartHandshake,
+                title: 'Preeti Mandal Direct Care',
+                desc: 'Diagnostic personal consultations',
+              },
+              {
+                icon: Sparkles,
+                title: 'Hospital-Grade Clean',
+                desc: 'Sanitized instruments every client',
+              },
+              {
+                icon: Clock,
+                title: '10:00 AM – 9:00 PM',
+                desc: 'Open 6 Days (Closed Tuesday)',
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-sm text-salon-gold">{item.title}</h4>
+                  <p className="text-[11px] text-salon-blush/80">{item.desc}</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-serif font-bold text-sm text-salon-gold">Preeti Mandal Direct Care</h4>
-                <p className="text-[11px] text-salon-blush/80">Diagnostic personal consultations</p>
-              </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                <Sparkles className="w-5 h-5" />
+        {/* Mobile View: Single Row Auto-Scrolling Mode (Right to Left) */}
+        <div className="md:hidden flex overflow-hidden select-none">
+          <div className="animate-marquee flex items-center py-1">
+            {[
+              {
+                icon: ShieldCheck,
+                title: '100% Genuine Brands',
+                desc: 'Sealed L’Oréal, Casmara & Rica',
+              },
+              {
+                icon: HeartHandshake,
+                title: 'Preeti Mandal Direct Care',
+                desc: 'Diagnostic personal consultations',
+              },
+              {
+                icon: Sparkles,
+                title: 'Hospital-Grade Clean',
+                desc: 'Sanitized instruments every client',
+              },
+              {
+                icon: Clock,
+                title: '10:00 AM – 9:00 PM',
+                desc: 'Open 6 Days (Closed Tuesday)',
+              },
+              {
+                icon: ShieldCheck,
+                title: '100% Genuine Brands',
+                desc: 'Sealed L’Oréal, Casmara & Rica',
+              },
+              {
+                icon: HeartHandshake,
+                title: 'Preeti Mandal Direct Care',
+                desc: 'Diagnostic personal consultations',
+              },
+              {
+                icon: Sparkles,
+                title: 'Hospital-Grade Clean',
+                desc: 'Sanitized instruments every client',
+              },
+              {
+                icon: Clock,
+                title: '10:00 AM – 9:00 PM',
+                desc: 'Open 6 Days (Closed Tuesday)',
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-2.5 shrink-0 px-3 whitespace-nowrap">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
+                  <item.icon className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-xs text-salon-gold leading-tight">{item.title}</h4>
+                  <p className="text-[10px] text-salon-blush/80 leading-tight mt-0.5">{item.desc}</p>
+                </div>
+                <span className="w-1.5 h-1.5 border border-salon-gold/40 rotate-45 ml-3 shrink-0" />
               </div>
-              <div>
-                <h4 className="font-serif font-bold text-sm text-salon-gold">Hospital-Grade Clean</h4>
-                <p className="text-[11px] text-salon-blush/80">Sanitized instruments every client</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-serif font-bold text-sm text-salon-gold">10:00 AM – 9:00 PM</h4>
-                <p className="text-[11px] text-salon-rose-light">Open 6 Days (Closed Tuesday)</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

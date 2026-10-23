@@ -17,7 +17,7 @@ import {
   Eye
 } from 'lucide-react';
 
-export default function HomePage({ categories = [], testimonials = [], galleryImages = [], onSelectService }) {
+export default function HomePage({ categories = [], testimonials = [], galleryImages = [], onSelectService, siteContent = {} }) {
   // Highlighted signature treatments
   const signatureTreatments = [
     {
@@ -54,10 +54,43 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
     }
   ];
 
+
+  // Dynamic Ribbon Commitments
+  const ribbonCards = [
+    {
+      icon: ShieldCheck,
+      title: siteContent?.ribbon?.item1Title || '100% Genuine Brands',
+      desc: siteContent?.ribbon?.item1Desc || 'Sealed L’Oréal, Casmara & Rica',
+    },
+    {
+      icon: HeartHandshake,
+      title: siteContent?.ribbon?.item2Title || 'Preeti Mandal Direct Care',
+      desc: siteContent?.ribbon?.item2Desc || 'Diagnostic personal consultations',
+    },
+    {
+      icon: Sparkles,
+      title: siteContent?.ribbon?.item3Title || 'Hospital-Grade Clean',
+      desc: siteContent?.ribbon?.item3Desc || 'Sanitized instruments every client',
+    },
+    {
+      icon: Clock,
+      title: siteContent?.ribbon?.item4Title || '10:00 AM – 9:00 PM',
+      desc: siteContent?.ribbon?.item4Desc || 'Open 6 Days (Closed Tuesday)',
+    },
+  ];
+
+
+  // Dynamic Signature / Most Loved Services
+  const activeSignatureItems = (Array.isArray(siteContent?.signature?.items) && siteContent.signature.items.length > 0)
+    ? siteContent.signature.items
+    : signatureTreatments;
+  const signatureEyebrow = siteContent?.signature?.eyebrow || '{signatureEyebrow}';
+  const signatureMainTitle = siteContent?.signature?.title || '{signatureMainTitle}';
+
   return (
     <div className="space-y-0">
       {/* 1. Cinematic Hero Section */}
-      <Hero />
+      <Hero content={siteContent?.hero} />
 
       {/* 2. Philosophy & Commitments Ribbon */}
       <section className="bg-salon-maroon text-white py-3.5 sm:py-4 md:py-5 border-y border-salon-gold/30 overflow-hidden relative">
@@ -68,28 +101,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         {/* Desktop View: Clean 4-Column Grid */}
         <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-4 gap-6 text-left">
-            {[
-              {
-                icon: ShieldCheck,
-                title: '100% Genuine Brands',
-                desc: 'Sealed L’Oréal, Casmara & Rica',
-              },
-              {
-                icon: HeartHandshake,
-                title: 'Preeti Mandal Direct Care',
-                desc: 'Diagnostic personal consultations',
-              },
-              {
-                icon: Sparkles,
-                title: 'Hospital-Grade Clean',
-                desc: 'Sanitized instruments every client',
-              },
-              {
-                icon: Clock,
-                title: '10:00 AM – 9:00 PM',
-                desc: 'Open 6 Days (Closed Tuesday)',
-              },
-            ].map((item, idx) => (
+            {ribbonCards.map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
                   <item.icon className="w-4 h-4" />
@@ -192,7 +204,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-3">
-            {signatureTreatments.map((item, idx) => (
+            {activeSignatureItems.map((item, idx) => (
               <Link
                 key={idx}
                 to={item.link}
@@ -254,19 +266,19 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
-                  High-Definition Bridal Artistry
+                  {siteContent?.bridal?.title || 'High-Definition Bridal Artistry'}
                 </h2>
 
                 <p className="text-salon-blush/85 text-base sm:text-lg font-light leading-relaxed max-w-2xl font-sans">
-                  From deep pre-bridal skin therapy to camera-ready HD makeup and custom saree draping, crafted by <strong className="text-white font-medium">Preeti Mandal</strong> for your most memorable celebration.
+                  {siteContent?.bridal?.description || 'From deep pre-bridal skin therapy to camera-ready HD makeup and custom saree draping, crafted by Preeti Mandal for your most memorable celebration.'}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
                   {[
-                    'Pre-Bridal Clinical Glow Care Package',
-                    'Signature Waterproof HD Bridal Makeup',
-                    'Bespoke Hairstyling & Extensions',
-                    'Designer Saree & Dupatta Draping'
+                    siteContent?.bridal?.feature1 || 'Pre-Bridal Clinical Glow Care Package',
+                    siteContent?.bridal?.feature2 || 'Signature Waterproof HD Bridal Makeup',
+                    siteContent?.bridal?.feature3 || 'Bespoke Hairstyling & Extensions',
+                    siteContent?.bridal?.feature4 || 'Designer Saree & Dupatta Draping'
                   ].map((feat, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs sm:text-sm text-salon-blush/90">
                       <span className="w-4 h-4 rounded-full bg-salon-gold/20 text-salon-gold flex items-center justify-center shrink-0">
@@ -288,7 +300,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
                 </Link>
 
                 <p className="text-xs text-salon-blush/60 italic text-left lg:text-right">
-                  Advance bookings recommended 3–6 weeks prior.
+                  {siteContent?.bridal?.bookingNote || 'Advance bookings recommended 3–6 weeks prior.'}
                 </p>
               </div>
             </div>
@@ -297,7 +309,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       </section>
 
       {/* 5. Certified Brands Showcase */}
-      <BrandsShowcase />
+      <BrandsShowcase content={siteContent?.brands} />
 
       {/* 6. Portfolio Preview Section */}
       <section className="py-14 sm:py-18 bg-salon-blush relative overflow-hidden">
@@ -396,13 +408,13 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
             <div className="lg:col-span-5">
               <div className="relative rounded-3xl bg-salon-maroon text-salon-blush p-8 sm:p-10 shadow-luxury-lg border border-salon-gold/30">
                 <span className="text-[10px] uppercase tracking-widest text-salon-gold font-bold block mb-2">
-                  OUR ESSENCE
+                  {siteContent?.about?.essenceTag || 'OUR ESSENCE'}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-4 leading-snug">
-                  “Your Beauty Is Our Duty.”
+                  {siteContent?.about?.quote || "“Your Beauty Is Our Duty.”"}
                 </h3>
                 <p className="text-xs sm:text-sm text-salon-blush/80 leading-relaxed font-light mb-6">
-                  Founded by <strong className="text-white font-medium">Preeti Mandal</strong> in Harinagar, Badarpur, Preeti Makeover was built to provide women with a reliable, clinical and luxury parlour experience close to home.
+                  {siteContent?.about?.essenceStory || 'Founded by Preeti Mandal in Harinagar, Badarpur, Preeti Makeover was built to provide women with a reliable, clinical and luxury parlour experience close to home.'}
                 </p>
                 <div className="space-y-2 pt-4 border-t border-white/10 text-xs text-salon-blush/80">
                   <div className="flex items-center gap-2">
@@ -423,11 +435,11 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
                   MEET PREETI MANDAL
                 </span>
                 <h2 className="text-3xl sm:text-4xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
-                  Passionate Artistry & Personal Consultation
+                  {siteContent?.about?.heading || 'Passionate Artistry & Personal Consultation'}
                 </h2>
                 <div className="w-16 h-0.5 bg-salon-gold mb-4"></div>
                 <p className="text-sm sm:text-base text-salon-text/80 font-light leading-relaxed">
-                  Every face, hair type and skin tone has distinct requirements. We take time to diagnose before recommending any facial, treatment or makeup drape, ensuring healthy, radiant and long-lasting results.
+                  {siteContent?.about?.description || 'Every face, hair type and skin tone has distinct requirements. We take time to diagnose before recommending any facial, treatment or makeup drape, ensuring healthy, radiant and long-lasting results.'}
                 </p>
               </div>
 
@@ -462,12 +474,12 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           {/* Main Title */}
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight mb-2 sm:mb-3">
-            Ready for Your Transformation?
+            {siteContent?.cta?.title || 'Ready for Your Transformation?'}
           </h2>
 
           {/* Clean Subtext */}
           <p className="text-sm sm:text-base text-white/80 font-light max-w-xl mx-auto mb-6 sm:mb-7 leading-relaxed">
-            Book your appointment online in seconds, or contact directly on WhatsApp.
+            {siteContent?.cta?.subtext || 'Book your appointment online in seconds, or contact directly on WhatsApp.'}
           </p>
 
           {/* Action Buttons */}
@@ -477,17 +489,17 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
             >
               <Calendar className="w-4 h-4 text-salon-maroon" />
-              <span>Book Appointment Online</span>
+              <span>{siteContent?.cta?.buttonText || 'Book Appointment Online'}</span>
             </Link>
 
             <a
-              href="https://wa.me/918810359438"
+              href="https://wa.me/${siteContent?.cta?.whatsappNumber || '918810359438'}"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-emerald-400/60 backdrop-blur-md hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"
             >
               <Phone className="w-4 h-4 text-emerald-400" />
-              <span>Message on WhatsApp</span>
+              <span>{siteContent?.cta?.whatsappText || 'Message on WhatsApp'}</span>
             </a>
           </div>
         </div>

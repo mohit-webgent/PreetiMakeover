@@ -6,7 +6,20 @@ import { Calendar, ArrowRight, MapPin, Clock, Phone } from 'lucide-react';
 
 
 
-export default function Hero() {
+export default function Hero({ content = {} }) {
+  const headingLine1 = content?.headingLine1 || 'Look good.';
+  const headingLine2 = content?.headingLine2 || 'Feel even better.';
+  const description = content?.description || 'Hair, skin, makeup, and bespoke bridal looks — crafted with meticulous care by Preeti Mandal. Premium products, hospital-grade hygiene, and a personal touch for every client.';
+  const tagline = content?.tagline || '{tagline}';
+  const modelImage = content?.modelImage || '/hero-bridal.jpg';
+  const badgeTitle = content?.badgeTitle || 'Signature Service';
+  const badgeService = content?.badgeService || 'HD Bridal Makeover';
+  const badgeSubtitle = content?.badgeSubtitle || 'Camera-ready perfection by Preeti Mandal';
+  const quickLocation = content?.quickLocation || 'Prince Colony, Badarpur';
+  const quickHours = content?.quickHours || '10 AM – 9 PM';
+  const quickPhone = content?.quickPhone || '+91 8810359438';
+  const btnAppointment = content?.btnAppointment || 'Book Appointment';
+  const btnServices = content?.btnServices || 'View Services';
   const heroRef = useRef(null);
 
   // Parallax on scroll (desktop only to prevent mobile image collision)
@@ -123,17 +136,15 @@ export default function Hero() {
           >
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-[56px] lg:text-[62px] font-serif font-bold text-salon-maroon leading-[1.06] tracking-tight">
-              <span className="hero-heading-line block opacity-0">Look good.</span>
+              <span className="hero-heading-line block opacity-0">{headingLine1}</span>
               <span className="hero-heading-line block opacity-0">
-                Feel even better.
+                {headingLine2}
               </span>
             </h1>
 
             {/* Description */}
             <p className="hero-desc opacity-0 text-[15px] sm:text-base text-salon-text/75 font-light max-w-lg mx-auto lg:mx-0 leading-relaxed font-sans">
-              Hair, skin, makeup, and bespoke bridal looks — crafted with meticulous care by{' '}
-              <strong className="font-semibold text-salon-maroon">Preeti Mandal</strong>.
-              Premium products, hospital-grade hygiene, and a personal touch for every client.
+              {description}
             </p>
 
             {/* Tagline */}
@@ -145,15 +156,15 @@ export default function Hero() {
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-[12px] text-salon-text/65 font-medium">
               <div className="hero-info-item opacity-0 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-salon-gold" />
-                <span>Prince Colony, Badarpur</span>
+                <span>{quickLocation}</span>
               </div>
               <div className="hero-info-item opacity-0 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-salon-gold" />
-                <span>10 AM – 9 PM</span>
+                <span>{quickHours}</span>
               </div>
               <div className="hero-info-item opacity-0 flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-salon-gold" />
-                <span>+91 8810359438</span>
+                <span>{quickPhone}</span>
               </div>
             </div>
 
@@ -169,7 +180,7 @@ export default function Hero() {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 sm:gap-2.5 px-3.5 sm:px-7 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-salon-maroon to-salon-maroon-light hover:from-salon-maroon-deep hover:to-salon-maroon shadow-luxury hover:shadow-luxury-lg transition-all border border-salon-gold/25 whitespace-nowrap"
                 >
                   <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-salon-gold shrink-0" />
-                  <span>Book Appointment</span>
+                  <span>{btnAppointment}</span>
                 </Link>
               </motion.div>
 
@@ -182,7 +193,7 @@ export default function Hero() {
                   to="/services"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold text-salon-maroon bg-white hover:bg-salon-babypink/20 border border-salon-rose/25 shadow-sm transition-all whitespace-nowrap"
                 >
-                  <span>View Services</span>
+                  <span>{btnServices}</span>
                   <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-salon-gold-dark shrink-0" />
                 </Link>
               </motion.div>
@@ -211,7 +222,7 @@ export default function Hero() {
                 transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               >
                 <img
-                  src="/hero-bridal.jpg"
+                  src={modelImage}
                   alt="Stunning HD bridal makeover by Preeti Makeover salon"
                   className="w-full h-[480px] sm:h-[550px] object-cover object-top"
                   loading="eager"
@@ -228,13 +239,13 @@ export default function Hero() {
                     transition={{ delay: 1.6, duration: 0.7 }}
                   >
                     <span className="text-[9px] uppercase tracking-[0.2em] text-salon-gold font-semibold block mb-0.5">
-                      Signature Service
+                      {badgeTitle}
                     </span>
                     <h3 className="font-serif text-lg sm:text-xl font-bold text-white leading-tight">
-                      HD Bridal Makeover
+                      {badgeService}
                     </h3>
                     <p className="text-[11px] text-white/65 mt-0.5 font-light">
-                      Camera-ready perfection by Preeti Mandal
+                      {badgeSubtitle}
                     </p>
                   </motion.div>
                 </div>

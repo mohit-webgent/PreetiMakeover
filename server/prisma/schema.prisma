@@ -119,3 +119,16 @@ model BusinessSettings {
   googleMapsUrl  String?
   updatedAt      DateTime @updatedAt
 }
+
+
+model SiteContent {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  section   String   // e.g. "hero", "ribbon", "signature", "bridal", "brands", "about", "cta"
+  label     String?
+  value     String   @db.Text
+  type      String   @default("text") // "text", "textarea", "image", "json"
+  updatedAt DateTime @updatedAt
+
+  @@index([section])
+}

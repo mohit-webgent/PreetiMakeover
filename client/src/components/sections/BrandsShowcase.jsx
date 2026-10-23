@@ -12,7 +12,9 @@ import {
 } from 'lucide-react';
 
 
-export default function BrandsShowcase() {
+export default function BrandsShowcase({ content = {} }) {
+  const eyebrow = content?.eyebrow || '{eyebrow}';
+  const mainTitle = content?.title || '{mainTitle}';
   const [activeTab, setActiveTab] = useState(0);
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

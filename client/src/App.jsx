@@ -19,6 +19,8 @@ import AdminPage from './pages/AdminPage';
 import { api } from './services/api';
 
 function AppLayout({ 
+  siteContent,
+  onContentUpdated,
   categories, 
   servicesLoading, 
   servicesError, 
@@ -59,6 +61,7 @@ function AppLayout({
             path="/" 
             element={
               <HomePage 
+                siteContent={siteContent}
                 categories={categories} 
                 testimonials={testimonials} 
                 galleryImages={galleryImages} 
@@ -117,6 +120,7 @@ function AppLayout({
             path="/admin/*" 
             element={
               <AdminPage 
+                onContentUpdated={onContentUpdated}
                 adminToken={adminToken} 
                 adminUser={adminUser} 
                 onLoginSuccess={handleLoginSuccess} 
@@ -154,6 +158,19 @@ export default function App() {
     }
   });
 
+    // CMS Site Content State
+  const [siteContent, setSiteContent] = useState({});
+
+  const refreshSiteContent = () => {
+    api.getContent()
+      .then((res) => {
+        if (res?.data) {
+          setSiteContent(res.data);
+        }
+      })
+      .catch((err) => console.log('Site content refresh:', err.message));
+  };
+
   // Public Catalog & Content State
   const [categories, setCategories] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -184,6 +201,15 @@ export default function App() {
   // Fetch Public Catalog Data from API
   useEffect(() => {
     let isMounted = true;
+
+    // Load CMS Site Content
+    api.getContent()
+      .then((res) => {
+        if (isMounted && res?.data) {
+          setSiteContent(res.data);
+        }
+      })
+      .catch((err) => console.log('Site content fetch:', err.message));
 
     // Load Services
     api.getServices()
@@ -241,6 +267,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppLayout 
+        siteContent={siteContent}
+        onContentUpdated={refreshSiteContent}
         categories={categories}
         servicesLoading={servicesLoading}
         servicesError={servicesError}

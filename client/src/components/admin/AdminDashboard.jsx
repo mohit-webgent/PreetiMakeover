@@ -1,5 +1,7 @@
+import WebsiteContentManager from './WebsiteContentManager';
 import React, { useState, useEffect } from 'react';
-import { 
+import {
+  Globe, 
   LayoutDashboard, 
   Calendar, 
   Scissors, 
@@ -26,7 +28,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 
-export default function AdminDashboard({ token, admin, onLogout, onBackToSite }) {
+export default function AdminDashboard({ token, admin, onLogout, onBackToSite, onContentUpdated }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Global feedback message
@@ -351,6 +353,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite })
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 py-2 border-t border-brand-blush/30 text-xs font-medium">
           {[
             { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+            { id: 'cms', label: 'Website Content (CMS)', icon: Globe },
             { id: 'appointments', label: 'Appointments', icon: Calendar, badge: dashboardData?.pendingEnquiries },
             { id: 'services', label: 'Services & Catalog', icon: Scissors },
             { id: 'gallery', label: 'Gallery', icon: Image },
@@ -559,6 +562,17 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite })
         )}
 
         {/* ========================================================================= */}
+        
+        {/* ========================================================================= */}
+        {/* TAB: WEBSITE CONTENT (CMS) & PHOTO STUDIO */}
+        {/* ========================================================================= */}
+        {activeTab === 'cms' && (
+          <WebsiteContentManager 
+            token={token} 
+            onContentUpdated={onContentUpdated} 
+          />
+        )}
+
         {/* TAB 2: APPOINTMENTS MANAGEMENT */}
         {/* ========================================================================= */}
         {activeTab === 'appointments' && (

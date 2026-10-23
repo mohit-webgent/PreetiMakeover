@@ -36,6 +36,9 @@ function authHeaders(token) {
 }
 
 export const api = {
+  // Public CMS Site Content
+  getContent: () => fetchJson('/api/content'),
+
   // Public Services
   getServices: () => fetchJson('/api/services'),
   getServiceBySlug: (slug) => fetchJson(`/api/services/${slug}`),
@@ -182,6 +185,46 @@ export const api = {
       method: 'DELETE',
       headers: authHeaders(token)
     }),
+
+  // Admin CMS Content Management
+  getAdminContent: (token) =>
+    fetchJson('/api/admin/content', {
+      headers: authHeaders(token)
+    }),
+
+  updateContentItem: (token, key, itemData) =>
+    fetchJson(`/api/admin/content/${encodeURIComponent(key)}`, {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(itemData)
+    }),
+
+  saveContentBatch: (token, items) =>
+    fetchJson('/api/admin/content/batch/save', {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify({ items })
+    }),
+
+  uploadImage: async (token, file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch('/api/admin/upload', {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(data?.message || 'Failed to upload image');
+    }
+    return data;
+  },
 
   // Admin Settings
   updateBusinessSettings: (token, settingsData) =>

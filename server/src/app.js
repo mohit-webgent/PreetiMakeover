@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -8,7 +9,7 @@ const apiRoutes = require('./routes/api');
 const app = express();
 
 // Security Headers
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
 // CORS configuration: resolve and normalize allowed origins
 function getAllowedOrigins() {
@@ -95,6 +96,9 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Serve User-Uploaded Media Statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Mount Core REST API Endpoints
 app.use('/api', apiRoutes);

@@ -60,7 +60,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       <Hero />
 
       {/* 2. Philosophy & Commitments Ribbon */}
-      <section className="bg-salon-maroon text-white py-4 md:py-8 border-y border-salon-gold/30 overflow-hidden relative">
+      <section className="bg-salon-maroon text-white py-2 sm:py-2.5 md:py-3 border-y border-salon-gold/30 overflow-hidden relative">
         {/* Edge Gradient Fades for Mobile Ticker */}
         <div className="md:hidden pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-salon-maroon to-transparent z-10" />
         <div className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-salon-maroon to-transparent z-10" />
@@ -91,8 +91,8 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               },
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                  <item.icon className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
+                  <item.icon className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-sm text-salon-gold">{item.title}</h4>

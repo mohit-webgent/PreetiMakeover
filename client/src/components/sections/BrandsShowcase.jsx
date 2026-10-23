@@ -59,7 +59,7 @@ export default function BrandsShowcase() {
   };
 
   return (
-    <section className="py-10 sm:py-14 bg-salon-blush border-y border-salon-babypink/60 relative overflow-hidden">
+    <section className="py-14 sm:py-18 bg-salon-blush border-y border-salon-babypink/60 relative overflow-hidden">
       {/* Background Botanical Leaves */}
       <BotanicalLeaves variant="corners" />
 

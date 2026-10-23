@@ -209,7 +209,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
   const activeReview = reviewsList[currentIndex] || reviewsList[0];
 
   return (
-    <section id="reviews" className="py-10 sm:py-14 bg-salon-blush/40 relative overflow-hidden border-t border-salon-babypink/60">
+    <section id="reviews" className="py-14 sm:py-18 bg-salon-blush/40 relative overflow-hidden border-t border-salon-babypink/60">
 
       {/* Decorative ambient background blur */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-salon-babypink/30 rounded-full blur-3xl pointer-events-none" />
@@ -219,7 +219,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Customer-friendly Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <span className="text-xs uppercase tracking-widest text-salon-gold font-bold block mb-2">
             HEARTFELT EXPERIENCES • REAL STORIES
           </span>

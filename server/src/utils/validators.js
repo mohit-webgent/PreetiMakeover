@@ -113,3 +113,29 @@ module.exports = {
   validateAppointmentDate,
   sanitizeText
 };
+
+/**
+ * Validate an image/link URL supplied by an admin.
+ * Allows https/http absolute URLs and site-relative paths ("/uploads/x.jpg"); blocks javascript:, data:, etc.
+ */
+function isSafeUrl(value) {
+  if (typeof value !== 'string') return false;
+  const v = value.trim();
+  if (!v) return false;
+  if (v.startsWith('/') && !v.startsWith('//')) return true;
+  try {
+    const u = new URL(v);
+    return u.protocol === 'https:' || u.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+/** Parse an optional integer, returning `fallback` for empty/invalid input. */
+function toInt(value, fallback = 0) {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+module.exports.isSafeUrl = isSafeUrl;
+module.exports.toInt = toInt;

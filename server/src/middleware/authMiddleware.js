@@ -52,7 +52,7 @@ async function authenticateAdmin(req, res, next) {
     // Strictly select only safe fields (NEVER passwordHash)
     const adminUser = await prisma.adminUser.findUnique({
       where: { id: decoded.id },
-      select: { id: true, email: true, name: true, role: true }
+      select: { id: true, email: true, name: true, role: true, passwordChangedAt: true }
     });
 
     if (!adminUser) {
@@ -62,7 +62,16 @@ async function authenticateAdmin(req, res, next) {
       });
     }
 
-    req.admin = adminUser;
+    // Tokens issued before the last password change are revoked
+    if (adminUser.passwordChangedAt && decoded.iat && decoded.iat < Math.floor(adminUser.passwordChangedAt.getTime() / 1000)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Your password was changed. Please log in again.'
+      });
+    }
+
+    const { passwordChangedAt, ...safeAdmin } = adminUser;
+    req.admin = safeAdmin;
     next();
   } catch (error) {
     next(error);

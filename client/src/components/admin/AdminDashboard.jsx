@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 
-export default function AdminDashboard({ token, admin, onLogout, onBackToSite, onContentUpdated }) {
+export default function AdminDashboard({ token, admin, onLogout, onBackToSite, onContentUpdated, onTokenRefreshed }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Global feedback message
@@ -89,6 +89,8 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
         passwordData.confirmPassword
       );
       if (res?.success) {
+        // Server revokes older sessions on password change and returns a fresh token
+        if (res.data?.token && onTokenRefreshed) onTokenRefreshed(res.data.token);
         setPasswordStatus({ type: 'success', message: 'Password updated successfully! Please keep your new credentials safe.' });
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         showToast('Admin password updated successfully');

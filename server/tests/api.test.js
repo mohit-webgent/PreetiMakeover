@@ -394,6 +394,97 @@ async function runTests() {
       'Security Audit: getJwtSecret fails safely with fatal error in production when JWT_SECRET is missing');
 
     // ==========================================
+    // v1.1 Hardening: CMS, uploads, sessions, reviews, errors
+    // ==========================================
+    const prismaT = require('../src/db');
+
+    // Session revocation: the token issued before the password change no longer works
+    const resRevoked = await request('GET', '/api/admin/me', null, { 'Authorization': `Bearer ${adminToken}` });
+    assert(resRevoked.status === 401, 'Security: tokens issued before a password change are revoked (HTTP 401)');
+
+    const auth = { 'Authorization': `Bearer ${freshToken}` };
+
+    // Public CMS content
+    const resContent = await request('GET', '/api/content');
+    assert(resContent.status === 200 && resContent.body.success === true && typeof resContent.body.data === 'object',
+      'CMS: GET /api/content returns grouped site content');
+
+    // CMS rejects malformed keys
+    const resBadKey = await request('PUT', '/api/admin/content/bad key', { value: 'x' }, auth);
+    assert(resBadKey.status === 400, 'CMS: PUT /api/admin/content/:key rejects malformed keys with HTTP 400');
+
+    // CMS batch save round-trip
+    const resBatch = await request('PUT', '/api/admin/content/batch/save', {
+      items: [{ key: 'zztest.flag', value: { ok: true }, type: 'json' }]
+    }, auth);
+    const resContent2 = await request('GET', '/api/content');
+    assert(resBatch.status === 200 && resContent2.body.data?.zztest?.flag?.ok === true,
+      'CMS: batch save persists JSON content and public endpoint parses it');
+    await prismaT.siteContent.deleteMany({ where: { section: 'zztest' } });
+
+    // Upload: HTML disguised as PNG is rejected by magic-byte check
+    function multipart(filename, contentType, buffer) {
+      const boundary = '----pmtest' + Date.now();
+      const head = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="image"; filename="${filename}"\r\nContent-Type: ${contentType}\r\n\r\n`);
+      const tail = Buffer.from(`\r\n--${boundary}--\r\n`);
+      return { body: Buffer.concat([head, buffer, tail]), type: `multipart/form-data; boundary=${boundary}` };
+    }
+    function rawRequest(method, path, buf, headers) {
+      return new Promise((resolve, reject) => {
+        const req = http.request(new URL(path, baseUrl), { method, headers: { ...headers, 'Content-Length': buf.length } }, (res) => {
+          let d = ''; res.on('data', (c) => { d += c; });
+          res.on('end', () => { let b; try { b = JSON.parse(d); } catch { b = d; } resolve({ status: res.statusCode, body: b }); });
+        });
+        req.on('error', reject); req.write(buf); req.end();
+      });
+    }
+    const fake = multipart('evil.html', 'image/png', Buffer.from('<html><script>alert(1)</script></html>'));
+    const resFake = await rawRequest('POST', '/api/admin/upload', fake.body, { ...auth, 'Content-Type': fake.type });
+    assert(resFake.status === 400, 'Uploads: HTML disguised as image/png is rejected (magic-byte validation)');
+
+    const svg = multipart('x.svg', 'image/svg+xml', Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>'));
+    const resSvg = await rawRequest('POST', '/api/admin/upload', svg.body, { ...auth, 'Content-Type': svg.type });
+    assert(resSvg.status === 400, 'Uploads: SVG files are rejected');
+
+    const png1x1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+    const good = multipart('pixel.png', 'image/png', png1x1);
+    const resGood = await rawRequest('POST', '/api/admin/upload', good.body, { ...auth, 'Content-Type': good.type });
+    assert(resGood.status === 200 && typeof resGood.body.url === 'string', 'Uploads: valid PNG is accepted and returns a URL');
+    if (resGood.body?.provider === 'local' && resGood.body.filename) {
+      require('fs').rmSync(require('path').join(__dirname, '../uploads', resGood.body.filename), { force: true });
+    }
+
+    const resNoAuthUpload = await rawRequest('POST', '/api/admin/upload', good.body, { 'Content-Type': good.type });
+    assert(resNoAuthUpload.status === 401, 'Uploads: unauthenticated upload is rejected with HTTP 401');
+
+    // Gallery update rejects javascript: URLs
+    const resJsUrl = await request('POST', '/api/admin/gallery', { title: 'x', category: 'Bridal', imageUrl: 'javascript:alert(1)' }, auth);
+    assert(resJsUrl.status === 400, 'Gallery: javascript: image URLs are rejected');
+
+    // Public review submission is stored unapproved
+    const resReview = await request('POST', '/api/testimonials', { clientName: 'Test Reviewer', rating: 5, reviewText: 'Lovely experience at the salon!' });
+    const pendingReview = await prismaT.testimonial.findFirst({ where: { clientName: 'Test Reviewer' } });
+    assert(resReview.status === 201 && pendingReview && pendingReview.isApproved === false,
+      'Reviews: public submission returns 201 and is held for moderation');
+    await prismaT.testimonial.deleteMany({ where: { clientName: 'Test Reviewer' } });
+
+    // Category with services cannot be deleted
+    const cats = await request('GET', '/api/admin/services', null, auth);
+    const catWithServices = (cats.body.data || []).find((c) => c.services && c.services.length > 0);
+    if (catWithServices) {
+      const resDelCat = await request('DELETE', `/api/admin/categories/${catWithServices.id}`, null, auth);
+      assert(resDelCat.status === 409, 'Categories: deleting a category that still has services returns HTTP 409');
+    }
+
+    // Error handling
+    const res404 = await request('GET', '/api/does-not-exist');
+    assert(res404.status === 404 && res404.body.success === false, 'Errors: unknown public route returns JSON 404');
+
+    const badJson = Buffer.from('{"customerName": ');
+    const resBadJson = await rawRequest('POST', '/api/appointments', badJson, { 'Content-Type': 'application/json' });
+    assert(resBadJson.status === 400 && resBadJson.body.success === false, 'Errors: malformed JSON body returns HTTP 400');
+
+    // ==========================================
     // Phase 4.1 CORS Hardening Tests
     // ==========================================
 

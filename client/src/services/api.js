@@ -52,6 +52,13 @@ export const api = {
   // Public Gallery Images (Active only)
   getGallery: () => fetchJson('/api/gallery'),
 
+  // Public review submission (held for moderation)
+  submitTestimonial: (reviewData) =>
+    fetchJson('/api/testimonials', {
+      method: 'POST',
+      body: JSON.stringify(reviewData)
+    }),
+
   // Public Appointment Submission
   createAppointment: (appointmentData) =>
     fetchJson('/api/appointments', {
@@ -141,6 +148,19 @@ export const api = {
       body: JSON.stringify(categoryData)
     }),
 
+  updateCategory: (token, id, categoryData) =>
+    fetchJson(`/api/admin/categories/${id}`, {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(categoryData)
+    }),
+
+  deleteCategory: (token, id) =>
+    fetchJson(`/api/admin/categories/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders(token)
+    }),
+
   // Admin Gallery
   getAdminGallery: (token) =>
     fetchJson('/api/admin/gallery', {
@@ -171,6 +191,13 @@ export const api = {
   getAdminTestimonials: (token) =>
     fetchJson('/api/admin/testimonials', {
       headers: authHeaders(token)
+    }),
+
+  createTestimonial: (token, testimonialData) =>
+    fetchJson('/api/admin/testimonials', {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify(testimonialData)
     }),
 
   updateTestimonial: (token, id, testimonialData) =>

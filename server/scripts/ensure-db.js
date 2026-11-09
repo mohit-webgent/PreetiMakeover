@@ -1,7 +1,8 @@
 const net = require('net');
 const path = require('path');
 const fs = require('fs');
-const { execSync, spawn } = require('child_process');
+const { execSync } = require('child_process');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const PORT = 5432;
 const HOST = '127.0.0.1';
@@ -94,7 +95,22 @@ function startPostgres() {
   }
 }
 
+function shouldManageLocalPostgres() {
+  if (process.env.NODE_ENV === 'production' || process.platform !== 'win32') return false;
+  try {
+    const { hostname } = new URL(process.env.DATABASE_URL || '');
+    return ['localhost', '127.0.0.1', '::1'].includes(hostname);
+  } catch {
+    return false;
+  }
+}
+
 async function ensureDatabaseRunning() {
+  if (!shouldManageLocalPostgres()) {
+    // Remote / production database: nothing to start locally.
+    return true;
+  }
+
   const isAlreadyRunning = await checkPort(PORT, HOST, 800);
   if (isAlreadyRunning) {
     console.log(`[Database] PostgreSQL is ready on port ${PORT}.`);

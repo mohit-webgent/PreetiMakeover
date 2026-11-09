@@ -3,6 +3,14 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../db');
 const { getJwtSecret } = require('../middleware/authMiddleware');
 
+function signAdminToken(admin) {
+  return jwt.sign(
+    { id: admin.id, email: admin.email, role: admin.role },
+    getJwtSecret(),
+    { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+  );
+}
+
 /**
  * Admin Login
  */
@@ -37,14 +45,7 @@ async function adminLogin(req, res, next) {
       });
     }
 
-    const secret = getJwtSecret();
-
-    // Generate JWT token (expires in 24 hours)
-    const token = jwt.sign(
-      { id: admin.id, email: admin.email, role: admin.role },
-      secret,
-      { expiresIn: '24h' }
-    );
+    const token = signAdminToken(admin);
 
     // Return only safe fields (NEVER passwordHash)
     res.status(200).json({
@@ -129,14 +130,17 @@ async function changePassword(req, res, next) {
     // Hash new password using 12 rounds of bcrypt
     const newPasswordHash = await bcrypt.hash(newPassword, 12);
 
-    await prisma.adminUser.update({
+    // Stamp the change one second in the past so the fresh token below (same second) stays valid,
+    // while every token issued earlier is revoked by authenticateAdmin.
+    const updated = await prisma.adminUser.update({
       where: { id: admin.id },
-      data: { passwordHash: newPasswordHash }
+      data: { passwordHash: newPasswordHash, passwordChangedAt: new Date(Date.now() - 1000) }
     });
 
     res.status(200).json({
       success: true,
-      message: 'Password changed successfully. Please keep your credentials secure.'
+      message: 'Password changed successfully. Other sessions have been signed out.',
+      data: { token: signAdminToken(updated) }
     });
   } catch (error) {
     next(error);

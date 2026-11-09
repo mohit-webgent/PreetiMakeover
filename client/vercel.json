@@ -5,7 +5,11 @@
       "destination": "https://preetimakeover.onrender.com/api/:path*"
     },
     {
-      "source": "/((?!api/|assets/|.*\\..*).*)",
+      "source": "/uploads/:path*",
+      "destination": "https://preetimakeover.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/((?!api/|uploads/|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]

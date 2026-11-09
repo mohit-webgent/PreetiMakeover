@@ -1,16 +1,12 @@
 const { PrismaClient } = require('@prisma/client');
 
-let prisma;
+// Single shared Prisma client (re-used across hot reloads in development).
+const prisma =
+  global.__prisma ||
+  new PrismaClient({
+    log: process.env.PRISMA_LOG ? ['query', 'error', 'warn'] : ['error', 'warn']
+  });
 
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient();
-} else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient({
-      log: process.env.PRISMA_LOG ? ['query', 'error', 'warn'] : ['error', 'warn']
-    });
-  }
-  prisma = global.prisma;
-}
+if (process.env.NODE_ENV !== 'production') global.__prisma = prisma;
 
 module.exports = prisma;

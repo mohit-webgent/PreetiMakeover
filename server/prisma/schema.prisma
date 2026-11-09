@@ -10,13 +10,14 @@ datasource db {
 }
 
 model AdminUser {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String
-  name         String
-  role         String    @default("admin")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String
+  name              String
+  role              String    @default("admin")
+  passwordChangedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model ServiceCategory {
@@ -84,7 +85,7 @@ model Appointment {
 model GalleryImage {
   id           String   @id @default(uuid())
   title        String
-  category     String   // e.g. "Bridal", "Hair", "Facials", "Nails", "Studio"
+  category     String // e.g. "Bridal", "Hair", "Facials", "Nails", "Studio"
   imageUrl     String
   altText      String
   displayOrder Int      @default(0)
@@ -105,26 +106,25 @@ model Testimonial {
 }
 
 model BusinessSettings {
-  id             String   @id @default("default")
-  businessName   String   @default("Preeti Makeover")
-  tagline        String   @default("Your Beauty Is Our Duty.")
-  ownerName      String   @default("Preeti Mandal")
-  phone          String   @default("+918810359438")
-  whatsapp       String   @default("+918810359438")
-  email          String   @default("preetimakeoverpm@gmail.com")
-  address        String   @default("D/109, Gali No. 5, Prince Colony, Harinagar, Jaitpur, Badarpur, New Delhi – 110044")
-  openingHour    String   @default("10:00 AM")
-  closingHour    String   @default("09:00 PM")
-  weeklyOffDay   String   @default("Tuesday")
-  googleMapsUrl  String?
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default("default")
+  businessName  String   @default("Preeti Makeover")
+  tagline       String   @default("Your Beauty Is Our Duty.")
+  ownerName     String   @default("Preeti Mandal")
+  phone         String   @default("+918810359438")
+  whatsapp      String   @default("+918810359438")
+  email         String   @default("preetimakeoverpm@gmail.com")
+  address       String   @default("D/109, Gali No. 5, Prince Colony, Harinagar, Jaitpur, Badarpur, New Delhi – 110044")
+  openingHour   String   @default("10:00 AM")
+  closingHour   String   @default("09:00 PM")
+  weeklyOffDay  String   @default("Tuesday")
+  googleMapsUrl String?
+  updatedAt     DateTime @updatedAt
 }
-
 
 model SiteContent {
   id        String   @id @default(uuid())
   key       String   @unique
-  section   String   // e.g. "hero", "ribbon", "signature", "bridal", "brands", "about", "cta"
+  section   String // e.g. "hero", "ribbon", "signature", "bridal", "brands", "about", "cta"
   label     String?
   value     String   @db.Text
   type      String   @default("text") // "text", "textarea", "image", "json"

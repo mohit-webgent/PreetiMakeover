@@ -1,5 +1,5 @@
 const prisma = require('../db');
-const { sanitizeText } = require('../utils/validators');
+const { sanitizeText, isSafeUrl, toInt } = require('../utils/validators');
 
 /**
  * Slugify helper
@@ -217,10 +217,10 @@ async function createService(req, res, next) {
         slug,
         description: description ? sanitizeText(description, 500) : null,
         startingPrice: parsedPrice,
-        durationMinutes: durationMinutes ? parseInt(durationMinutes, 10) : null,
+        durationMinutes: durationMinutes ? toInt(durationMinutes, null) : null,
         isFeatured: Boolean(isFeatured),
         isActive: isActive !== undefined ? Boolean(isActive) : true,
-        displayOrder: displayOrder ? parseInt(displayOrder, 10) : 0
+        displayOrder: toInt(displayOrder, 0)
       }
     });
 
@@ -261,7 +261,7 @@ async function updateService(req, res, next) {
       }
     }
     if (durationMinutes !== undefined) {
-      updateData.durationMinutes = durationMinutes ? parseInt(durationMinutes, 10) : null;
+      updateData.durationMinutes = durationMinutes ? toInt(durationMinutes, null) : null;
     }
     if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
@@ -320,7 +320,7 @@ async function createCategory(req, res, next) {
         name: cleanName,
         slug,
         description: description ? sanitizeText(description, 500) : null,
-        displayOrder: displayOrder ? parseInt(displayOrder, 10) : 0,
+        displayOrder: toInt(displayOrder, 0),
         isActive: true
       }
     });
@@ -368,9 +368,8 @@ async function createGalleryImage(req, res, next) {
       return res.status(400).json({ success: false, message: 'Image URL is required.' });
     }
 
-    // Basic URL validation
     const cleanUrl = imageUrl.trim();
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://') && !cleanUrl.startsWith('/')) {
+    if (!isSafeUrl(cleanUrl)) {
       return res.status(400).json({ success: false, message: 'Please provide a valid image URL (http/https or relative path).' });
     }
 
@@ -380,7 +379,7 @@ async function createGalleryImage(req, res, next) {
         category: sanitizeText(category, 50),
         imageUrl: cleanUrl,
         altText: altText ? sanitizeText(altText, 200) : sanitizeText(title, 120),
-        displayOrder: displayOrder ? parseInt(displayOrder, 10) : 0,
+        displayOrder: toInt(displayOrder, 0),
         isFeatured: Boolean(isFeatured),
         isActive: isActive !== undefined ? Boolean(isActive) : true
       }
@@ -409,7 +408,12 @@ async function updateGalleryImage(req, res, next) {
     const updateData = {};
     if (title && title.trim()) updateData.title = sanitizeText(title, 120);
     if (category && category.trim()) updateData.category = sanitizeText(category, 50);
-    if (imageUrl && imageUrl.trim()) updateData.imageUrl = imageUrl.trim();
+    if (imageUrl && imageUrl.trim()) {
+      if (!isSafeUrl(imageUrl)) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid image URL (http/https or relative path).' });
+      }
+      updateData.imageUrl = imageUrl.trim();
+    }
     if (altText !== undefined) updateData.altText = sanitizeText(altText, 200);
     if (displayOrder !== undefined) updateData.displayOrder = parseInt(displayOrder, 10) || 0;
     if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
@@ -554,7 +558,12 @@ async function updateBusinessSettings(req, res, next) {
     if (openingHour) updateData.openingHour = sanitizeText(openingHour, 20);
     if (closingHour) updateData.closingHour = sanitizeText(closingHour, 20);
     if (weeklyOffDay) updateData.weeklyOffDay = sanitizeText(weeklyOffDay, 20);
-    if (googleMapsUrl !== undefined) updateData.googleMapsUrl = googleMapsUrl ? googleMapsUrl.trim() : null;
+    if (googleMapsUrl !== undefined) {
+      if (googleMapsUrl && !isSafeUrl(googleMapsUrl)) {
+        return res.status(400).json({ success: false, message: 'Google Maps link must be a valid http(s) URL.' });
+      }
+      updateData.googleMapsUrl = googleMapsUrl ? googleMapsUrl.trim() : null;
+    }
 
     const updated = await prisma.businessSettings.upsert({
       where: { id: 'default' },
@@ -585,7 +594,73 @@ async function updateBusinessSettings(req, res, next) {
   }
 }
 
+// =========================================================================
+// 7. CATEGORY EDIT / DELETE & ADMIN-CREATED TESTIMONIALS
+// =========================================================================
+
+async function updateCategory(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { name, description, displayOrder, isActive } = req.body;
+    const data = {};
+    if (name && name.trim()) data.name = sanitizeText(name, 100);
+    if (description !== undefined) data.description = description ? sanitizeText(description, 500) : null;
+    if (displayOrder !== undefined) data.displayOrder = toInt(displayOrder, 0);
+    if (isActive !== undefined) data.isActive = Boolean(isActive);
+    const updated = await prisma.serviceCategory.update({ where: { id }, data });
+    res.status(200).json({ success: true, message: 'Category updated successfully.', data: updated });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteCategory(req, res, next) {
+  try {
+    const { id } = req.params;
+    const serviceCount = await prisma.service.count({ where: { categoryId: id } });
+    if (serviceCount > 0) {
+      return res.status(409).json({
+        success: false,
+        message: `This category still has ${serviceCount} service(s). Move or delete them first.`
+      });
+    }
+    await prisma.serviceCategory.delete({ where: { id } });
+    res.status(200).json({ success: true, message: 'Category deleted successfully.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function createTestimonial(req, res, next) {
+  try {
+    const { clientName, serviceName, rating, reviewText, isApproved, displayOrder } = req.body;
+    if (!clientName || !clientName.trim()) {
+      return res.status(400).json({ success: false, message: 'Client name is required.' });
+    }
+    if (!reviewText || !reviewText.trim()) {
+      return res.status(400).json({ success: false, message: 'Review text is required.' });
+    }
+    const stars = toInt(rating, 5);
+    const created = await prisma.testimonial.create({
+      data: {
+        clientName: sanitizeText(clientName, 100),
+        serviceName: serviceName ? sanitizeText(serviceName, 100) : null,
+        rating: Math.min(5, Math.max(1, stars)),
+        reviewText: sanitizeText(reviewText, 1000),
+        isApproved: isApproved !== undefined ? Boolean(isApproved) : true,
+        displayOrder: toInt(displayOrder, 0)
+      }
+    });
+    res.status(201).json({ success: true, message: 'Testimonial added successfully.', data: created });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
+  updateCategory,
+  deleteCategory,
+  createTestimonial,
   getDashboardSummary,
   getAppointments,
   updateAppointmentStatus,

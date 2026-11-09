@@ -13,8 +13,7 @@ export default function AdminPage({ adminToken, adminUser, onLoginSuccess, onLog
   if (!adminToken) {
     return (
       <div className="pt-20 min-h-screen bg-salon-blush flex items-center justify-center p-4">
-        <AdminLogin onLoginSuccess={onLoginSuccess} onBackToSite={handleBackToSite}
-        onContentUpdated={onContentUpdated} />
+        <AdminLogin onLoginSuccess={onLoginSuccess} onBackToSite={handleBackToSite} />
       </div>
     );
   }
@@ -25,7 +24,9 @@ export default function AdminPage({ adminToken, adminUser, onLoginSuccess, onLog
         token={adminToken} 
         admin={adminUser} 
         onLogout={onLogout} 
-        onBackToSite={handleBackToSite} 
+        onBackToSite={handleBackToSite}
+        onContentUpdated={onContentUpdated}
+        onTokenRefreshed={(newToken) => onLoginSuccess(newToken, adminUser)}
       />
     </div>
   );

@@ -1,36 +1,43 @@
-require('dotenv').config();
+const { config, assertProductionConfig, isLocalDatabase } = require('./config/env');
 const app = require('./app');
-const { ensureDatabaseRunning } = require('../scripts/ensure-db');
-
-const PORT = process.env.PORT || 5000;
+const prisma = require('./db');
 
 async function startServer() {
-  try {
-    await ensureDatabaseRunning();
-  } catch (err) {
-    console.warn('[Database] Pre-flight DB check warning:', err.message);
+  assertProductionConfig();
+
+  // Only try to auto-start PostgreSQL for a local development database.
+  if (!config.isProduction && isLocalDatabase()) {
+    try {
+      const { ensureDatabaseRunning } = require('../scripts/ensure-db');
+      await ensureDatabaseRunning();
+    } catch (err) {
+      console.warn('[Database] Pre-flight DB check warning:', err.message);
+    }
   }
 
-  const server = app.listen(PORT, () => {
-    console.log(`===============================================`);
-    console.log(` Preeti Makeover Backend Service`);
-    console.log(` Running on: http://localhost:${PORT}`);
-    console.log(` Healthcheck: http://localhost:${PORT}/api/health`);
-    console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`===============================================`);
+  const server = app.listen(config.port, () => {
+    console.log('===============================================');
+    console.log(' Preeti Makeover Backend Service');
+    console.log(` Running on:  http://localhost:${config.port}`);
+    console.log(` Healthcheck: http://localhost:${config.port}/api/health`);
+    console.log(` Environment: ${config.nodeEnv}`);
+    console.log('===============================================');
   });
 
-  // Graceful Shutdown
-  const handleShutdown = (signal) => {
-    console.log(`Received ${signal}. Shutting down server gracefully...`);
-    server.close(() => {
-      console.log('HTTP server closed.');
+  const shutdown = (signal) => {
+    console.log(`Received ${signal}. Shutting down gracefully...`);
+    server.close(async () => {
+      await prisma.$disconnect().catch(() => {});
       process.exit(0);
     });
+    setTimeout(() => process.exit(1), 10000).unref();
   };
 
-  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
-  process.on('SIGINT', () => handleShutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error(err.message || err);
+  process.exit(1);
+});

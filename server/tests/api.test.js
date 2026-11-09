@@ -4,6 +4,16 @@
 const http = require('http');
 const app = require('../src/app');
 
+// Upcoming dates computed at runtime so tests never go stale
+function nextWeekday(day) { // 0=Sun..6=Sat
+  const d = new Date();
+  d.setDate(d.getDate() + 7 + ((day - d.getDay() + 7) % 7));
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+const NEXT_TUESDAY = nextWeekday(2);
+const NEXT_WEDNESDAY = nextWeekday(3);
+
 let server;
 let baseUrl;
 
@@ -101,7 +111,7 @@ async function runTests() {
     const res6 = await request('POST', '/api/appointments', {
       customerName: 'Pooja Verma',
       phone: '9810359438',
-      preferredDate: '2026-10-27',
+      preferredDate: NEXT_TUESDAY,
       serviceName: 'Bridal HD Makeup'
     });
     assert(res6.status === 422 && res6.body.isTuesday === true, 
@@ -111,17 +121,17 @@ async function runTests() {
     const res7 = await request('POST', '/api/appointments', {
       customerName: 'Pooja Verma',
       phone: '12345',
-      preferredDate: '2026-10-28',
+      preferredDate: NEXT_WEDNESDAY,
       serviceName: 'Bridal HD Makeup'
     });
     assert(res7.status === 400 && res7.body.field === 'phone', 
       'POST /api/appointments rejects invalid phone with HTTP 400');
 
-    // Test 8: Accept Valid Appointment (Wednesday 2026-10-28)
+    // Test 8: Accept Valid Appointment (next Wednesday)
     const res8 = await request('POST', '/api/appointments', {
       customerName: 'Simran Kaur',
       phone: '9810359438',
-      preferredDate: '2026-10-28',
+      preferredDate: NEXT_WEDNESDAY,
       preferredTime: '11:30 AM',
       serviceName: 'Casmara Luxury Algae Facial',
       message: 'Need consultation for sensitive skin.'
@@ -134,7 +144,7 @@ async function runTests() {
     const res9 = await request('POST', '/api/appointments', {
       customerName: 'Spam Bot',
       phone: '9810359438',
-      preferredDate: '2026-10-28',
+      preferredDate: NEXT_WEDNESDAY,
       website: 'https://spambot-link.com'
     });
     assert(res9.status === 200 && res9.body.data === undefined, 
@@ -364,6 +374,7 @@ async function runTests() {
 
     // Test 32: getJwtSecret Fails Safely in Production When Secret is Missing
     const { getJwtSecret } = require('../src/middleware/authMiddleware');
+
     const savedEnv = process.env.NODE_ENV;
     const savedSecret = process.env.JWT_SECRET;
     let thrownInProduction = false;

@@ -20,7 +20,7 @@ export default function AdminPage({ adminToken, adminUser, onLoginSuccess, onLog
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2]">
+    <div className="min-h-screen bg-[#FFF7FA]">
       <AdminDashboard 
         token={adminToken} 
         admin={adminUser} 

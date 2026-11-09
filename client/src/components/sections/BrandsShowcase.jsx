@@ -13,8 +13,8 @@ import {
 
 
 export default function BrandsShowcase({ content = {} }) {
-  const eyebrow = content?.eyebrow || '{eyebrow}';
-  const mainTitle = content?.title || '{mainTitle}';
+  const eyebrow = content?.eyebrow && content.eyebrow !== '{eyebrow}' ? content.eyebrow : 'CERTIFIED CLINICAL QUALITY';
+  const mainTitle = content?.title && content.title !== '{mainTitle}' ? content.title : 'Professional Product Brands';
   const [activeTab, setActiveTab] = useState(0);
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -69,14 +69,14 @@ export default function BrandsShowcase({ content = {} }) {
       <div className="absolute top-1/2 left-10 w-80 h-80 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
       <div className="absolute top-1/2 right-10 w-80 h-80 bg-salon-rose/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-9">
           <span className="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-salon-gold-dark font-semibold block mb-2">
             CERTIFIED CLINICAL QUALITY
           </span>
-          <h2 className="text-2xl sm:text-4xl lg:text-[42px] font-serif font-bold text-salon-maroon tracking-tight leading-tight mb-2.5">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight leading-tight mb-2.5">
             Professional Product Brands
           </h2>
           <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mx-auto mb-3"></div>
@@ -173,7 +173,7 @@ export default function BrandsShowcase({ content = {} }) {
               <div>
                 {/* Top Row: Luxury Monogram Crest & Index Number */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1A030D] via-[#2A0617] to-salon-maroon text-salon-gold font-cinzel font-bold text-sm tracking-wider flex items-center justify-center shadow-md border border-salon-gold/40 ring-1 ring-salon-gold/25 ring-offset-2 ring-offset-white group-hover:scale-105 group-hover:border-salon-gold group-hover:shadow-gold-glow transition-all duration-300 shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3A0D2C] via-[#3A0D2C] to-salon-maroon text-salon-gold font-cinzel font-bold text-sm tracking-wider flex items-center justify-center shadow-md border border-salon-gold/40 ring-1 ring-salon-gold/25 ring-offset-2 ring-offset-white group-hover:scale-105 group-hover:border-salon-gold group-hover:shadow-gold-glow transition-all duration-300 shrink-0">
                     {b.initials}
                   </div>
 

@@ -5,6 +5,12 @@ import Footer from './components/layout/Footer';
 import MobileQuickBar from './components/layout/MobileQuickBar';
 import ScrollToTop from './components/common/ScrollToTop';
 import FloatingWhatsApp from './components/common/FloatingWhatsApp';
+import ScrollProgress from './components/common/ScrollProgress';
+import BackToTop from './components/common/BackToTop';
+import FloatingPetals from './components/common/FloatingPetals';
+import PageTransition from './components/common/PageTransition';
+import useAutoReveal from './components/common/useAutoReveal';
+import { AnimatePresence } from 'framer-motion';
 
 
 // Multi-Page Routes
@@ -36,6 +42,7 @@ function AppLayout({
   const location = useLocation();
   const navigate = useNavigate();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  useAutoReveal();
 
   // Handle legacy hash migration (#admin -> /admin)
   useEffect(() => {
@@ -46,17 +53,21 @@ function AppLayout({
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-salon-blush text-salon-text font-sans antialiased selection:bg-salon-gold/30 selection:text-salon-maroon">
+    <div className="min-h-screen flex flex-col text-salon-text font-sans antialiased selection:bg-salon-rose/30 selection:text-salon-maroon">
       <ScrollToTop />
       {/* Global Botanical Watermarks across all pages */}
       
 
       {/* Public Header Navigation (Hidden on Admin portal for clean workspace) */}
+      {!isAdminRoute && <ScrollProgress />}
+      {!isAdminRoute && <FloatingPetals />}
       {!isAdminRoute && <Navbar />}
 
       {/* Main Multi-page Routes */}
-      <main className="flex-1 pb-20 md:pb-0">
-        <Routes>
+      <main className="relative z-[1] flex-1 pb-20 md:pb-0">
+        <AnimatePresence mode="wait">
+        <PageTransition key={isAdminRoute ? 'admin' : location.pathname}>
+        <Routes location={location}>
           <Route 
             path="/" 
             element={
@@ -132,6 +143,8 @@ function AppLayout({
           {/* Catch-all redirect to Home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </PageTransition>
+        </AnimatePresence>
       </main>
 
       {/* Public Footer & Floating Mobile Bar */}
@@ -140,6 +153,7 @@ function AppLayout({
           <Footer />
           <MobileQuickBar />
           <FloatingWhatsApp />
+          <BackToTop />
         </>
       )}
     </div>

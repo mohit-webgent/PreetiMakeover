@@ -41,7 +41,7 @@ export default function GallerySection({ galleryImages = [], onBookClick }) {
     : (filter === 'all' ? defaultPlaceholders : defaultPlaceholders.filter(p => p.category === filter));
 
   return (
-    <section id="gallery" className="py-24 bg-[#FAF7F2]">
+    <section id="gallery" className="py-24 bg-[#FFF7FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header matching PDF Page 2 */}

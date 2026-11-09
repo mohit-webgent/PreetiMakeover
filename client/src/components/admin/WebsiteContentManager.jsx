@@ -466,7 +466,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('hero')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Hero Changes'}</span>
@@ -655,7 +655,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('ribbon')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Ribbon Changes'}</span>
@@ -781,7 +781,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('signature')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Services Cards'}</span>
@@ -916,7 +916,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('bridal')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Bridal Changes'}</span>
@@ -1026,7 +1026,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('brands')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Brands Changes'}</span>
@@ -1074,7 +1074,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('about')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save About Changes'}</span>
@@ -1160,7 +1160,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               <button
                 onClick={() => handleSaveSection('cta')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Banner Changes'}</span>

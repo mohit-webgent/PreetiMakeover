@@ -99,12 +99,12 @@ export default function GalleryPage({ galleryImages = [] }) {
   };
 
   return (
-    <div className="pt-28 pb-24 bg-salon-blush min-h-screen">
+    <div className="pt-24 sm:pt-28 pb-24 min-h-screen">
       
       {/* 1. Page Header */}
-      <div className="bg-salon-blush border-b border-salon-babypink/60 py-14 relative overflow-hidden">
+      <div className="page-hero">
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
           
           <nav className="flex items-center gap-2 text-xs text-salon-text/60 mb-4" aria-label="Breadcrumb">
             <Link to="/" className="hover:text-salon-maroon transition-colors">Home</Link>
@@ -156,7 +156,7 @@ export default function GalleryPage({ galleryImages = [] }) {
       </div>
 
       {/* 2. Gallery Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative overflow-hidden">
+      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-16 relative overflow-hidden">
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredItems.map((item, idx) => (

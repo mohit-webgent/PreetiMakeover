@@ -11,7 +11,7 @@ export default function BridalFeature({ onBridalEnquiry }) {
   ];
 
   return (
-    <section id="bridal" className="py-16 bg-[#FAF7F2]">
+    <section id="bridal" className="py-16 bg-[#FFF7FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Deep Plum Editorial Banner matching PDF Page 1 */}

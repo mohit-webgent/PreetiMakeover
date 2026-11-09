@@ -1,240 +1,229 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { 
-  Phone, 
-  Menu, 
-  X, 
-  Sparkles, 
-  ChevronRight, 
-  MessageCircle
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Phone,
+  Menu,
+  X,
+  Sparkles,
+  ChevronRight,
+  MessageCircle,
+  Home,
+  Scissors,
+  Crown,
+  Images,
+  Heart,
+  CalendarHeart
 } from 'lucide-react';
 
+const navLinks = [
+  { label: 'Home', path: '/', icon: Home },
+  { label: 'Services', path: '/services', icon: Scissors },
+  { label: 'Bridal', path: '/bridal-makeup', icon: Crown },
+  { label: 'Gallery', path: '/gallery', icon: Images },
+  { label: 'About', path: '/about', icon: Heart },
+  { label: 'Contact', path: '/contact', icon: CalendarHeart }
+];
+
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+  useEffect(() => setOpen(false), [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Services', path: '/services' },
-    { label: 'Bridal Makeup', path: '/bridal-makeup' },
-    { label: 'Gallery', path: '/gallery' },
-    { label: 'About Us', path: '/about' },
-    { label: 'Contact & Book', path: '/contact' },
-  ];
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
   return (
     <>
-      <header className="fixed top-0 lg:top-3.5 left-0 right-0 z-50 px-0 lg:px-6 pointer-events-none transition-all duration-300">
-        {/* Floating Island Container - Constrained Width & Rounded Pill on Desktop */}
-        <div className="w-full lg:max-w-6xl mx-auto pointer-events-auto">
-          <div className="bg-[#2B0B1A]/95 backdrop-blur-xl border-b border-salon-gold/25 lg:border lg:border-salon-gold/35 shadow-[0_4px_20px_rgba(0,0,0,0.4)] lg:shadow-[0_12px_35px_rgba(0,0,0,0.5)] rounded-none lg:rounded-full px-3.5 sm:px-5 py-2.5 sm:py-2.5 transition-all duration-300">
-            <div className="flex items-center justify-between">
-
-              {/* Brand Logo with Cinzel Luxury Typography */}
-              <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group focus:outline-none select-none">
-                <div className="relative flex items-center justify-center shrink-0">
-                  <img
-                    src="/pm_logo.png"
-                    alt="Preeti Makeover Crest"
-                    className="h-8 sm:h-10 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(212,175,55,0.45)] group-hover:scale-105 group-hover:drop-shadow-[0_4px_12px_rgba(212,175,55,0.65)] transition-all duration-300"
-                  />
-                </div>
-                <div className="flex flex-col justify-center">
-                  <span className="font-cinzel text-[13px] sm:text-base md:text-lg font-bold tracking-[0.08em] text-white group-hover:text-salon-gold-light transition-colors leading-tight">
-                    PREETI MAKEOVER
+      <header className="fixed top-0 left-0 right-0 z-50 px-0 lg:px-6 pointer-events-none">
+        <motion.div
+          initial={{ y: -40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={`pointer-events-auto mx-auto transition-all duration-500 ${
+            scrolled ? 'lg:mt-2 lg:max-w-6xl' : 'lg:mt-4 lg:max-w-7xl'
+          }`}
+        >
+          <div
+            className={`border-b lg:border border-white/70 backdrop-blur-xl lg:rounded-full px-4 sm:px-6 lg:px-5 transition-all duration-500 ${
+              scrolled
+                ? 'bg-white/85 py-2 shadow-[0_12px_40px_-12px_rgba(163,36,94,0.28)]'
+                : 'bg-white/60 py-2.5 sm:py-3 shadow-[0_8px_30px_-15px_rgba(163,36,94,0.2)]'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-4">
+              {/* Brand */}
+              <Link to="/" className="flex items-center gap-2.5 group select-none shrink-0">
+                <motion.img
+                  whileHover={{ rotate: -8, scale: 1.08 }}
+                  src="/pm_logo.png"
+                  alt="Preeti Makeover"
+                  className="h-9 sm:h-10 w-auto object-contain drop-shadow-[0_4px_10px_rgba(238,127,168,0.45)]"
+                />
+                <div className="leading-none">
+                  <span className="block font-serif text-[15px] sm:text-lg font-bold text-salon-maroon tracking-wide">
+                    Preeti <span className="italic text-gradient-rose">Makeover</span>
                   </span>
-                  <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.22em] text-salon-gold font-medium block leading-none mt-0.5">
-                    Luxury Salon & Studio
+                  <span className="block font-script text-[15px] sm:text-base text-salon-rose-dark -mt-0.5">
+                    beauty is our duty
                   </span>
                 </div>
               </Link>
 
-              {/* Desktop Navigation Links */}
-              <nav className="hidden lg:flex items-center space-x-1" aria-label="Main Navigation">
+              {/* Desktop links with sliding pill */}
+              <nav className="hidden lg:flex items-center gap-1 rounded-full bg-salon-babypink-light/70 p-1 border border-salon-rose/15" aria-label="Main navigation">
                 {navLinks.map((link) => (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    end={link.path === '/'}
-                    className={({ isActive }) =>
-                      `px-3.5 py-1.5 text-[11px] xl:text-xs uppercase tracking-wider font-medium transition-all duration-200 rounded-full ${
-                        isActive
-                          ? 'text-salon-gold font-bold bg-white/10 border border-salon-gold/30'
-                          : 'text-salon-blush/80 hover:text-white hover:bg-white/5'
-                      }`
-                    }
-                  >
-                    {link.label}
+                  <NavLink key={link.path} to={link.path} end={link.path === '/'} className="relative">
+                    {({ isActive }) => (
+                      <span
+                        className={`relative z-10 block px-4 py-2 text-[13px] font-medium rounded-full transition-colors duration-300 ${
+                          isActive ? 'text-white' : 'text-salon-text-muted hover:text-salon-maroon'
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.span
+                            layoutId="nav-pill"
+                            className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-salon-maroon via-salon-rose-dark to-salon-rose shadow-luxury-gold"
+                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                          />
+                        )}
+                        {link.label}
+                      </span>
+                    )}
                   </NavLink>
                 ))}
               </nav>
 
-              {/* Desktop CTAs */}
-              <div className="hidden sm:flex items-center gap-2">
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold text-salon-maroon-deep bg-gradient-to-r from-[#D4AF37] via-[#E5C583] to-[#C5A15A] hover:from-[#E5C583] hover:to-[#D4AF37] shadow-[0_4px_16px_rgba(197,161,90,0.35)] hover:shadow-[0_6px_22px_rgba(197,161,90,0.55)] transition-all transform hover:-translate-y-0.5 border border-salon-gold-light group"
+              {/* CTAs */}
+              <div className="flex items-center gap-2">
+                <a
+                  href="tel:+918810359438"
+                  className="hidden xl:inline-flex items-center gap-1.5 text-[13px] font-medium text-salon-maroon hover:text-salon-rose-dark transition-colors pr-1"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-salon-maroon-deep" />
-                  <span>Book Now</span>
+                  <Phone className="w-4 h-4" /> 88103 59438
+                </a>
+                <Link to="/contact" className="btn-primary !px-4 sm:!px-5 !py-2 sm:!py-2.5 !text-xs sm:!text-[13px]">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Book<span className="hidden sm:inline"> Now</span></span>
                 </Link>
-              </div>
-
-              {/* Mobile Controls (Book + Hamburger) */}
-              <div className="lg:hidden flex items-center gap-2">
-                <Link
-                  to="/contact"
-                  className="sm:hidden px-3.5 py-1.5 rounded-full text-[11px] font-bold text-salon-maroon bg-gradient-to-r from-salon-gold-light via-salon-gold to-salon-gold-dark shadow-sm active:scale-95"
-                >
-                  Book
-                </Link>
-
                 <button
-                  onClick={() => setMobileMenuOpen(true)}
-                  className="min-w-[40px] min-h-[40px] flex items-center justify-center p-2 rounded-xl text-salon-gold bg-white/10 hover:bg-white/15 active:scale-95 focus:outline-none transition-all border border-salon-gold/40 shadow-sm"
-                  aria-label="Open navigation menu"
+                  onClick={() => setOpen(true)}
+                  className="lg:hidden w-10 h-10 rounded-full flex items-center justify-center bg-white text-salon-maroon border border-salon-rose/30 shadow-sm active:scale-90 transition"
+                  aria-label="Open menu"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
               </div>
-
             </div>
           </div>
-        </div>
+        </motion.div>
       </header>
 
-      {/* Full-Screen Mobile Navigation Overlay - 100% Solid, High Contrast, No Borders, Non-Scrollable */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 bg-[#16020E] z-[100] flex flex-col justify-between px-6 py-6 sm:px-8 sm:py-8 overflow-hidden select-none animate-fade-in">
-          
-          {/* Top Bar: Brand Crest + Close Button (X) */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/10">
-            <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5">
-              <img
-                src="/pm_logo.png"
-                alt="Preeti Makeover Logo"
-                className="h-10 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(212,175,55,0.4)]"
-              />
-              <div>
-                <span className="font-cinzel text-base font-bold tracking-wider text-white block leading-tight">
-                  PREETI MAKEOVER
-                </span>
-                <span className="text-[9px] uppercase tracking-widest text-salon-gold font-medium block mt-0.5">
-                  Luxury Salon & Studio
-                </span>
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="lg:hidden fixed inset-0 z-[90] bg-salon-maroon-subtle/40 backdrop-blur-sm"
+            />
+            <motion.aside
+              key="drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 32 }}
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-[100] w-[86%] max-w-sm bg-petal-gradient shadow-2xl flex flex-col overflow-y-auto"
+              aria-label="Mobile navigation"
+            >
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-salon-rose/25 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-10 -left-16 w-56 h-56 rounded-full bg-salon-lavender/40 blur-3xl pointer-events-none" />
+
+              <div className="relative flex items-center justify-between px-6 pt-6 pb-4">
+                <div>
+                  <p className="font-serif text-xl font-bold text-salon-maroon">
+                    Preeti <span className="italic text-gradient-rose">Makeover</span>
+                  </p>
+                  <p className="font-script text-lg text-salon-rose-dark -mt-1">beauty is our duty</p>
+                </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="w-10 h-10 rounded-full bg-white text-salon-maroon shadow flex items-center justify-center active:scale-90 transition"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            </Link>
 
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-10 h-10 rounded-full bg-white/10 text-white hover:text-salon-gold flex items-center justify-center active:scale-95 transition-all"
-              aria-label="Close navigation menu"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+              <nav className="relative flex-1 px-4 py-2 space-y-1.5">
+                {navLinks.map((link, i) => {
+                  const Icon = link.icon;
+                  return (
+                    <motion.div
+                      key={link.path}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.08 + i * 0.05 }}
+                    >
+                      <NavLink
+                        to={link.path}
+                        end={link.path === '/'}
+                        className={({ isActive }) =>
+                          `group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 transition-all ${
+                            isActive
+                              ? 'bg-gradient-to-r from-salon-maroon to-salon-rose-dark text-white shadow-luxury-gold'
+                              : 'bg-white/70 text-salon-text hover:bg-white'
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <>
+                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-salon-babypink text-salon-maroon'}`}>
+                              <Icon className="w-[18px] h-[18px]" />
+                            </span>
+                            <span className="flex-1 font-medium">{link.label === 'Bridal' ? 'Bridal Makeup' : link.label}</span>
+                            <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isActive ? 'text-white' : 'text-salon-rose'}`} />
+                          </>
+                        )}
+                      </NavLink>
+                    </motion.div>
+                  );
+                })}
+              </nav>
 
-          {/* Navigation Links - Solid Bold White / Gold, Cinzel Luxury Font, No Borders, Clean Spacing */}
-          <nav className="flex flex-col space-y-2.5 sm:space-y-3.5 my-auto py-2" aria-label="Mobile Navigation">
-            {navLinks.map((link, idx) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                end={link.path === '/'}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `group flex items-center justify-between py-2.5 text-left transition-all duration-200 border-none outline-none ${
-                    isActive
-                      ? 'text-salon-gold'
-                      : 'text-white/95 hover:text-salon-gold-light'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className="flex items-center gap-3.5">
-                      <span className={`font-cinzel text-xs tracking-widest ${
-                        isActive ? 'text-salon-gold font-bold' : 'text-salon-gold/50 font-medium'
-                      }`}>
-                        0{idx + 1}
-                      </span>
-                      <span className={`font-cinzel tracking-[0.08em] uppercase transition-colors ${
-                        isActive 
-                          ? 'font-bold text-lg sm:text-xl text-salon-gold' 
-                          : 'font-semibold text-base sm:text-lg text-white group-hover:text-salon-gold-light'
-                      }`}>
-                        {link.label}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center">
-                      <ChevronRight
-                        className={`w-4 h-4 transition-transform ${
-                          isActive ? 'text-salon-gold translate-x-1' : 'text-white/30 group-hover:text-salon-gold/70'
-                        }`}
-                      />
-                    </div>
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-
-          {/* Bottom Actions - Clear & Direct (No Scroll Needed) */}
-          <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
-            <Link
-              to="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-3.5 rounded-full text-center font-cinzel font-bold text-xs sm:text-sm tracking-[0.12em] uppercase text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold shadow-luxury transition-all active:scale-95"
-            >
-              Book an Appointment
-            </Link>
-
-            <div className="flex items-center justify-between text-xs text-white/80 pt-1">
-              <a
-                href="tel:+918810359438"
-                className="flex items-center gap-1.5 text-white hover:text-salon-gold transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5 text-salon-gold" />
-                <span>+91 8810359438</span>
-              </a>
-
-              <a
-                href="https://wa.me/918810359438"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors"
-              >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span>WhatsApp Chat</span>
-              </a>
-            </div>
-
-            <div className="flex items-center justify-between text-[10px] text-white/50 pt-1 font-sans">
-              <span>Prince Colony, Harinagar, Badarpur</span>
-              <span className="text-salon-gold">Open 10 AM – 9 PM</span>
-            </div>
-          </div>
-
-        </div>
-      )}
+              <div className="relative p-5 space-y-3">
+                <Link to="/contact" className="btn-primary w-full !py-3.5">
+                  <CalendarHeart className="w-4 h-4" /> Book an Appointment
+                </Link>
+                <div className="grid grid-cols-2 gap-2">
+                  <a href="tel:+918810359438" className="btn-soft !px-3 !py-2.5 !text-xs">
+                    <Phone className="w-4 h-4" /> Call
+                  </a>
+                  <a href="https://wa.me/918810359438" target="_blank" rel="noopener noreferrer" className="btn-soft !px-3 !py-2.5 !text-xs !text-emerald-700">
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </a>
+                </div>
+                <p className="text-center text-[11px] text-salon-text-muted">Open 10 AM – 9 PM · Closed Tuesdays</p>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

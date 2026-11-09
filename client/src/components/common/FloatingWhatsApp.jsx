@@ -14,7 +14,7 @@ export default function FloatingWhatsApp() {
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
-      className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50"
+      className="hidden md:flex fixed bottom-6 right-6 z-50"
     >
       <a
         href="https://wa.me/918810359438?text=Hello%20Preeti%20Makeover,%20I%20would%20like%20to%20enquire%20about%20salon%20services."
@@ -30,7 +30,7 @@ export default function FloatingWhatsApp() {
         <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8 relative z-10 drop-shadow-sm" />
 
         {/* Hover Tooltip (desktop only) */}
-        <span className="hidden sm:group-hover:flex absolute right-full mr-3.5 items-center px-3 py-1.5 rounded-xl bg-[#250816]/95 backdrop-blur-md text-white text-xs font-semibold whitespace-nowrap shadow-luxury border border-salon-gold/30 pointer-events-none transition-all">
+        <span className="hidden sm:group-hover:flex absolute right-full mr-3.5 items-center px-3 py-1.5 rounded-xl bg-[#3A0D2C]/95 backdrop-blur-md text-white text-xs font-semibold whitespace-nowrap shadow-luxury border border-salon-gold/30 pointer-events-none transition-all">
           <span className="w-2 h-2 rounded-full bg-[#25D366] mr-2 animate-pulse" />
           Chat on WhatsApp
         </span>

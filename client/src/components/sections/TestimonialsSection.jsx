@@ -32,7 +32,7 @@ function FaceArtSvg({ className = "w-full h-full" }) {
       {/* Upper Eyelid / Brow Arch */}
       <path
         d="M100 135 C130 110, 165 118, 185 145"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -40,7 +40,7 @@ function FaceArtSvg({ className = "w-full h-full" }) {
       {/* Eye Crease / Lash curve */}
       <path
         d="M115 158 C135 172, 160 168, 175 148"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="6.5"
         strokeLinecap="round"
       />
@@ -48,7 +48,7 @@ function FaceArtSvg({ className = "w-full h-full" }) {
       {/* Elegant Continuous Profile Line (Forehead -> Nose Bridge -> Tip -> Nostril) */}
       <path
         d="M185 70 C182 150, 208 240, 198 298 C192 318, 205 332, 222 328 C238 322, 246 308, 238 290 C232 280, 218 280, 218 290"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -57,24 +57,24 @@ function FaceArtSvg({ className = "w-full h-full" }) {
       {/* Bold Outer Cheek and Jawline Sweep down to Chin */}
       <path
         d="M50 205 C40 320, 46 425, 110 480 C160 525, 235 515, 285 435 C310 395, 335 425, 350 455"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="8.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
 
       {/* Signature Beauty Spots / Freckles on cheek */}
-      <circle cx="85" cy="290" r="5" fill="#14020A" />
-      <circle cx="115" cy="275" r="5.5" fill="#14020A" />
-      <circle cx="138" cy="265" r="4.5" fill="#14020A" />
-      <circle cx="148" cy="290" r="5" fill="#14020A" />
-      <circle cx="105" cy="305" r="4" fill="#14020A" />
+      <circle cx="85" cy="290" r="5" fill="#3A0D2C" />
+      <circle cx="115" cy="275" r="5.5" fill="#3A0D2C" />
+      <circle cx="138" cy="265" r="4.5" fill="#3A0D2C" />
+      <circle cx="148" cy="290" r="5" fill="#3A0D2C" />
+      <circle cx="105" cy="305" r="4" fill="#3A0D2C" />
 
       {/* Full Sensual Lips */}
       {/* Upper Lip Contour with Cupid's Bow */}
       <path
         d="M135 375 C158 355, 175 365, 185 375 C195 365, 212 355, 245 380"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="7"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -82,14 +82,14 @@ function FaceArtSvg({ className = "w-full h-full" }) {
       {/* Mouth Parting Line */}
       <path
         d="M135 375 C168 395, 210 395, 245 380"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="6"
         strokeLinecap="round"
       />
       {/* Lower Lip Contour */}
       <path
         d="M142 380 C165 432, 215 432, 238 380"
-        stroke="#14020A"
+        stroke="#3A0D2C"
         strokeWidth="7"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -215,8 +215,8 @@ export default function TestimonialsSection({ testimonials = [] }) {
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-salon-babypink/30 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 right-10 w-80 h-80 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main Section Container with wider max-width for large screens */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Main Section Container (Full-Width Responsive) */}
+      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
 
         {/* Customer-friendly Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
@@ -233,7 +233,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
         <div
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
-          className="max-w-full md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto bg-white rounded-3xl shadow-luxury-lg border border-salon-gold/25 p-5 sm:p-8 md:p-10 lg:p-12 relative transition-all duration-300 group overflow-hidden"
+          className="w-full bg-white/90 backdrop-blur rounded-[2rem] shadow-luxury-lg border border-white ring-1 ring-salon-rose/20 p-5 sm:p-8 md:p-10 lg:p-12 relative transition-all duration-300 group overflow-hidden"
         >
 
           {/* Subtle Live Auto-rotate Pulse badge */}

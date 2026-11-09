@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/sections/Hero';
 import BrandsShowcase from '../components/sections/BrandsShowcase';
+import PromiseRibbon from '../components/sections/PromiseRibbon';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
 
 import {
@@ -14,7 +15,11 @@ import {
   Check,
   Calendar,
   Phone,
-  Eye
+  Eye,
+  Star,
+  Award,
+  Crown,
+  Heart
 } from 'lucide-react';
 
 export default function HomePage({ categories = [], testimonials = [], galleryImages = [], onSelectService, siteContent = {} }) {
@@ -25,6 +30,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       category: 'Bridal Studio',
       desc: 'Flawless high-definition bridal glam with bespoke hair draping and long-wear waterproof skin prep.',
       badge: 'Most Requested',
+      highlight: 'Waterproof HD Finish',
       link: '/bridal-makeup',
       image: '/signature-bridal.jpg'
     },
@@ -33,6 +39,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       category: 'Clinical Skincare',
       desc: 'Spanish peel-off algae mask delivering intense hydration, firming and luminous radiance.',
       badge: 'Skin Glow',
+      highlight: 'Spanish Algae Peel',
       link: '/services',
       image: '/signature-facial.jpg'
     },
@@ -41,6 +48,7 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       category: 'Hair Treatments',
       desc: 'Advanced structural realignment and keratin sealing for mirror-shine, frizz-free hair.',
       badge: 'Restorative',
+      highlight: 'Mirror-Shine Keratin',
       link: '/services',
       image: '/signature-hair.jpg'
     },
@@ -49,11 +57,11 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
       category: 'Hygienic Care',
       desc: 'Gentle, 98% natural origin colophony-free wax designed for sensitive and delicate skin.',
       badge: 'Painless Care',
+      highlight: '98% Natural Origin',
       link: '/services',
       image: '/signature-waxing.jpg'
     }
   ];
-
 
   // Dynamic Ribbon Commitments
   const ribbonCards = [
@@ -79,117 +87,49 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
     },
   ];
 
+  // Social Proof Stats
+  const salonStats = [
+    { number: '10+', label: 'Years Experience', sub: 'Founded by Preeti Mandal', icon: Award },
+    { number: '1,200+', label: 'Happy Brides', sub: 'Signature HD Glamour', icon: Crown },
+    { number: '27+', label: 'Salon Services', sub: 'Hair, Skin & Bridal', icon: Sparkles },
+    { number: '4.9★', label: 'Client Rating', sub: 'Google & Direct Reviews', icon: Star },
+  ];
 
   // Dynamic Signature / Most Loved Services
   const activeSignatureItems = (Array.isArray(siteContent?.signature?.items) && siteContent.signature.items.length > 0)
     ? siteContent.signature.items
     : signatureTreatments;
-  const signatureEyebrow = siteContent?.signature?.eyebrow || '{signatureEyebrow}';
-  const signatureMainTitle = siteContent?.signature?.title || '{signatureMainTitle}';
+  
+  const signatureEyebrow = siteContent?.signature?.eyebrow && siteContent.signature.eyebrow !== '{signatureEyebrow}'
+    ? siteContent.signature.eyebrow
+    : 'CLIENT FAVORITES & SIGNATURE CARE';
+    
+  const signatureMainTitle = siteContent?.signature?.title && siteContent.signature.title !== '{signatureMainTitle}'
+    ? siteContent.signature.title
+    : 'Our Most Loved Services';
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 text-salon-text">
       {/* 1. Cinematic Hero Section */}
-      <Hero content={siteContent?.hero} />
+      <Hero content={siteContent?.hero} stats={salonStats} />
 
-      {/* 2. Philosophy & Commitments Ribbon */}
-      <section className="bg-salon-maroon text-white py-3.5 sm:py-4 md:py-5 border-y border-salon-gold/30 overflow-hidden relative">
-        {/* Edge Gradient Fades for Mobile Ticker */}
-        <div className="md:hidden pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-salon-maroon to-transparent z-10" />
-        <div className="md:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-salon-maroon to-transparent z-10" />
+      {/* 2. Promise ribbon (stats now live inside the hero) */}
+      <PromiseRibbon promises={ribbonCards} />
 
-        {/* Desktop View: Clean 4-Column Grid */}
-        <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-4 gap-6 text-left">
-            {ribbonCards.map((item, idx) => (
-              <div key={idx} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                  <item.icon className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-sm text-salon-gold">{item.title}</h4>
-                  <p className="text-[11px] text-salon-blush/80">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile View: Single Row Auto-Scrolling Mode (Right to Left) */}
-        <div className="md:hidden flex overflow-hidden select-none">
-          <div className="animate-marquee flex items-center py-1">
-            {[
-              {
-                icon: ShieldCheck,
-                title: '100% Genuine Brands',
-                desc: 'Sealed L’Oréal, Casmara & Rica',
-              },
-              {
-                icon: HeartHandshake,
-                title: 'Preeti Mandal Direct Care',
-                desc: 'Diagnostic personal consultations',
-              },
-              {
-                icon: Sparkles,
-                title: 'Hospital-Grade Clean',
-                desc: 'Sanitized instruments every client',
-              },
-              {
-                icon: Clock,
-                title: '10:00 AM – 9:00 PM',
-                desc: 'Open 6 Days (Closed Tuesday)',
-              },
-              {
-                icon: ShieldCheck,
-                title: '100% Genuine Brands',
-                desc: 'Sealed L’Oréal, Casmara & Rica',
-              },
-              {
-                icon: HeartHandshake,
-                title: 'Preeti Mandal Direct Care',
-                desc: 'Diagnostic personal consultations',
-              },
-              {
-                icon: Sparkles,
-                title: 'Hospital-Grade Clean',
-                desc: 'Sanitized instruments every client',
-              },
-              {
-                icon: Clock,
-                title: '10:00 AM – 9:00 PM',
-                desc: 'Open 6 Days (Closed Tuesday)',
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center gap-2.5 shrink-0 px-3 whitespace-nowrap">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                  <item.icon className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-xs text-salon-gold leading-tight">{item.title}</h4>
-                  <p className="text-[10px] text-salon-blush/80 leading-tight mt-0.5">{item.desc}</p>
-                </div>
-                <span className="w-1.5 h-1.5 border border-salon-gold/40 rotate-45 ml-3 shrink-0" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Curated Signature Offerings Section */}
-      <section className="py-14 sm:py-18 bg-salon-blush relative overflow-hidden">
-        
+      {/* 4. Curated Signature Offerings Section (Re-imagined with Modern Rounded Glass Cards) */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4F7] via-[#FFF9FB] to-[#FCEEF3] relative overflow-hidden">
         {/* Subtle Ambient Background Gradients */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/5 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-babypink/25 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-rose/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 sm:gap-6">
             <div>
-              <span className="font-cinzel text-[11px] sm:text-xs uppercase tracking-[0.25em] text-salon-gold-dark font-bold block mb-2">
-                CLIENT FAVORITES & TOP PICKS
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
+                {signatureEyebrow}
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
-                Our Most Loved Services
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight">
+                {signatureMainTitle}
               </h2>
               <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3.5"></div>
             </div>
@@ -203,12 +143,12 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {activeSignatureItems.map((item, idx) => (
               <Link
                 key={idx}
                 to={item.link}
-                className="group relative aspect-square rounded-none overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-luxury hover:shadow-luxury-lg p-3 sm:p-4 lg:p-5 flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 cursor-pointer block select-none"
+                className="group relative aspect-[3/4] sm:aspect-[4/5] rounded-3xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-luxury hover:shadow-luxury-lg p-5 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 cursor-pointer block select-none bg-black/10"
               >
                 {/* Background Image with Zoom on Hover */}
                 <img
@@ -218,35 +158,35 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
                   loading="lazy"
                 />
 
-                {/* Luxury Gradient Dark Overlay for Ultra Readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1A030D]/95 via-[#2A0617]/75 to-[#1A030D]/40 transition-colors duration-500 group-hover:from-[#14020A]/98 group-hover:via-[#220412]/70 pointer-events-none"></div>
+                {/* Refined Modern Gradient Overlay (Clean & Visible Photography) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#3A0D2C]/95 via-[#3A0D2C]/55 to-transparent transition-colors duration-500 group-hover:from-[#3A0D2C]/95 group-hover:via-[#220412]/45 pointer-events-none"></div>
 
                 {/* Ambient Gold Radial Glow on Card Corner */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-salon-gold/15 rounded-full blur-2xl pointer-events-none group-hover:bg-salon-gold/30 transition-all duration-500"></div>
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-salon-gold/20 rounded-full blur-2xl pointer-events-none group-hover:bg-salon-gold/35 transition-all duration-500"></div>
 
                 {/* Top Badge & Number */}
                 <div className="relative z-10 flex items-center justify-between">
-                  <span className="px-1.5 sm:px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9.5px] font-sans font-bold uppercase tracking-wider bg-black/45 backdrop-blur-md text-salon-gold-light border border-salon-gold/35 shadow-sm">
+                  <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-sans font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-sm">
                     {item.badge}
                   </span>
-                  <span className="font-cinzel text-[10px] sm:text-xs font-semibold tracking-widest text-salon-gold/85 drop-shadow-sm">
+                  <span className="font-cinzel text-xs font-bold tracking-widest text-salon-gold-light drop-shadow-sm">
                     0{idx + 1}
                   </span>
                 </div>
 
                 {/* Bottom Content & Action */}
-                <div className="relative z-10">
-                  <span className="text-[8px] sm:text-[9.5px] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-cinzel font-bold text-salon-gold block mb-0.5 sm:mb-1 drop-shadow-sm">
+                <div className="relative z-10 space-y-1.5">
+                  <span className="text-[9.5px] uppercase tracking-[0.2em] font-cinzel font-bold text-salon-gold block drop-shadow-sm">
                     {item.category}
                   </span>
-                  <h3 className="font-cinzel text-[11.5px] sm:text-[14px] lg:text-[16px] font-bold text-white mb-0.5 sm:mb-1 leading-snug group-hover:text-salon-gold-light transition-colors line-clamp-2 drop-shadow-md">
+                  <h3 className="font-cinzel text-base sm:text-lg font-bold text-white leading-snug group-hover:text-salon-gold-light transition-colors drop-shadow-md">
                     {item.name}
                   </h3>
-                  <p className="text-[9.5px] sm:text-[11px] text-white/75 font-sans font-light leading-snug line-clamp-1 sm:line-clamp-2 mb-1.5 sm:mb-2.5 drop-shadow-sm">
+                  <p className="text-xs text-white/80 font-sans font-light leading-relaxed line-clamp-2 drop-shadow-sm">
                     {item.desc}
                   </p>
 
-                  <div className="flex items-center justify-between pt-1 sm:pt-2 border-t border-white/15 text-[9px] sm:text-[10.5px] lg:text-[11px] font-cinzel font-semibold tracking-wider text-salon-gold group-hover:text-white transition-colors">
+                  <div className="flex items-center justify-between pt-2 border-t border-white/20 text-xs font-cinzel font-semibold tracking-wider text-salon-gold-light group-hover:text-white transition-colors">
                     <span>Explore & Book</span>
                     <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1.5 transition-transform text-salon-gold" />
                   </div>
@@ -257,15 +197,22 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         </div>
       </section>
 
-      {/* 4. Dedicated Bridal Feature Spotlight */}
-      <section className="py-12 sm:py-16 bg-salon-blush">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[36px] bg-gradient-to-br from-salon-maroon-deep via-salon-maroon to-salon-maroon-light text-salon-blush p-8 sm:p-14 relative overflow-hidden shadow-luxury-lg border border-salon-gold/30">
-            <div className="absolute right-0 top-0 w-96 h-96 bg-salon-gold/15 rounded-full blur-3xl pointer-events-none"></div>
+      {/* 5. Dedicated Bridal Feature Spotlight (Elevated High-Fashion Editorial Card) */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FCEEF3] to-[#FAF4F7]">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+          <div className="rounded-[40px] bg-gradient-to-br from-[#3A0D2C] via-[#5A1745] to-[#200410] text-salon-blush p-8 sm:p-14 relative overflow-hidden shadow-luxury-lg border border-salon-gold/40">
+            {/* Ambient Gold & Rose Atmosphere */}
+            <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-salon-gold/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute left-0 bottom-0 w-[400px] h-[400px] bg-salon-rose/15 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-8 space-y-4">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-8 space-y-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-salon-gold/30 text-[10px] uppercase tracking-[0.2em] text-salon-gold font-bold">
+                  <Crown className="w-3.5 h-3.5 text-salon-gold" />
+                  <span>The Bridal Couture Experience</span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">
                   {siteContent?.bridal?.title || 'High-Definition Bridal Artistry'}
                 </h2>
 
@@ -273,18 +220,22 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
                   {siteContent?.bridal?.description || 'From deep pre-bridal skin therapy to camera-ready HD makeup and custom saree draping, crafted by Preeti Mandal for your most memorable celebration.'}
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                {/* 4 Feature Glass Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   {[
                     siteContent?.bridal?.feature1 || 'Pre-Bridal Clinical Glow Care Package',
                     siteContent?.bridal?.feature2 || 'Signature Waterproof HD Bridal Makeup',
                     siteContent?.bridal?.feature3 || 'Bespoke Hairstyling & Extensions',
                     siteContent?.bridal?.feature4 || 'Designer Saree & Dupatta Draping'
                   ].map((feat, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs sm:text-sm text-salon-blush/90">
-                      <span className="w-4 h-4 rounded-full bg-salon-gold/20 text-salon-gold flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3" />
+                    <div 
+                      key={i} 
+                      className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-salon-gold/40 hover:bg-white/10 transition-all text-xs sm:text-sm text-salon-blush"
+                    >
+                      <span className="w-6 h-6 rounded-full bg-salon-gold/25 text-salon-gold flex items-center justify-center shrink-0 border border-salon-gold/30">
+                        <Check className="w-3.5 h-3.5" />
                       </span>
-                      <span>{feat}</span>
+                      <span className="font-medium">{feat}</span>
                     </div>
                   ))}
                 </div>
@@ -293,14 +244,14 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-center gap-4">
                 <Link
                   to="/bridal-makeup"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-sm font-semibold text-salon-maroon bg-gradient-to-r from-salon-gold-light via-salon-gold to-salon-gold-dark hover:brightness-105 shadow-luxury transition-all transform hover:-translate-y-0.5 border border-salon-gold/40"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-salon-gold-light via-salon-gold to-salon-gold-dark hover:brightness-105 shadow-luxury transition-all transform hover:-translate-y-0.5 border border-salon-gold/40"
                 >
                   <Calendar className="w-4 h-4 text-salon-maroon" />
                   <span>Explore Bridal Studio</span>
                 </Link>
 
-                <p className="text-xs text-salon-blush/60 italic text-left lg:text-right">
-                  {siteContent?.bridal?.bookingNote || 'Advance bookings recommended 3–6 weeks prior.'}
+                <p className="text-xs text-salon-blush/70 italic text-left lg:text-right">
+                  {siteContent?.bridal?.bookingNote || 'Advance bookings recommended 3–6 weeks prior • Private sanitized suite'}
                 </p>
               </div>
             </div>
@@ -308,19 +259,18 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         </div>
       </section>
 
-      {/* 5. Certified Brands Showcase */}
+      {/* 6. Certified Brands Showcase */}
       <BrandsShowcase content={siteContent?.brands} />
 
-      {/* 6. Portfolio Preview Section */}
-      <section className="py-14 sm:py-18 bg-salon-blush relative overflow-hidden">
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 gap-4 sm:gap-6">
+      {/* 7. Portfolio Preview Section (Editorial Fashion Gallery) */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4F7] via-[#FFF9FB] to-[#FCEEF3] relative overflow-hidden">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
             <div>
-              <span className="text-[11px] sm:text-xs uppercase tracking-[0.22em] text-salon-gold-dark font-semibold block mb-2">
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
                 PORTFOLIO SNAPSHOT
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight">
                 Salon Work Gallery
               </h2>
               <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3"></div>
@@ -335,8 +285,8 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
             </Link>
           </div>
 
-          {/* Visual Transformation Photo Cards - Clean, Pure Photography, No Bulky Text */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          {/* Visual Transformation Photo Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
               {
                 title: 'Royal Indian Bridal HD Glam',
@@ -362,13 +312,13 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               <Link
                 key={idx}
                 to="/gallery"
-                className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-sm hover:shadow-luxury-lg transition-all duration-500 hover:-translate-y-1 block select-none bg-black/5"
+                className="group relative aspect-[4/5] rounded-3xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-md hover:shadow-luxury-lg transition-all duration-500 hover:-translate-y-1.5 block select-none bg-black/10"
               >
                 {/* Full-Bleed Photograph with Smooth Zoom */}
                 <img
                   src={p.image}
                   alt={p.title}
-                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out pointer-events-none"
+                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
                   loading="lazy"
                 />
 
@@ -376,19 +326,19 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 pointer-events-none"></div>
 
                 {/* Top Category Badge */}
-                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-[8.5px] sm:text-[9.5px] font-cinzel font-semibold uppercase tracking-wider text-white">
+                <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                  <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-[9px] sm:text-[10px] font-cinzel font-bold uppercase tracking-wider text-white shadow-sm">
                     {p.category}
                   </span>
                 </div>
 
                 {/* Bottom Title & Eye Icon Overlay */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-10 flex items-end justify-between gap-2 pointer-events-none">
-                  <span className="font-cinzel text-xs sm:text-[13.5px] font-bold text-white leading-tight drop-shadow-md line-clamp-2 group-hover:text-salon-gold-light transition-colors">
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-10 flex items-end justify-between gap-2 pointer-events-none">
+                  <span className="font-cinzel text-xs sm:text-sm font-bold text-white leading-tight drop-shadow-md line-clamp-2 group-hover:text-salon-gold-light transition-colors">
                     {p.title}
                   </span>
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center shrink-0 group-hover:bg-salon-maroon group-hover:border-salon-gold group-hover:text-salon-gold transition-all duration-300 shadow-sm">
-                    <Eye className="w-3.5 h-3.5" />
+                  <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/30 text-white flex items-center justify-center shrink-0 group-hover:bg-salon-maroon group-hover:border-salon-gold group-hover:text-salon-gold transition-all duration-300 shadow-sm">
+                    <Eye className="w-4 h-4" />
                   </div>
                 </div>
               </Link>
@@ -397,31 +347,32 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
         </div>
       </section>
 
-      {/* 7. Client Reviews / Satisfaction Section */}
+      {/* 8. Client Reviews / Satisfaction Section */}
       <TestimonialsSection testimonials={testimonials} />
 
-      {/* 8. Studio Story & Values Teaser */}
-      <section className="py-14 sm:py-18 bg-salon-blush border-t border-salon-babypink/60 relative overflow-hidden">
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 9. Studio Story & Values Teaser (Refined Editorial Split Layout) */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FCEEF3] to-[#FAF4F7] border-t border-salon-babypink/60 relative overflow-hidden">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Column: Signature Founder Card */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-3xl bg-salon-maroon text-salon-blush p-8 sm:p-10 shadow-luxury-lg border border-salon-gold/30">
+              <div className="relative rounded-[36px] bg-gradient-to-br from-salon-maroon via-salon-maroon-deep to-[#2A0515] text-salon-blush p-8 sm:p-10 shadow-luxury-lg border border-salon-gold/40">
                 <span className="text-[10px] uppercase tracking-widest text-salon-gold font-bold block mb-2">
                   {siteContent?.about?.essenceTag || 'OUR ESSENCE'}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-4 leading-snug">
-                  {siteContent?.about?.quote || "“Your Beauty Is Our Duty.”"}
+                  {siteContent?.about?.quote || '“Your Beauty Is Our Duty.”'}
                 </h3>
-                <p className="text-xs sm:text-sm text-salon-blush/80 leading-relaxed font-light mb-6">
+                <p className="text-xs sm:text-sm text-salon-blush/85 leading-relaxed font-light mb-6">
                   {siteContent?.about?.essenceStory || 'Founded by Preeti Mandal in Harinagar, Badarpur, Preeti Makeover was built to provide women with a reliable, clinical and luxury parlour experience close to home.'}
                 </p>
-                <div className="space-y-2 pt-4 border-t border-white/10 text-xs text-salon-blush/80">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-2.5 pt-4 border-t border-white/10 text-xs text-salon-blush/80">
+                  <div className="flex items-center gap-2.5">
                     <MapPin className="w-4 h-4 text-salon-gold shrink-0" />
                     <span>Prince Colony, Harinagar, Badarpur, New Delhi</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <Clock className="w-4 h-4 text-salon-gold shrink-0" />
                     <span>Open 10 AM – 9 PM (Closed Tuesdays)</span>
                   </div>
@@ -429,24 +380,25 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
               </div>
             </div>
 
+            {/* Right Column: Founder Story Content */}
             <div className="lg:col-span-7 space-y-6">
               <div>
-                <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
                   MEET PREETI MANDAL
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight mb-3 leading-tight">
                   {siteContent?.about?.heading || 'Passionate Artistry & Personal Consultation'}
                 </h2>
-                <div className="w-16 h-0.5 bg-salon-gold mb-4"></div>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mb-4"></div>
                 <p className="text-sm sm:text-base text-salon-text/80 font-light leading-relaxed">
                   {siteContent?.about?.description || 'Every face, hair type and skin tone has distinct requirements. We take time to diagnose before recommending any facial, treatment or makeup drape, ensuring healthy, radiant and long-lasting results.'}
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 pt-2">
+              <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
                   to="/about"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold text-salon-maroon bg-white hover:bg-salon-babypink/30 border border-salon-rose/30 shadow-sm transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-semibold text-salon-maroon bg-white hover:bg-salon-babypink/30 border border-salon-rose/30 shadow-sm transition-all"
                 >
                   <span>Read Salon Story & Values</span>
                   <ArrowRight className="w-3.5 h-3.5 text-salon-gold-dark" />
@@ -454,46 +406,48 @@ export default function HomePage({ categories = [], testimonials = [], galleryIm
 
                 <Link
                   to="/contact"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-sm transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-sm transition-all"
                 >
                   <span>Book Visit</span>
                 </Link>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* 9. Grand Booking Call-to-Action Banner (Compact, Full-Width & Clean) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#230412] via-[#1A030E] to-[#2B0618] text-white py-12 sm:py-16 border-y border-salon-gold/30">
-        
+      {/* 10. Grand Booking Call-to-Action Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#4A0E30] via-[#6B1442] to-[#A3245E] text-white py-14 sm:py-18 border-t border-salon-gold/30">
         {/* Full-width Ambient Glows */}
-        <div className="absolute top-0 right-1/4 w-96 h-64 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-64 bg-salon-rose/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-96 h-64 bg-salon-gold/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-64 bg-salon-rose/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          {/* Main Title */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight mb-2 sm:mb-3">
+        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-salon-gold/30 text-[10px] uppercase tracking-[0.2em] text-salon-gold font-bold mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-salon-gold" />
+            <span>Instant Salon Booking</span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight mb-3">
             {siteContent?.cta?.title || 'Ready for Your Transformation?'}
           </h2>
 
-          {/* Clean Subtext */}
-          <p className="text-sm sm:text-base text-white/80 font-light max-w-xl mx-auto mb-6 sm:mb-7 leading-relaxed">
-            {siteContent?.cta?.subtext || 'Book your appointment online in seconds, or contact directly on WhatsApp.'}
+          <p className="text-sm sm:text-base text-white/80 font-light max-w-xl mx-auto mb-7 leading-relaxed">
+            {siteContent?.cta?.subtext || 'Book your appointment online in seconds, or contact directly on WhatsApp for personal bridal guidance.'}
           </p>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
             <Link
               to="/contact"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FEE5C8] via-[#E5B57F] to-[#FEE5C8] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
             >
               <Calendar className="w-4 h-4 text-salon-maroon" />
               <span>{siteContent?.cta?.buttonText || 'Book Appointment Online'}</span>
             </Link>
 
             <a
-              href="https://wa.me/${siteContent?.cta?.whatsappNumber || '918810359438'}"
+              href={`https://wa.me/${siteContent?.cta?.whatsappNumber || '918810359438'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-emerald-400/60 backdrop-blur-md hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"

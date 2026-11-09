@@ -299,7 +299,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-brand-plum flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FFF7FA] text-brand-plum flex flex-col font-sans">
       
       {/* Toast Notification */}
       {toast && (
@@ -837,7 +837,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         key={svc.id}
                         className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
                           svc.isActive 
-                            ? 'bg-[#FAF7F2] border-brand-blush/60 hover:border-brand-gold/50' 
+                            ? 'bg-[#FFF7FA] border-brand-blush/60 hover:border-brand-gold/50' 
                             : 'bg-gray-50 border-gray-200 opacity-60'
                         }`}
                       >

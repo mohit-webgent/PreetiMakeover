@@ -35,7 +35,7 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FFF7FA] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         
         {/* Back button */}
@@ -55,7 +55,7 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
             <img
               src="/pm_logo.png"
               alt="Preeti Makeover Crest"
-              className="h-16 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(197,161,90,0.45)]"
+              className="h-16 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(229,143,176,0.45)]"
             />
           </div>
           <h2 className="font-serif text-3xl font-bold text-brand-plum tracking-tight">

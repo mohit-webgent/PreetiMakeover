@@ -101,7 +101,7 @@ export default function ServicesSection({ categories, loading, error, onSelectSe
             return (
               <div
                 key={item.num}
-                className="group bg-[#FAF7F2] rounded-3xl p-8 border border-brand-blush/60 hover:border-brand-gold/60 hover:shadow-luxury transition-all duration-300 flex flex-col justify-between"
+                className="group bg-[#FFF7FA] rounded-3xl p-8 border border-brand-blush/60 hover:border-brand-gold/60 hover:shadow-luxury transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -140,7 +140,7 @@ export default function ServicesSection({ categories, loading, error, onSelectSe
         </div>
 
         {/* Comprehensive Service Catalog Browser */}
-        <div className="bg-[#FAF7F2] rounded-3xl p-6 sm:p-10 border border-brand-blush/60 shadow-sm">
+        <div className="bg-[#FFF7FA] rounded-3xl p-6 sm:p-10 border border-brand-blush/60 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h3 className="font-serif text-2xl font-bold text-brand-plum">

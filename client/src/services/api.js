@@ -3,6 +3,9 @@
  * Connects directly to Vite proxy (/api)
  */
 
+// Generous timeout: the free-tier API can take ~30–50s to wake from sleep.
+const REQUEST_TIMEOUT_MS = 60000;
+
 async function fetchJson(endpoint, options = {}) {
   const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const defaultHeaders = {
@@ -17,8 +20,22 @@ async function fetchJson(endpoint, options = {}) {
       ...options.headers
     }
   };
+  if (!config.signal && typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+    config.signal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  }
 
-  const response = await fetch(url, config);
+  let response;
+  try {
+    response = await fetch(url, config);
+  } catch (err) {
+    const error = new Error(
+      err?.name === 'TimeoutError' || err?.name === 'AbortError'
+        ? 'Our server is taking too long to respond. Please try again, or message us on WhatsApp.'
+        : 'Network error. Please check your internet connection and try again.'
+    );
+    error.network = true;
+    throw error;
+  }
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
@@ -100,12 +117,36 @@ export const api = {
     const query = new URLSearchParams();
     if (params.status && params.status !== 'ALL') query.append('status', params.status);
     if (params.search) query.append('search', params.search);
+    if (params.range && params.range !== 'all') query.append('range', params.range);
     if (params.page) query.append('page', params.page);
     if (params.limit) query.append('limit', params.limit);
     const qs = query.toString() ? `?${query.toString()}` : '';
     return fetchJson(`/api/admin/appointments${qs}`, {
       headers: authHeaders(token)
     });
+  },
+
+  /** Download appointments matching the current filters as a CSV file. */
+  downloadAppointmentsCsv: async (token, params = {}) => {
+    const query = new URLSearchParams();
+    if (params.status && params.status !== 'ALL') query.append('status', params.status);
+    if (params.search) query.append('search', params.search);
+    if (params.range && params.range !== 'all') query.append('range', params.range);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    const response = await fetch(`/api/admin/appointments/export.csv${qs}`, { headers: authHeaders(token) });
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      throw new Error(data?.message || 'Export failed');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `appointments-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   },
 
   updateAppointmentStatus: (token, id, status, adminNotes) =>

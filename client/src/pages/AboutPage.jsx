@@ -1,240 +1,139 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Heart, 
-  Sparkles, 
-  CheckCircle2, 
-  MapPin, 
-  Clock, 
-  ShieldCheck, 
-  Award, 
-  CalendarX, 
-  Phone, 
-  Calendar,
-  MessageCircle,
-  Scissors
-} from 'lucide-react';
+import { Award, HeartHandshake, MapPin, ShieldCheck, Sparkles } from 'lucide-react';
+import Seo from '../components/common/Seo';
+import PageHeader from '../components/common/PageHeader';
+import { WhatsAppIcon } from '../components/common/icons';
+import { useBusiness } from '../context/SiteDataContext';
+import { openStatus } from '../lib/business';
 
 export default function AboutPage() {
-  const pillars = [
+  const biz = useBusiness();
+  const status = openStatus(biz);
+  const first = biz.ownerName.split(' ')[0];
+
+  const values = [
     {
-      title: 'Genuine Sealed Formulations',
-      desc: 'We strictly reject counterfeit or unbranded duplicates. Every tube of L’Oréal color, Casmara algae peel, O3+ facial, and Italian Rica wax is verified and genuine.',
-      icon: Award
+      icon: Award,
+      title: 'Genuine, sealed products',
+      text: "No duplicates or loose mixtures. Every L'Oréal colour, Casmara mask, O3+ facial and Rica wax is genuine and opened in front of you."
     },
     {
-      title: 'Hospital-Grade Salon Hygiene',
-      desc: 'All stainless-steel tools, scissors, and combs are sanitized between clients. We use disposable sheets, wax strips, and single-use facial sponges for complete safety.',
-      icon: ShieldCheck
+      icon: ShieldCheck,
+      title: 'Careful hygiene',
+      text: 'Scissors, combs and tools are sanitised between clients, with disposable sheets, wax strips and single-use facial sponges.'
     },
     {
-      title: 'Honest Diagnostic Consultations',
-      desc: 'We never upsell unnecessary treatments. Preeti Mandal directly analyzes your skin barrier and hair porosity, setting realistic expectations and timelines.',
-      icon: Heart
+      icon: HeartHandshake,
+      title: 'Honest advice',
+      text: `${first} looks at your skin and hair before suggesting anything, and never pushes treatments you don't need.`
     },
     {
-      title: 'Warm & Safe Women’s Haven',
-      desc: 'A comfortable, dignified, and relaxing studio environment where every client is treated like family with undivided attention and care.',
-      icon: Sparkles
+      icon: Sparkles,
+      title: 'A calm, women-only space',
+      text: 'A comfortable, private studio where you get unhurried, personal attention on every visit.'
     }
   ];
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 min-h-screen">
-      
-      {/* 1. Page Header */}
-      <div className="page-hero">
-        
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-          
-          <nav className="flex items-center gap-2 text-xs text-salon-text/60 mb-4" aria-label="Breadcrumb">
-            <Link to="/" className="hover:text-salon-maroon transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-salon-maroon font-semibold">About Us</span>
-          </nav>
+    <>
+      <Seo
+        title={`About ${biz.ownerName} & the Studio`}
+        description={`Meet ${biz.ownerName}, founder of ${biz.businessName} in ${biz.shortAddress}: genuine products, careful hygiene and honest, personal consultations.`}
+        path="/about"
+      />
 
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-salon-babypink/70 text-salon-maroon text-xs font-semibold uppercase tracking-wider mb-3 border border-salon-rose/30">
-              <Sparkles className="w-3.5 h-3.5 text-salon-gold-dark" />
-              <span>Our Story & Philosophy</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-serif font-bold text-salon-maroon tracking-tight">
-              About Preeti Makeover
-            </h1>
-            <p className="text-base sm:text-lg text-salon-text/80 font-light mt-3 leading-relaxed">
-              Founded and led by <strong>Preeti Mandal</strong>, Preeti Makeover is a trusted beauty parlour and makeover studio in Badarpur, New Delhi, dedicated to personalized care, uncompromising hygiene, and artistic excellence.
+      <PageHeader
+        crumb="About"
+        title={`Meet ${biz.ownerName}`}
+        intro={`${biz.businessName} is a personal beauty studio in Badarpur, New Delhi. ${first} started it so women nearby could get genuine products, careful hygiene and real attention, close to home.`}
+      />
+
+      {/* Story */}
+      <section className="section">
+        <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
+          <figure className="rounded-block bg-rose p-8 sm:p-10 lg:col-span-5 lg:self-start">
+            <img src="/pm_logo.png" alt="" width="64" height="64" className="h-16 w-16 object-contain" />
+            <blockquote className="mt-6 text-[1.3125rem] font-medium leading-relaxed text-wine sm:text-[1.4375rem]">
+              “Women in our community should never have to compromise on genuine products or hygiene. Every look we create is built on respect and care.”
+            </blockquote>
+            <figcaption className="mt-5 text-small text-ink-soft">{biz.ownerName}, founder</figcaption>
+          </figure>
+
+          <div className="max-w-prose space-y-5 text-lead text-ink-soft lg:col-span-7">
+            <p>
+              At {biz.businessName}, beauty is never an assembly line. In our studio in Prince Colony, Harinagar, every client gets
+              {` ${first}'s`} individual attention, from the first consultation to the final touch.
             </p>
+            <p>
+              Whether you come in for a hair botox treatment, an O3+ brightening facial, gentle Rica waxing or your wedding day,
+              we put the long-term health of your skin and hair first.
+            </p>
+            <p>
+              We believe beauty shines brightest when it's backed by authentic products and careful hygiene. That's why we sanitise
+              every tool between clients and close every {biz.weeklyOffDay} for a full deep clean.
+            </p>
+            <div className="flex flex-col gap-3 pt-3 sm:flex-row">
+              <Link to="/services" className="btn-secondary">See services & prices</Link>
+              <Link to="/contact" className="btn-primary">Book a visit</Link>
+            </div>
           </div>
-
         </div>
-      </div>
+      </section>
 
-      {/* 2. The Story Section */}
-      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-16 relative overflow-hidden">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Story Card */}
+      {/* Values */}
+      <section className="section border-y border-line bg-rose-light">
+        <div className="container-x">
+          <h2 className="title max-w-2xl">What you can count on</h2>
+          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:gap-x-14">
+            {values.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="flex gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-card text-gold"><Icon className="h-5 w-5" /></span>
+                <div>
+                  <h3 className="text-h3">{title}</h3>
+                  <p className="mt-2 text-ink-soft">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Visit */}
+      <section className="section">
+        <div className="container-x grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-14">
           <div className="lg:col-span-5">
-            <div className="relative rounded-3xl bg-salon-maroon text-salon-blush p-8 sm:p-10 shadow-luxury-lg border border-salon-gold/30 space-y-6">
-              <div className="w-16 h-16 rounded-2xl border border-salon-gold/40 bg-salon-maroon-deep/80 flex items-center justify-center p-1.5 shadow-md">
-                <img
-                  src="/pm_logo.png"
-                  alt="Preeti Makeover Crest"
-                  className="w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(229,143,176,0.5)]"
-                />
-              </div>
-
-              <div>
-                <span className="text-[10px] uppercase tracking-widest text-salon-gold font-bold block mb-1">
-                  Studio Founder & Master Stylist
-                </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white leading-snug">
-                  Preeti Mandal
-                </h3>
-              </div>
-
-              <p className="text-xs sm:text-sm text-salon-blush/85 leading-relaxed font-light">
-                “When I started Preeti Makeover in Prince Colony, my goal was clear: women in our community should never have to compromise on genuine salon products or hygienic standards. Every look we create is built on respect, care, and quality.”
-              </p>
-
-              <div className="pt-4 border-t border-white/10 space-y-3 text-xs text-salon-blush/80">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-salon-gold shrink-0" />
-                  <span>D/109, Gali No. 5, Prince Colony, Harinagar, Badarpur</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-salon-gold shrink-0" />
-                  <span>Open 10:00 AM – 9:00 PM (Wednesday – Monday)</span>
-                </div>
-                <div className="flex items-center gap-2 text-salon-rose-light font-medium">
-                  <CalendarX className="w-4 h-4 text-salon-rose shrink-0" />
-                  <span>Tuesday: Weekly Off (Closed)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Narrative Content */}
-          <div className="lg:col-span-7 space-y-6">
-            <div>
-              <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
-                AUTHENTIC LOCAL EXCELLENCE
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-salon-maroon tracking-tight mb-4">
-                Beauty Grounded in Trust, Hygiene & Quality
-              </h2>
-              <div className="w-16 h-0.5 bg-salon-gold mb-4"></div>
-              
-              <div className="space-y-4 text-sm text-salon-text/80 font-light leading-relaxed">
-                <p>
-                  At Preeti Makeover, beauty is never treated as an assembly line. Located in Prince Colony, Harinagar, Jaitpur, Badarpur, we take immense pride in offering an intimate, comfortable studio where each client receives individual attention from Preeti Mandal.
-                </p>
-                <p>
-                  Whether you are visiting for a restorative Hair Botox treatment, an O3+ brightening facial, gentle Italian Rica waxing, or your once-in-a-lifetime bridal ceremony, our priority is always the long-term health of your hair and skin.
-                </p>
-                <p>
-                  We believe that true beauty shines brightest when backed by authentic products and hospital-grade sanitization. That is why we maintain strict sterilization routines and close every Tuesday for full-studio hygiene maintenance.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <Link
-                to="/services"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold text-salon-maroon bg-white hover:bg-salon-babypink/40 border border-salon-rose/30 shadow-sm transition-all"
-              >
-                <Scissors className="w-3.5 h-3.5 text-salon-gold-dark" />
-                <span>Explore Services</span>
-              </Link>
-
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-sm transition-all"
-              >
-                <Calendar className="w-3.5 h-3.5 text-salon-gold" />
-                <span>Book Appointment</span>
-              </Link>
-            </div>
-          </div>
-
-        </div>
-
-        {/* 3. The 4 Commitments Pillars */}
-        <div className="mt-24">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
-              OUR UNWAVERING PROMISE
-            </span>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-salon-maroon">
-              The 4 Preeti Makeover Pillars
-            </h3>
-            <div className="w-16 h-0.5 bg-salon-gold mx-auto mt-3"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {pillars.map((item, idx) => {
-              const IconComp = item.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white rounded-3xl p-7 border border-salon-babypink/80 shadow-sm hover:shadow-luxury transition-all space-y-4"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-salon-babypink text-salon-maroon flex items-center justify-center">
-                    <IconComp className="w-6 h-6 text-salon-gold-dark" />
-                  </div>
-                  <h4 className="font-serif font-bold text-lg text-salon-maroon">
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-salon-text/75 font-light leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 4. Studio Location & Map Banner */}
-        <div className="mt-20 rounded-3xl bg-white p-8 sm:p-12 border border-salon-babypink shadow-sm">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8 space-y-3">
-              <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-bold">
-                VISIT THE SALON
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-salon-maroon">
-                Located in Prince Colony, Harinagar, Badarpur
-              </h3>
-              <p className="text-xs sm:text-sm text-salon-text/75 font-light leading-relaxed">
-                Address: D/109, Gali No. 5, Prince Colony, Harinagar, Jaitpur, Badarpur, New Delhi – 110044. Easily accessible from Badarpur border, Jaitpur, and surrounding South Delhi areas.
-              </p>
-              <div className="pt-2 flex items-center gap-4 text-xs font-semibold text-salon-maroon">
-                <a href="tel:+918810359438" className="hover:text-salon-gold-dark transition-colors flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-salon-gold-dark" />
-                  <span>+91 88103 59438</span>
-                </a>
-                <span>•</span>
-                <span className="text-salon-rose-dark">Closed Tuesdays</span>
-              </div>
-            </div>
-
-            <div className="lg:col-span-4 flex justify-start lg:justify-end">
-              <a
-                href="https://maps.google.com/?q=D/109+Prince+Colony+Harinagar+Jaitpur+Badarpur+New+Delhi+110044"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-semibold text-salon-maroon bg-salon-babypink/70 hover:bg-salon-babypink border border-salon-rose/30 shadow-sm transition-all"
-              >
-                <MapPin className="w-4 h-4 text-salon-gold-dark" />
-                <span>Open in Google Maps</span>
+            <h2 className="title">Visit the studio</h2>
+            <p className="mt-4 flex gap-3 text-lead text-ink">
+              <MapPin className="mt-1.5 h-5 w-5 shrink-0 text-gold" /> {biz.address}
+            </p>
+            <p className="mt-3 text-ink-soft">Easy to reach from Badarpur border, Jaitpur and nearby South Delhi areas.</p>
+            <p className="mt-5 text-ink">
+              {biz.openDaysLabel}, {biz.hoursLabel}
+              <span className="block text-ink-soft">Closed every {biz.weeklyOffDay}</span>
+            </p>
+            <p className="mt-2 inline-flex items-center gap-2 text-small font-semibold text-ink">
+              <span className={`h-2.5 w-2.5 rounded-full ${status.isOpen ? 'bg-leaf' : 'bg-rose-accent'}`} aria-hidden="true" />
+              {status.label}
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a href={biz.directionsUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">Get directions</a>
+              <a href={biz.wa('Hello Preeti Makeover! Could you share directions to the studio?')} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                <WhatsAppIcon className="h-5 w-5 text-wa" /> Ask on WhatsApp
               </a>
             </div>
           </div>
+          <div className="overflow-hidden rounded-block border border-line lg:col-span-7">
+            <iframe
+              title={`Map showing ${biz.businessName}`}
+              src={biz.mapEmbedUrl}
+              className="h-72 w-full border-0 sm:h-96"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
-
-      </div>
-
-    </div>
+      </section>
+    </>
   );
 }

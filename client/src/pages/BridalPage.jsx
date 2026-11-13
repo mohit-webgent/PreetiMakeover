@@ -1,303 +1,195 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Sparkles, 
-  Calendar, 
-  MessageCircle, 
-  Check, 
-  Clock, 
-  Heart, 
-  ShieldCheck, 
-  Award, 
-  ArrowRight,
-  Camera,
-  Star
-} from 'lucide-react';
+import { Check, Clock } from 'lucide-react';
+import ArchFrame from '../components/common/Arch';
+import Photo from '../components/common/Photo';
+import Seo from '../components/common/Seo';
+import PageHeader from '../components/common/PageHeader';
+import FaqSection, { buildFaqs, faqJsonLd } from '../components/sections/FaqSection';
+import { WhatsAppIcon } from '../components/common/icons';
+import { useBusiness, useSiteData } from '../context/SiteDataContext';
 
-export default function BridalPage({ onSelectService }) {
+const FAQ_TOPICS = ['bridal', 'products', 'pricing', 'confirm'];
+
+const PACKAGES = [
+  {
+    name: 'Pre-bridal glow package',
+    duration: 'About 4 hours',
+    desc: 'Casmara algae facial, de-tan, Rica waxing, body polishing and a spa manicure and pedicure, in one visit.',
+    idealFor: '2–4 days before the wedding',
+    popular: true
+  },
+  {
+    name: 'Signature HD bridal makeup',
+    duration: 'About 3 hours',
+    desc: 'Waterproof, high-definition bridal makeup with skin prep, contouring, eye makeup, lashes and bindi setting.',
+    idealFor: 'Wedding ceremony, varmala and reception',
+    popular: true
+  },
+  {
+    name: 'Engagement & party makeup',
+    duration: 'About 90 minutes',
+    desc: 'A softer, luminous look for engagement, sangeet or cocktail night, and for bridesmaids and family.',
+    idealFor: 'Engagement, sagan, sangeet, cocktail'
+  },
+  {
+    name: 'Bridal hairstyling & extensions',
+    duration: 'About 60 minutes',
+    desc: 'Floral buns, soft waves or braids, with jewellery and maang tikka placed securely.',
+    idealFor: 'Any bridal or party look'
+  },
+  {
+    name: 'Saree & dupatta draping',
+    duration: 'About 30 minutes',
+    desc: 'Secure, neat pleats and dupatta setting that stay in place while you walk, dance and pose.',
+    idealFor: 'Lehenga, saree or chunni'
+  }
+];
+
+const STEPS = [
+  {
+    title: 'Consultation',
+    text: 'We look at your skin, hair and event dates, and plan facials and hair care in the weeks before.'
+  },
+  {
+    title: 'Trial and planning',
+    text: 'We decide your look together: makeup finish, hairstyle, jewellery placement and dupatta setting.'
+  },
+  {
+    title: 'Your wedding day',
+    text: 'A calm, private room and an unhurried schedule, so you are ready on time and look like yourself.'
+  }
+];
+
+export default function BridalPage() {
   const navigate = useNavigate();
+  const biz = useBusiness();
+  const { gallery } = useSiteData();
+  const first = biz.ownerName.split(' ')[0];
 
-  const bridalPackages = [
-    {
-      name: 'Pre-Bridal Glow Care Package',
-      duration: '240 mins (Approx. 4 hours)',
-      desc: 'Complete head-to-toe clinical glow ritual: Casmara algae facial, skin de-tan therapy, Italian Rica liposoluble waxing, body polishing, and spa manicure/pedicure.',
-      idealFor: 'Recommended 2 to 4 days prior to the wedding day for radiant, prepared skin.',
-      featured: true,
-      serviceName: 'Pre-Bridal Glow Care Package'
-    },
-    {
-      name: 'Signature Bridal HD Makeup',
-      duration: '180 mins (Approx. 3 hours)',
-      desc: 'Bespoke high-definition waterproof bridal makeover. Skin prep, precision contouring, dramatic or soft-glam eye artistry, custom false lashes, and delicate bindi setting.',
-      idealFor: 'Main Wedding Ceremony, Varmala & Reception.',
-      featured: true,
-      serviceName: 'Signature Bridal HD Makeup'
-    },
-    {
-      name: 'Party & Engagement Glam Makeup',
-      duration: '90 mins',
-      desc: 'Luminous event glam tailored for brides during Engagement, Sangeet, Cocktail, or for bridesmaids and family members.',
-      idealFor: 'Engagement, Sagan, Sangeet, or Cocktail Night.',
-      featured: false,
-      serviceName: 'Party & Engagement Glam Makeup'
-    },
-    {
-      name: 'Designer Saree & Dupatta Draping',
-      duration: '30 mins',
-      desc: 'Expert bridal saree, lehenga dupatta, and chunni draping. Secure pinning and elegant pleating designed for easy walking, dancing, and perfect photography.',
-      idealFor: 'Any bridal attire requiring secure, photogenic pleats and draping.',
-      featured: false,
-      serviceName: 'Designer Saree & Dupatta Draping'
-    },
-    {
-      name: 'Bridal Hairstyling & Extensions',
-      duration: '60 mins',
-      desc: 'Intricate traditional floral bridal buns, textured Hollywood waves, or elegant braided hairstyles with secure accessory and maang tikka placement.',
-      idealFor: 'Complements bridal and party makeup with structural hold.',
-      featured: false,
-      serviceName: 'Bridal Hairstyling & Extensions'
-    }
-  ];
+  // Owner's uploaded bridal photos when available, else the studio's own bridal shots
+  const uploaded = gallery.filter((g) => /bridal|bride|wedding/i.test(`${g.category} ${g.title}`));
+  const photos = uploaded.length >= 2
+    ? uploaded.slice(0, 3).map((g) => ({ src: g.imageUrl, alt: g.altText || g.title }))
+    : [
+        { src: '/bridal-feature-detail.jpg', alt: 'Traditional saree look with bridal jewellery' },
+        { src: '/signature-bridal.jpg', alt: 'Occasion look with an ivory lehenga' }
+      ];
 
-  const handleBookPackage = (pkgName) => {
-    navigate('/contact', { state: { preselectedService: pkgName } });
-  };
+  const book = (name) => navigate('/contact', { state: { preselectedService: name } });
 
   return (
-    <div className="pt-24 sm:pt-28 pb-24 min-h-screen">
-      
-      {/* 1. Bridal Editorial Header */}
-      <div className="page-hero">
-        
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-          
-          <nav className="flex items-center gap-2 text-xs text-salon-text/60 mb-4" aria-label="Breadcrumb">
-            <Link to="/" className="hover:text-salon-maroon transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-salon-maroon font-semibold">Bridal Makeup</span>
-          </nav>
+    <>
+      <Seo
+        title="Bridal Makeup Artist in Badarpur, New Delhi"
+        description={`HD and waterproof bridal makeup, pre-bridal glow packages, hairstyling and saree draping by ${biz.ownerName} at ${biz.businessName}, ${biz.shortAddress}. Book your bridal date.`}
+        path="/bridal-makeup"
+        jsonLd={faqJsonLd(buildFaqs(biz, FAQ_TOPICS))}
+      />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-8 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-salon-babypink/80 text-salon-maroon text-xs font-semibold uppercase tracking-wider border border-salon-rose/30">
-                <Sparkles className="w-3.5 h-3.5 text-salon-gold-dark" />
-                <span>Preeti Mandal Signature Studio</span>
-              </div>
+      <PageHeader
+        crumb="Bridal makeup"
+        title="Bridal makeup for every function"
+        intro={`From pre-bridal skin care to your wedding-day look, ${first} plans every detail with you and does your makeup herself. Book 3–6 weeks before your date.`}
+        aside={
+          <ArchFrame className="mx-auto aspect-[4/5] w-[min(100%,20rem)] sm:w-[min(100%,24rem)]">
+            <Photo src="/hero-bridal.jpg" alt="Indian bride in a red lehenga with HD bridal makeup" priority sizes="(min-width: 1024px) 384px, 80vw" className="h-full w-full object-cover object-top" />
+          </ArchFrame>
+        }
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button type="button" onClick={() => book('Signature HD bridal makeup')} className="btn-primary">Book a bridal consultation</button>
+          <a href={biz.wa("Hello Preeti Makeover! I'd like to discuss bridal makeup for my wedding.")} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+            <WhatsAppIcon className="h-5 w-5 text-wa" /> Ask about dates
+          </a>
+        </div>
+      </PageHeader>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-salon-maroon tracking-tight leading-tight">
-                Bridal & Occasion <br />
-                <span className="italic text-gradient-rose">Makeover Artistry</span>
-              </h1>
+      {/* What every bride gets, beside a pair of bridal photos */}
+      <section className="section">
+        <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-6">
+            <h2 className="title max-w-2xl">What every bride gets</h2>
+            <ul className="mt-8 space-y-5">
+              {[
+                'HD makeup that looks natural in person and on camera',
+                'Waterproof, long-wear products for a long day',
+                'Draping you can walk, dance and sit in comfortably',
+                `${first} on time and with you through your schedule`
+              ].map((t) => (
+                <li key={t} className="flex gap-3 border-t border-line pt-5 text-lead text-ink">
+                  <Check className="mt-1.5 h-5 w-5 shrink-0 text-gold" /> {t}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-              <p className="text-base sm:text-lg text-salon-text/80 font-light leading-relaxed max-w-2xl font-sans">
-                Every bride deserves a look that reflects her true personality while photographing impeccably under stage lights. At Preeti Makeover in Badarpur, each bridal transformation is customized, punctual, and crafted using high-definition, waterproof international cosmetics.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 pt-4">
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-luxury transition-all transform hover:-translate-y-0.5"
-                >
-                  <Calendar className="w-4 h-4 text-salon-gold" />
-                  <span>Reserve Bridal Date</span>
+          <ul aria-label="Bridal looks" className="grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-6">
+            {photos.slice(0, 2).map((p, i) => (
+              <li key={p.src} className={i === 1 ? 'mt-10' : ''}>
+                <Link to="/gallery" className="block aspect-[3/4] overflow-hidden rounded-card bg-rose">
+                  <Photo src={p.src} alt={p.alt} sizes="(min-width: 1024px) 25vw, 45vw" className="h-full w-full object-cover object-top" />
                 </Link>
-
-                <a
-                  href="https://wa.me/918810359438?text=Hello%20Preeti%20Makeover,%20I%20would%20like%20to%20enquire%20about%20Bridal%20Makeover%20Packages."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-sm font-semibold text-emerald-900 bg-white hover:bg-emerald-50 border border-emerald-200 shadow-sm transition-all"
-                >
-                  <MessageCircle className="w-4 h-4 text-emerald-600" />
-                  <span>Direct Bridal WhatsApp</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Right Column: Studio Card */}
-            <div className="lg:col-span-4">
-              <div className="rounded-3xl bg-salon-maroon text-salon-blush p-8 shadow-luxury-lg border border-salon-gold/30 space-y-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-salon-gold shrink-0">
-                    <Award className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-lg text-white">The Bridal Promise</h3>
-                    <p className="text-xs text-salon-gold">Prince Colony Studio</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 pt-2 text-xs text-salon-blush/85 border-t border-white/10 font-light">
-                  <div className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Flawless HD & 4K camera compatibility</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Strictly waterproof & tear-proof formulations</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Comfortable draping designed for ease of movement</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Punctual preparation matching your wedding timeline</span>
-                  </div>
-                </div>
-
-                <div className="pt-3 text-[11px] text-salon-blush/60 italic border-t border-white/10">
-                  Preeti Mandal personally directs and executes your bridal transformation.
-                </div>
-              </div>
-            </div>
-          </div>
-
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      </section>
 
-      {/* 2. Packages Grid */}
-      <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-16">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
-            TAILORED CELEBRATION PACKAGES
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-salon-maroon tracking-tight mb-3">
-            Bridal Offerings
-          </h2>
-          <div className="w-16 h-0.5 bg-salon-gold mx-auto mb-3"></div>
-          <p className="text-sm text-salon-text/75 font-light leading-relaxed">
-            Transparent breakdown of our confirmed bridal and occasion makeup services.
-          </p>
+      {/* Packages */}
+      <section className="section">
+        <div className="container-x">
+          <h2 className="title">Bridal packages</h2>
+          <p className="lead mt-3">Prices depend on your look and the number of functions, so we confirm them after a consultation.</p>
+
+          <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {PACKAGES.map((p) => (
+              <li key={p.name} className="card flex flex-col p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-h3">{p.name}</h3>
+                  {p.popular && <span className="shrink-0 rounded-full bg-gold-soft px-2.5 py-0.5 text-caption font-semibold text-gold-deep">Most booked</span>}
+                </div>
+                <p className="mt-1 inline-flex items-center gap-1.5 text-small text-ink-soft"><Clock className="h-4 w-4" /> {p.duration}</p>
+                <p className="mt-3 flex-1 text-ink-soft">{p.desc}</p>
+                <p className="mt-4 text-small"><span className="font-semibold text-ink">Best for:</span> <span className="text-ink-soft">{p.idealFor}</span></p>
+                <button type="button" onClick={() => book(p.name)} className="btn-secondary btn-sm mt-5 self-start">Book this</button>
+              </li>
+            ))}
+          </ul>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {bridalPackages.map((pkg, idx) => (
-            <div
-              key={idx}
-              className={`rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between ${
-                pkg.featured
-                  ? 'bg-white border-2 border-salon-gold shadow-luxury relative'
-                  : 'bg-white border border-salon-babypink shadow-sm hover:shadow-luxury'
-              }`}
-            >
-              <div>
-                {pkg.featured && (
-                  <div className="absolute -top-3 left-8 px-3 py-0.5 rounded-full bg-salon-maroon text-salon-gold text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                    Signature Choice
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center gap-1 text-xs text-salon-gold-dark font-medium bg-salon-blush px-2.5 py-0.5 rounded-full border border-salon-babypink/60">
-                    <Clock className="w-3 h-3" />
-                    <span>{pkg.duration}</span>
-                  </span>
-                </div>
-
-                <h3 className="font-serif text-2xl font-bold text-salon-maroon mb-3 leading-snug">
-                  {pkg.name}
-                </h3>
-
-                <p className="text-xs text-salon-text/80 font-light leading-relaxed mb-4">
-                  {pkg.desc}
-                </p>
-
-                <div className="p-3 rounded-2xl bg-salon-blush border border-salon-babypink/60 text-[11px] text-salon-maroon font-medium mb-6">
-                  <span className="text-salon-gold-dark font-bold block mb-0.5">Recommended For:</span>
-                  {pkg.idealFor}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-salon-babypink/60 mt-4 flex items-center justify-between">
+      {/* The journey: a real sequence, so the steps are numbered */}
+      <section className="section bg-rose-light border-y border-line">
+        <div className="container-x">
+          <h2 className="title">How we plan your bridal look</h2>
+          <ol className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="relative flex gap-5 md:block">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-wine font-display text-xl text-white">{i + 1}</span>
                 <div>
-                  <span className="text-[10px] uppercase text-salon-text/50 tracking-wider block">Price</span>
-                  <span className="text-xs font-semibold text-salon-maroon">Price on Consultation</span>
+                  <h3 className="text-h3 md:mt-5">{s.title}</h3>
+                  <p className="mt-2 text-ink-soft">{s.text}</p>
                 </div>
-
-                <button
-                  onClick={() => handleBookPackage(pkg.serviceName)}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep transition-all shadow-sm active:scale-95"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-salon-gold" />
-                  <span>Enquire</span>
-                </button>
-              </div>
-
-            </div>
-          ))}
+              </li>
+            ))}
+          </ol>
         </div>
+      </section>
 
-        {/* 3. The 3-Stage Bridal Journey */}
-        <div className="mt-24 bg-white rounded-3xl p-8 sm:p-14 border border-salon-babypink shadow-sm">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs uppercase tracking-widest text-salon-gold-dark font-semibold block mb-2">
-              SEAMLESS TIMELINE
-            </span>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-salon-maroon">
-              The Preeti Makeover Bridal Journey
-            </h3>
-            <div className="w-16 h-0.5 bg-salon-gold mx-auto mt-3"></div>
-          </div>
+      <FaqSection topics={FAQ_TOPICS} title="Bridal questions" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className="p-6 rounded-2xl bg-salon-blush border border-salon-babypink/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-salon-maroon text-salon-gold font-serif text-lg font-bold flex items-center justify-center mx-auto">
-                1
-              </div>
-              <h4 className="font-serif font-bold text-lg text-salon-maroon">Diagnostic Consultation</h4>
-              <p className="text-xs text-salon-text/75 font-light leading-relaxed">
-                We assess skin hydration, undertones, and event timing to recommend customized facials and hair prep schedules weeks in advance.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-salon-blush border border-salon-babypink/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-salon-maroon text-salon-gold font-serif text-lg font-bold flex items-center justify-center mx-auto">
-                2
-              </div>
-              <h4 className="font-serif font-bold text-lg text-salon-maroon">Trial & Attire Planning</h4>
-              <p className="text-xs text-salon-text/75 font-light leading-relaxed">
-                Discuss jewelry placement, dupatta weight, floral hairstyles, and makeup finish preferences so there are zero surprises.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-salon-blush border border-salon-babypink/80 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-salon-maroon text-salon-gold font-serif text-lg font-bold flex items-center justify-center mx-auto">
-                3
-              </div>
-              <h4 className="font-serif font-bold text-lg text-salon-maroon">Wedding Day Radiance</h4>
-              <p className="text-xs text-salon-text/75 font-light leading-relaxed">
-                Relax in a calm, sanitized private environment while Preeti Mandal crafts your final HD bridal look right on schedule.
-              </p>
-            </div>
-          </div>
+      <section className="container-x pb-16 sm:pb-24">
+        <div className="rounded-block bg-wine px-6 py-12 text-center text-white sm:px-12 sm:py-14">
+          <h2 className="title text-white">Talk to {first} about your dates</h2>
+          <p className="mx-auto mt-4 max-w-prose text-lead text-white/80">
+            Share your wedding dates and venue on WhatsApp. We'll reply with availability and a plan for your functions.
+          </p>
+          <a href={biz.wa("Hello Preeti Makeover! I'd like to discuss bridal makeup for my wedding.")} target="_blank" rel="noopener noreferrer" className="btn mt-8 bg-white text-wine hover:bg-rose">
+            <WhatsAppIcon className="h-5 w-5 text-wa" /> Chat on WhatsApp
+          </a>
         </div>
-
-        {/* 4. Direct Bridal WhatsApp CTA Banner */}
-        <div className="mt-16 text-center">
-          <div className="inline-block p-8 rounded-3xl bg-gradient-to-r from-salon-babypink/70 via-salon-blush to-salon-babypink/50 border border-salon-rose/30 max-w-2xl w-full">
-            <h4 className="font-serif text-2xl font-bold text-salon-maroon mb-2">
-              Have Questions About Dates or Venue Visits?
-            </h4>
-            <p className="text-xs text-salon-text/75 mb-6 font-light">
-              We guide brides directly via WhatsApp on available dates, pre-bridal packages, and timing estimates.
-            </p>
-            <a
-              href="https://wa.me/918810359438?text=Hello%20Preeti%20Makeover,%20I%20am%20interested%20in%20discussing%20Bridal%20Makeover%20services."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-md transition-all"
-            >
-              <MessageCircle className="w-4 h-4 text-salon-gold" />
-              <span>Message Preeti Mandal on WhatsApp</span>
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
+      </section>
+    </>
   );
 }

@@ -1,463 +1,274 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Check, Clock, HeartHandshake, MapPin, Phone, ShieldCheck, Sparkles } from 'lucide-react';
 import Hero from '../components/sections/Hero';
 import BrandsShowcase from '../components/sections/BrandsShowcase';
-import PromiseRibbon from '../components/sections/PromiseRibbon';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
+import Photo from '../components/common/Photo';
+import Seo from '../components/common/Seo';
+import { WhatsAppIcon } from '../components/common/icons';
+import { useBusiness, useSiteData, useStats } from '../context/SiteDataContext';
+import { openStatus } from '../lib/business';
 
-import {
-  Sparkles,
-  ArrowRight,
-  HeartHandshake,
-  Clock,
-  MapPin,
-  ShieldCheck,
-  Check,
-  Calendar,
-  Phone,
-  Eye,
-  Star,
-  Award,
-  Crown,
-  Heart
-} from 'lucide-react';
+const SIGNATURE_DEFAULTS = [
+  {
+    name: 'Signature HD bridal makeover',
+    category: 'Bridal',
+    desc: 'High-definition, long-wear bridal makeup with skin prep, hairstyling and dupatta setting.',
+    link: '/bridal-makeup',
+    image: '/signature-bridal.jpg'
+  },
+  {
+    name: 'Casmara algae facial',
+    category: 'Skin',
+    desc: 'A Spanish peel-off algae mask for deep hydration, firmness and an even glow.',
+    link: '/services',
+    image: '/signature-facial.jpg'
+  },
+  {
+    name: 'Hair botox & nanoplastia',
+    category: 'Hair',
+    desc: 'Smooths frizz and restores shine with a keratin-sealing treatment.',
+    link: '/services',
+    image: '/signature-hair.jpg'
+  },
+  {
+    name: 'Rica liposoluble waxing',
+    category: 'Waxing',
+    desc: 'Gentle, colophony-free Italian wax made for sensitive skin.',
+    link: '/services',
+    image: '/signature-waxing.jpg'
+  }
+];
 
-export default function HomePage({ categories = [], testimonials = [], galleryImages = [], onSelectService, siteContent = {} }) {
-  // Highlighted signature treatments
-  const signatureTreatments = [
-    {
-      name: 'Signature Bridal HD Makeover',
-      category: 'Bridal Studio',
-      desc: 'Flawless high-definition bridal glam with bespoke hair draping and long-wear waterproof skin prep.',
-      badge: 'Most Requested',
-      highlight: 'Waterproof HD Finish',
-      link: '/bridal-makeup',
-      image: '/signature-bridal.jpg'
-    },
-    {
-      name: 'Casmara Luxury Algae Facial',
-      category: 'Clinical Skincare',
-      desc: 'Spanish peel-off algae mask delivering intense hydration, firming and luminous radiance.',
-      badge: 'Skin Glow',
-      highlight: 'Spanish Algae Peel',
-      link: '/services',
-      image: '/signature-facial.jpg'
-    },
-    {
-      name: 'Hair Botox & Nanoplastia Restoration',
-      category: 'Hair Treatments',
-      desc: 'Advanced structural realignment and keratin sealing for mirror-shine, frizz-free hair.',
-      badge: 'Restorative',
-      highlight: 'Mirror-Shine Keratin',
-      link: '/services',
-      image: '/signature-hair.jpg'
-    },
-    {
-      name: 'Italian Rica Liposoluble Waxing',
-      category: 'Hygienic Care',
-      desc: 'Gentle, 98% natural origin colophony-free wax designed for sensitive and delicate skin.',
-      badge: 'Painless Care',
-      highlight: '98% Natural Origin',
-      link: '/services',
-      image: '/signature-waxing.jpg'
-    }
+
+const cms = (value, fallback) => (value && !/^\{.*\}$/.test(String(value).trim()) ? value : fallback);
+
+export default function HomePage() {
+  const { content, categories, testimonials, testimonialsLoaded, gallery } = useSiteData();
+  const biz = useBusiness();
+  const stats = useStats();
+  const status = openStatus(biz);
+
+  const serviceCount = categories.reduce((n, c) => n + (c.services?.length || 0), 0);
+  const signatureItems = Array.isArray(content?.signature?.items) && content.signature.items.length ? content.signature.items : SIGNATURE_DEFAULTS;
+  const galleryItems = useMemo(
+    () => [...gallery.filter((g) => g.isFeatured), ...gallery.filter((g) => !g.isFeatured)].slice(0, 4),
+    [gallery]
+  );
+
+  const ribbon = content?.ribbon || {};
+  const promises = [
+    { icon: ShieldCheck, title: cms(ribbon.item1Title, 'Genuine, sealed products'), desc: cms(ribbon.item1Desc, "L'Oréal, Casmara, Rica and other professional brands, opened in front of you.") },
+    { icon: Sparkles, title: cms(ribbon.item3Title, 'Spotless hygiene'), desc: cms(ribbon.item3Desc, 'Tools sanitised between clients, with disposable capes, strips and sponges.') },
+    { icon: HeartHandshake, title: cms(ribbon.item2Title, `${biz.ownerName.split(' ')[0]} looks after you`), desc: cms(ribbon.item2Desc, 'A personal consultation before every treatment, with honest advice.') }
   ];
 
-  // Dynamic Ribbon Commitments
-  const ribbonCards = [
-    {
-      icon: ShieldCheck,
-      title: siteContent?.ribbon?.item1Title || '100% Genuine Brands',
-      desc: siteContent?.ribbon?.item1Desc || 'Sealed L’Oréal, Casmara & Rica',
-    },
-    {
-      icon: HeartHandshake,
-      title: siteContent?.ribbon?.item2Title || 'Preeti Mandal Direct Care',
-      desc: siteContent?.ribbon?.item2Desc || 'Diagnostic personal consultations',
-    },
-    {
-      icon: Sparkles,
-      title: siteContent?.ribbon?.item3Title || 'Hospital-Grade Clean',
-      desc: siteContent?.ribbon?.item3Desc || 'Sanitized instruments every client',
-    },
-    {
-      icon: Clock,
-      title: siteContent?.ribbon?.item4Title || '10:00 AM – 9:00 PM',
-      desc: siteContent?.ribbon?.item4Desc || 'Open 6 Days (Closed Tuesday)',
-    },
-  ];
-
-  // Social Proof Stats
-  const salonStats = [
-    { number: '10+', label: 'Years Experience', sub: 'Founded by Preeti Mandal', icon: Award },
-    { number: '1,200+', label: 'Happy Brides', sub: 'Signature HD Glamour', icon: Crown },
-    { number: '27+', label: 'Salon Services', sub: 'Hair, Skin & Bridal', icon: Sparkles },
-    { number: '4.9★', label: 'Client Rating', sub: 'Google & Direct Reviews', icon: Star },
-  ];
-
-  // Dynamic Signature / Most Loved Services
-  const activeSignatureItems = (Array.isArray(siteContent?.signature?.items) && siteContent.signature.items.length > 0)
-    ? siteContent.signature.items
-    : signatureTreatments;
-  
-  const signatureEyebrow = siteContent?.signature?.eyebrow && siteContent.signature.eyebrow !== '{signatureEyebrow}'
-    ? siteContent.signature.eyebrow
-    : 'CLIENT FAVORITES & SIGNATURE CARE';
-    
-  const signatureMainTitle = siteContent?.signature?.title && siteContent.signature.title !== '{signatureMainTitle}'
-    ? siteContent.signature.title
-    : 'Our Most Loved Services';
+  const bridal = content?.bridal || {};
+  const about = content?.about || {};
+  const cta = content?.cta || {};
 
   return (
-    <div className="space-y-0 text-salon-text">
-      {/* 1. Cinematic Hero Section */}
-      <Hero content={siteContent?.hero} stats={salonStats} />
+    <>
+      <Seo
+        description={`${biz.businessName} by ${biz.ownerName} in ${biz.shortAddress}. HD bridal makeup, hair botox, nanoplastia, keratin, Casmara facials and Rica waxing. Book online.`}
+        path="/"
+      />
 
-      {/* 2. Promise ribbon (stats now live inside the hero) */}
-      <PromiseRibbon promises={ribbonCards} />
+      <Hero content={content?.hero} stats={stats} />
 
-      {/* 4. Curated Signature Offerings Section (Re-imagined with Modern Rounded Glass Cards) */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4F7] via-[#FFF9FB] to-[#FCEEF3] relative overflow-hidden">
-        {/* Subtle Ambient Background Gradients */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-salon-gold/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-salon-rose/15 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 sm:gap-6">
+      {/* Practical info people look for first: are you open, where are you, how do I reach you */}
+      <section aria-label="Visiting information" className="container-x">
+        <div className="card grid divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="flex items-start gap-3 p-5">
+            <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${status.isOpen ? 'bg-leaf' : 'bg-rose-accent'}`} aria-hidden="true" />
             <div>
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
-                {signatureEyebrow}
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight">
-                {signatureMainTitle}
-              </h2>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3.5"></div>
+              <p className="font-semibold text-ink">{status.label}</p>
+              <p className="text-small text-ink-soft">{biz.openDaysLabel}, {biz.hoursLabel}</p>
             </div>
+          </div>
+          <a href={biz.directionsUrl} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-5 transition-colors hover:bg-rose-light">
+            <MapPin className="mt-1 h-5 w-5 shrink-0 text-gold" />
+            <div>
+              <p className="font-semibold text-ink">{cms(content?.hero?.quickLocation, 'Prince Colony, Badarpur')}</p>
+              <p className="text-small font-semibold text-wine">Get directions</p>
+            </div>
+          </a>
+          <a href={biz.telHref} className="flex items-start gap-3 p-5 transition-colors hover:bg-rose-light">
+            <Phone className="mt-1 h-5 w-5 shrink-0 text-gold" />
+            <div>
+              <p className="font-semibold text-ink">{biz.phoneDisplay}</p>
+              <p className="text-small text-ink-soft">Call or WhatsApp</p>
+            </div>
+          </a>
+        </div>
+      </section>
 
-            <Link
-              to="/services"
-              className="inline-flex items-center gap-2.5 text-xs sm:text-sm font-cinzel font-semibold tracking-wider text-salon-maroon hover:text-salon-gold-dark transition-colors group"
-            >
-              <span>Explore All 27 Salon Services</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform text-salon-gold-dark" />
+      {/* Signature services */}
+      <section className="section">
+        <div className="container-x">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <h2 className="title">{cms(content?.signature?.title, 'Most-loved services')}</h2>
+              <p className="lead mt-3">The treatments clients book most often.</p>
+            </div>
+            <Link to="/services" className="link hidden shrink-0 sm:inline">
+              {serviceCount ? `All ${serviceCount} services` : 'All services'}
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {activeSignatureItems.map((item, idx) => (
-              <Link
-                key={idx}
-                to={item.link}
-                className="group relative aspect-[3/4] sm:aspect-[4/5] rounded-3xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-luxury hover:shadow-luxury-lg p-5 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 cursor-pointer block select-none bg-black/10"
-              >
-                {/* Background Image with Zoom on Hover */}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
-                  loading="lazy"
-                />
-
-                {/* Refined Modern Gradient Overlay (Clean & Visible Photography) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#3A0D2C]/95 via-[#3A0D2C]/55 to-transparent transition-colors duration-500 group-hover:from-[#3A0D2C]/95 group-hover:via-[#220412]/45 pointer-events-none"></div>
-
-                {/* Ambient Gold Radial Glow on Card Corner */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-salon-gold/20 rounded-full blur-2xl pointer-events-none group-hover:bg-salon-gold/35 transition-all duration-500"></div>
-
-                {/* Top Badge & Number */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-sans font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-sm">
-                    {item.badge}
-                  </span>
-                  <span className="font-cinzel text-xs font-bold tracking-widest text-salon-gold-light drop-shadow-sm">
-                    0{idx + 1}
-                  </span>
-                </div>
-
-                {/* Bottom Content & Action */}
-                <div className="relative z-10 space-y-1.5">
-                  <span className="text-[9.5px] uppercase tracking-[0.2em] font-cinzel font-bold text-salon-gold block drop-shadow-sm">
-                    {item.category}
-                  </span>
-                  <h3 className="font-cinzel text-base sm:text-lg font-bold text-white leading-snug group-hover:text-salon-gold-light transition-colors drop-shadow-md">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs text-white/80 font-sans font-light leading-relaxed line-clamp-2 drop-shadow-sm">
-                    {item.desc}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-white/20 text-xs font-cinzel font-semibold tracking-wider text-salon-gold-light group-hover:text-white transition-colors">
-                    <span>Explore & Book</span>
-                    <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1.5 transition-transform text-salon-gold" />
+          <ul className="-mx-5 mt-8 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+            {signatureItems.map((item) => (
+              <li key={item.name} className="w-[78%] shrink-0 snap-start sm:w-auto">
+                <Link to={item.link || '/services'} className="group block">
+                  <div className="aspect-[4/5] overflow-hidden rounded-card bg-rose">
+                    <Photo
+                      src={item.image}
+                      alt=""
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 78vw"
+                      className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    />
                   </div>
-                </div>
-              </Link>
+                  <p className="mt-4 text-small font-medium text-gold-deep">{item.category}</p>
+                  <h3 className="mt-1 text-h3 group-hover:text-wine">{item.name}</h3>
+                  <p className="mt-2 line-clamp-2 text-small text-ink-soft">{item.desc}</p>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
+          <Link to="/services" className="btn-secondary mt-6 w-full sm:hidden">
+            {serviceCount ? `See all ${serviceCount} services` : 'See all services'}
+          </Link>
         </div>
       </section>
 
-      {/* 5. Dedicated Bridal Feature Spotlight (Elevated High-Fashion Editorial Card) */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FCEEF3] to-[#FAF4F7]">
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-          <div className="rounded-[40px] bg-gradient-to-br from-[#3A0D2C] via-[#5A1745] to-[#200410] text-salon-blush p-8 sm:p-14 relative overflow-hidden shadow-luxury-lg border border-salon-gold/40">
-            {/* Ambient Gold & Rose Atmosphere */}
-            <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-salon-gold/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute left-0 bottom-0 w-[400px] h-[400px] bg-salon-rose/15 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Bridal: the one strong colour moment on the page */}
+      <section className="bg-wine text-white">
+        <div className="container-x section grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-5">
+            <div className="mx-auto aspect-[4/5] max-w-md overflow-hidden rounded-block bg-wine-deep">
+              <Photo src="/bridal-feature-detail.jpg" alt="Traditional saree look with bridal jewellery" sizes="(min-width: 1024px) 40vw, 90vw" className="h-full w-full object-cover object-top" />
+            </div>
+          </div>
 
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              <div className="lg:col-span-8 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-salon-gold/30 text-[10px] uppercase tracking-[0.2em] text-salon-gold font-bold">
-                  <Crown className="w-3.5 h-3.5 text-salon-gold" />
-                  <span>The Bridal Couture Experience</span>
-                </div>
-
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">
-                  {siteContent?.bridal?.title || 'High-Definition Bridal Artistry'}
-                </h2>
-
-                <p className="text-salon-blush/85 text-base sm:text-lg font-light leading-relaxed max-w-2xl font-sans">
-                  {siteContent?.bridal?.description || 'From deep pre-bridal skin therapy to camera-ready HD makeup and custom saree draping, crafted by Preeti Mandal for your most memorable celebration.'}
-                </p>
-
-                {/* 4 Feature Glass Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  {[
-                    siteContent?.bridal?.feature1 || 'Pre-Bridal Clinical Glow Care Package',
-                    siteContent?.bridal?.feature2 || 'Signature Waterproof HD Bridal Makeup',
-                    siteContent?.bridal?.feature3 || 'Bespoke Hairstyling & Extensions',
-                    siteContent?.bridal?.feature4 || 'Designer Saree & Dupatta Draping'
-                  ].map((feat, i) => (
-                    <div 
-                      key={i} 
-                      className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-salon-gold/40 hover:bg-white/10 transition-all text-xs sm:text-sm text-salon-blush"
-                    >
-                      <span className="w-6 h-6 rounded-full bg-salon-gold/25 text-salon-gold flex items-center justify-center shrink-0 border border-salon-gold/30">
-                        <Check className="w-3.5 h-3.5" />
-                      </span>
-                      <span className="font-medium">{feat}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-center gap-4">
-                <Link
-                  to="/bridal-makeup"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-salon-gold-light via-salon-gold to-salon-gold-dark hover:brightness-105 shadow-luxury transition-all transform hover:-translate-y-0.5 border border-salon-gold/40"
-                >
-                  <Calendar className="w-4 h-4 text-salon-maroon" />
-                  <span>Explore Bridal Studio</span>
-                </Link>
-
-                <p className="text-xs text-salon-blush/70 italic text-left lg:text-right">
-                  {siteContent?.bridal?.bookingNote || 'Advance bookings recommended 3–6 weeks prior • Private sanitized suite'}
-                </p>
-              </div>
+          <div className="lg:col-span-7">
+            <h2 className="title text-white">{cms(bridal.title, 'Bridal makeup for every function')}</h2>
+            <p className="mt-4 max-w-prose text-lead text-white/80">
+              {cms(bridal.description, `From pre-bridal skin care to your wedding-day HD look and saree draping, planned with you by ${biz.ownerName}.`)}
+            </p>
+            <ul className="mt-6 space-y-3">
+              {[
+                cms(bridal.feature1, 'Pre-bridal glow care package'),
+                cms(bridal.feature2, 'Waterproof HD bridal makeup'),
+                cms(bridal.feature3, 'Bridal hairstyling and extensions'),
+                cms(bridal.feature4, 'Saree and dupatta draping')
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-3">
+                  <Check className="mt-1 h-5 w-5 shrink-0 text-gold-soft" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link to="/bridal-makeup" className="btn bg-white text-wine hover:bg-rose">See bridal packages</Link>
+              <p className="text-small text-white/70">{cms(bridal.bookingNote, 'Book 3–6 weeks before your date.')}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. Certified Brands Showcase */}
-      <BrandsShowcase content={siteContent?.brands} />
-
-      {/* 7. Portfolio Preview Section (Editorial Fashion Gallery) */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4F7] via-[#FFF9FB] to-[#FCEEF3] relative overflow-hidden">
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4 sm:gap-6">
-            <div>
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
-                PORTFOLIO SNAPSHOT
-              </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight">
-                Salon Work Gallery
-              </h2>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mt-3"></div>
-            </div>
-
-            <Link
-              to="/gallery"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-cinzel font-semibold tracking-wider text-salon-maroon hover:text-salon-gold-dark transition-colors group"
-            >
-              <span>View Full Gallery With Filter & Zoom</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform text-salon-gold-dark" />
-            </Link>
-          </div>
-
-          {/* Visual Transformation Photo Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              {
-                title: 'Royal Indian Bridal HD Glam',
-                category: 'Bridal Makeover',
-                image: '/gallery-bridal.jpg'
-              },
-              {
-                title: 'Nanoplastia & Hair Botox Glow',
-                category: 'Hair Treatments',
-                image: '/gallery-hair.jpg'
-              },
-              {
-                title: 'Cocktail & Evening Glam Makeup',
-                category: 'Occasion Artistry',
-                image: '/gallery-makeup.jpg'
-              },
-              {
-                title: 'Bespoke Gel Nail Extensions',
-                category: 'Nail Artistry',
-                image: '/gallery-nails.jpg'
-              }
-            ].map((p, idx) => (
-              <Link
-                key={idx}
-                to="/gallery"
-                className="group relative aspect-[4/5] rounded-3xl overflow-hidden border border-salon-gold/30 hover:border-salon-gold shadow-md hover:shadow-luxury-lg transition-all duration-500 hover:-translate-y-1.5 block select-none bg-black/10"
-              >
-                {/* Full-Bleed Photograph with Smooth Zoom */}
-                <img
-                  src={p.image}
-                  alt={p.title}
-                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out pointer-events-none"
-                  loading="lazy"
-                />
-
-                {/* Subtle Contrast Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-300 pointer-events-none"></div>
-
-                {/* Top Category Badge */}
-                <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                  <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-[9px] sm:text-[10px] font-cinzel font-bold uppercase tracking-wider text-white shadow-sm">
-                    {p.category}
-                  </span>
-                </div>
-
-                {/* Bottom Title & Eye Icon Overlay */}
-                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-10 flex items-end justify-between gap-2 pointer-events-none">
-                  <span className="font-cinzel text-xs sm:text-sm font-bold text-white leading-tight drop-shadow-md line-clamp-2 group-hover:text-salon-gold-light transition-colors">
-                    {p.title}
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-md border border-white/30 text-white flex items-center justify-center shrink-0 group-hover:bg-salon-maroon group-hover:border-salon-gold group-hover:text-salon-gold transition-all duration-300 shadow-sm">
-                    <Eye className="w-4 h-4" />
-                  </div>
-                </div>
-              </Link>
+      {/* Why clients come back + products */}
+      <section className="section">
+        <div className="container-x">
+          <h2 className="title max-w-2xl">Why clients keep coming back</h2>
+          <ul className="mt-10 grid gap-8 sm:grid-cols-3">
+            {promises.map(({ icon: Icon, title, desc }) => (
+              <li key={title} className="border-t border-line pt-6">
+                <Icon className="h-6 w-6 text-gold" />
+                <h3 className="mt-4 text-h3">{title}</h3>
+                <p className="mt-2 text-ink-soft">{desc}</p>
+              </li>
             ))}
+          </ul>
+          <div className="mt-14">
+            <BrandsShowcase content={content?.brands} />
           </div>
         </div>
       </section>
 
-      {/* 8. Client Reviews / Satisfaction Section */}
-      <TestimonialsSection testimonials={testimonials} />
-
-      {/* 9. Studio Story & Values Teaser (Refined Editorial Split Layout) */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#FCEEF3] to-[#FAF4F7] border-t border-salon-babypink/60 relative overflow-hidden">
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Column: Signature Founder Card */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-[36px] bg-gradient-to-br from-salon-maroon via-salon-maroon-deep to-[#2A0515] text-salon-blush p-8 sm:p-10 shadow-luxury-lg border border-salon-gold/40">
-                <span className="text-[10px] uppercase tracking-widest text-salon-gold font-bold block mb-2">
-                  {siteContent?.about?.essenceTag || 'OUR ESSENCE'}
-                </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-4 leading-snug">
-                  {siteContent?.about?.quote || '“Your Beauty Is Our Duty.”'}
-                </h3>
-                <p className="text-xs sm:text-sm text-salon-blush/85 leading-relaxed font-light mb-6">
-                  {siteContent?.about?.essenceStory || 'Founded by Preeti Mandal in Harinagar, Badarpur, Preeti Makeover was built to provide women with a reliable, clinical and luxury parlour experience close to home.'}
-                </p>
-                <div className="space-y-2.5 pt-4 border-t border-white/10 text-xs text-salon-blush/80">
-                  <div className="flex items-center gap-2.5">
-                    <MapPin className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Prince Colony, Harinagar, Badarpur, New Delhi</span>
+      {/* Portfolio: shown once the owner has uploaded real work (Admin → Gallery) */}
+      {gallery.length > 0 && (
+      <section className="section border-y border-line bg-rose-light">
+        <div className="container-x">
+          <div className="flex items-end justify-between gap-6">
+            <h2 className="title">Recent work from the studio</h2>
+            <Link to="/gallery" className="link shrink-0">View gallery</Link>
+          </div>
+          <ul className={`mt-8 grid gap-3 sm:gap-6 ${galleryItems.length === 3 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2 lg:grid-cols-4'}`}>
+            {galleryItems.map((p, i) => (
+              <li key={p.id} className={galleryItems.length === 3 && i === 0 ? 'col-span-2 sm:col-span-1' : ''}>
+                <Link to="/gallery" className="group block">
+                  <div className={`overflow-hidden rounded-card bg-rose ${galleryItems.length === 3 && i === 0 ? 'aspect-[4/3] sm:aspect-[4/5]' : 'aspect-[4/5]'}`}>
+                    <Photo
+                      src={p.imageUrl}
+                      alt={p.altText || p.title}
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    />
                   </div>
-                  <div className="flex items-center gap-2.5">
-                    <Clock className="w-4 h-4 text-salon-gold shrink-0" />
-                    <span>Open 10 AM – 9 PM (Closed Tuesdays)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Founder Story Content */}
-            <div className="lg:col-span-7 space-y-6">
-              <div>
-                <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-salon-gold-dark font-bold block mb-1.5">
-                  MEET PREETI MANDAL
-                </span>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-salon-maroon tracking-tight mb-3 leading-tight">
-                  {siteContent?.about?.heading || 'Passionate Artistry & Personal Consultation'}
-                </h2>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-salon-gold to-salon-gold-light mb-4"></div>
-                <p className="text-sm sm:text-base text-salon-text/80 font-light leading-relaxed">
-                  {siteContent?.about?.description || 'Every face, hair type and skin tone has distinct requirements. We take time to diagnose before recommending any facial, treatment or makeup drape, ensuring healthy, radiant and long-lasting results.'}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
-                  to="/about"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-semibold text-salon-maroon bg-white hover:bg-salon-babypink/30 border border-salon-rose/30 shadow-sm transition-all"
-                >
-                  <span>Read Salon Story & Values</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-salon-gold-dark" />
+                  <p className="mt-3 font-semibold text-ink">{p.title}</p>
+                  <p className="text-small text-ink-soft">{p.category}</p>
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+      )}
 
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-semibold text-white bg-salon-maroon hover:bg-salon-maroon-deep shadow-sm transition-all"
-                >
-                  <span>Book Visit</span>
-                </Link>
-              </div>
-            </div>
+      <TestimonialsSection testimonials={testimonials} loaded={testimonialsLoaded} />
 
+      {/* Meet the founder */}
+      <section className="section pt-0">
+        <div className="container-x grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
+          <figure className="rounded-block bg-rose p-8 sm:p-10 lg:col-span-5">
+            <img src="/pm_logo.png" alt="" width="64" height="64" className="h-16 w-16 object-contain" />
+            <blockquote className="mt-6 font-display text-[1.75rem] leading-snug text-wine sm:text-3xl">
+              {cms(about.quote, `“${biz.tagline}”`)}
+            </blockquote>
+            <figcaption className="mt-4 text-small text-ink-soft">{biz.ownerName}, founder</figcaption>
+          </figure>
+          <div className="lg:col-span-7">
+            <h2 className="title">{cms(about.heading, `Meet ${biz.ownerName}`)}</h2>
+            <p className="lead mt-4">
+              {cms(about.description, 'Every face, hair type and skin tone is different. We take time to understand yours before recommending a facial, treatment or look, so results are healthy and last.')}
+            </p>
+            <p className="mt-4 max-w-prose text-ink-soft">
+              {cms(about.essenceStory, `${biz.ownerName} started ${biz.businessName} in ${biz.shortAddress} so women nearby could get genuine products, careful hygiene and a personal salon experience close to home.`)}
+            </p>
+            <Link to="/about" className="btn-secondary mt-8">Read our story</Link>
           </div>
         </div>
       </section>
 
-      {/* 10. Grand Booking Call-to-Action Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#4A0E30] via-[#6B1442] to-[#A3245E] text-white py-14 sm:py-18 border-t border-salon-gold/30">
-        {/* Full-width Ambient Glows */}
-        <div className="absolute top-0 right-1/4 w-96 h-64 bg-salon-gold/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-64 bg-salon-rose/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-salon-gold/30 text-[10px] uppercase tracking-[0.2em] text-salon-gold font-bold mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-salon-gold" />
-            <span>Instant Salon Booking</span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white tracking-tight mb-3">
-            {siteContent?.cta?.title || 'Ready for Your Transformation?'}
-          </h2>
-
-          <p className="text-sm sm:text-base text-white/80 font-light max-w-xl mx-auto mb-7 leading-relaxed">
-            {siteContent?.cta?.subtext || 'Book your appointment online in seconds, or contact directly on WhatsApp for personal bridal guidance.'}
+      {/* Closing booking prompt */}
+      <section className="container-x pb-16 sm:pb-24">
+        <div className="rounded-block bg-rose px-6 py-12 text-center sm:px-12 sm:py-16">
+          <h2 className="title">{cms(cta.title, 'Book your visit')}</h2>
+          <p className="lead mx-auto mt-4">
+            {cms(cta.subtext, 'Choose a service and time online in under a minute, or message us on WhatsApp for bridal planning.')}
           </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
-            <Link
-              to="/contact"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-salon-maroon bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury-gold hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-luxury"
-            >
-              <Calendar className="w-4 h-4 text-salon-maroon" />
-              <span>{siteContent?.cta?.buttonText || 'Book Appointment Online'}</span>
-            </Link>
-
-            <a
-              href={`https://wa.me/${siteContent?.cta?.whatsappNumber || '918810359438'}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-emerald-400/60 backdrop-blur-md hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm"
-            >
-              <Phone className="w-4 h-4 text-emerald-400" />
-              <span>{siteContent?.cta?.whatsappText || 'Message on WhatsApp'}</span>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link to="/contact" className="btn-primary">{cms(cta.buttonText, 'Book a visit')}</Link>
+            <a href={biz.wa('Hello Preeti Makeover! I would like to book an appointment.')} target="_blank" rel="noopener noreferrer" className="btn-wa">
+              <WhatsAppIcon className="h-5 w-5" /> {cms(cta.whatsappText, 'Chat on WhatsApp')}
             </a>
           </div>
+          <p className="mt-6 flex items-center justify-center gap-2 text-small text-ink-soft">
+            <Clock className="h-4 w-4 text-gold" /> {biz.openDaysLabel}, {biz.hoursLabel}. Closed every {biz.weeklyOffDay}.
+          </p>
         </div>
       </section>
-    </div>
+    </>
   );
 }

@@ -12,14 +12,14 @@ export default function AdminPage({ adminToken, adminUser, onLoginSuccess, onLog
 
   if (!adminToken) {
     return (
-      <div className="pt-20 min-h-screen bg-salon-blush flex items-center justify-center p-4">
+      <div className="admin-scope min-h-screen bg-salon-blush flex items-center justify-center p-4">
         <AdminLogin onLoginSuccess={onLoginSuccess} onBackToSite={handleBackToSite} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF7FA]">
+    <div className="admin-scope min-h-screen bg-paper">
       <AdminDashboard 
         token={adminToken} 
         admin={adminUser} 

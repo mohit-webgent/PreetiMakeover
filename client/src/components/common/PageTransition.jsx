@@ -1,14 +1,15 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
-/** Soft fade/slide used for every route change. */
+/** Short cross-fade between pages: confirms the navigation without moving content around. */
 export default function PageTransition({ children }) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={reduce ? undefined : { opacity: 0 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
     >
       {children}
     </motion.div>

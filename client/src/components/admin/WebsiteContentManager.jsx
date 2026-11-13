@@ -16,9 +16,11 @@ import {
   Calendar,
   Eye,
   FileText,
-  Trash2
+  Trash2,
+  Star
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { DEFAULT_STATS } from '../../config/siteDefaults';
 
 /**
  * Image Field Uploader with Drag-and-Drop, Live Preview & URL fallback
@@ -63,16 +65,16 @@ function ImageFieldUploader({ label, value, onChange, token, helperText }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum">
+        <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry">
           {label}
         </label>
-        {helperText && <span className="text-[11px] text-brand-plum/50">{helperText}</span>}
+        {helperText && <span className="text-[11px] text-salon-text-muted">{helperText}</span>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
         {/* Preview Thumbnail */}
         <div className="sm:col-span-4 flex items-center gap-3">
-          <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-brand-ivory border-2 border-brand-gold/40 shadow-sm shrink-0 flex items-center justify-center">
+          <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-salon-blush-light border-2 border-salon-petal/40 shadow-sm shrink-0 flex items-center justify-center">
             {value ? (
               <img 
                 src={value} 
@@ -81,17 +83,17 @@ function ImageFieldUploader({ label, value, onChange, token, helperText }) {
                 onError={(e) => { e.target.src = '/pm_logo.png'; }}
               />
             ) : (
-              <ImageIcon className="w-8 h-8 text-brand-plum/30" />
+              <ImageIcon className="w-8 h-8 text-salon-berry/30" />
             )}
             {uploading && (
-              <div className="absolute inset-0 bg-brand-plum/70 backdrop-blur-xs flex items-center justify-center">
-                <RefreshCw className="w-5 h-5 text-brand-gold animate-spin" />
+              <div className="absolute inset-0 bg-salon-berry/70 backdrop-blur-sm flex items-center justify-center">
+                <RefreshCw className="w-5 h-5 text-salon-petal animate-spin" />
               </div>
             )}
           </div>
-          <div className="text-xs text-brand-plum/70 space-y-1">
-            <span className="font-semibold block text-brand-plum">Current Photo</span>
-            <span className="text-[10px] text-brand-plum/50 break-all line-clamp-2">
+          <div className="text-xs text-salon-berry/70 space-y-1">
+            <span className="font-semibold block text-salon-berry">Current Photo</span>
+            <span className="text-[11px] text-salon-text-muted break-all line-clamp-2">
               {value || 'No image set'}
             </span>
           </div>
@@ -106,8 +108,8 @@ function ImageFieldUploader({ label, value, onChange, token, helperText }) {
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all ${
               dragOver 
-                ? 'border-brand-gold bg-brand-gold/10 scale-[1.01]' 
-                : 'border-brand-blush hover:border-brand-gold bg-brand-ivory/50 hover:bg-white'
+                ? 'border-salon-petal bg-salon-petal/10 scale-[1.01]' 
+                : 'border-salon-blush hover:border-salon-petal bg-salon-blush-light/50 hover:bg-white'
             }`}
           >
             <input
@@ -117,24 +119,24 @@ function ImageFieldUploader({ label, value, onChange, token, helperText }) {
               accept="image/*"
               className="hidden"
             />
-            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-brand-plum">
-              <Upload className="w-4 h-4 text-brand-gold-dark" />
+            <div className="flex items-center justify-center gap-2 text-xs font-semibold text-salon-berry">
+              <Upload className="w-4 h-4 text-salon-petal-dark" />
               <span>{uploading ? 'Uploading to Server...' : 'Click to Upload or Drag & Drop'}</span>
             </div>
-            <p className="text-[10px] text-brand-plum/50 mt-1">
+            <p className="text-[11px] text-salon-text-muted mt-1">
               Supports JPG, PNG, WebP up to 8MB
             </p>
           </div>
 
           {/* URL text input */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-brand-plum/50 uppercase tracking-wider shrink-0">Or URL:</span>
+            <span className="text-[11px] text-salon-text-muted uppercase tracking-wider shrink-0">Or URL:</span>
             <input
               type="text"
               value={value || ''}
               onChange={(e) => onChange(e.target.value)}
               placeholder="/hero-bridal.jpg or https://..."
-              className="flex-1 px-3 py-1.5 rounded-lg border border-brand-blush text-xs bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+              className="flex-1 px-3 py-1.5 rounded-lg border border-salon-blush text-xs bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
             />
           </div>
 
@@ -167,8 +169,6 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
     badgeService: 'HD Bridal Makeover',
     badgeSubtitle: 'Camera-ready perfection by Preeti Mandal',
     quickLocation: 'Prince Colony, Badarpur',
-    quickHours: '10 AM – 9 PM',
-    quickPhone: '+91 8810359438',
     btnAppointment: 'Book Appointment',
     btnServices: 'View Services'
   });
@@ -254,9 +254,11 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
     title: 'Ready for Your Transformation?',
     subtext: 'Book your appointment online in seconds, or contact directly on WhatsApp.',
     buttonText: 'Book Appointment Online',
-    whatsappNumber: '918810359438',
     whatsappText: 'Message on WhatsApp'
   });
+
+  // Social-proof numbers shown in the hero (one source for the whole site)
+  const [statsData, setStatsData] = useState(() => DEFAULT_STATS.map((st) => ({ ...st })));
 
   // Load content from API
   useEffect(() => {
@@ -283,6 +285,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         if (d.brands) setBrandsData(prev => ({ ...prev, ...d.brands }));
         if (d.about) setAboutData(prev => ({ ...prev, ...d.about }));
         if (d.cta) setCtaData(prev => ({ ...prev, ...d.cta }));
+        if (Array.isArray(d.stats?.items) && d.stats.items.length) setStatsData(d.stats.items);
       }
     } catch (err) {
       console.error('Failed to load CMS content:', err);
@@ -304,7 +307,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
     try {
       if (sectionKey === 'hero') {
-        itemsToSave = Object.entries(heroData).map(([k, v]) => ({
+        itemsToSave = Object.entries(heroData).filter(([k]) => !['quickHours', 'quickPhone'].includes(k)).map(([k, v]) => ({
           key: `hero.${k}`,
           value: v,
           section: 'hero',
@@ -344,8 +347,14 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
           section: 'about',
           type: 'text'
         }));
+      } else if (sectionKey === 'stats') {
+        const cleaned = statsData
+          .map((st) => ({ number: String(st.number || '').trim(), label: String(st.label || '').trim(), sub: String(st.sub || '').trim() }))
+          .filter((st) => st.number && st.label);
+        if (cleaned.length === 0) throw new Error('Add at least one stat with a number and a label.');
+        itemsToSave = [{ key: 'stats.items', value: JSON.stringify(cleaned), section: 'stats', type: 'json', label: 'Hero stats' }];
       } else if (sectionKey === 'cta') {
-        itemsToSave = Object.entries(ctaData).map(([k, v]) => ({
+        itemsToSave = Object.entries(ctaData).filter(([k]) => k !== 'whatsappNumber').map(([k, v]) => ({
           key: `cta.${k}`,
           value: v,
           section: 'cta',
@@ -371,13 +380,14 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
     { id: 'bridal', label: 'Bridal Spotlight', icon: Crown, desc: 'HD Bridal headline, highlights & booking note' },
     { id: 'brands', label: 'Brands Showcase', icon: Eye, desc: 'Brand showcase heading & certification note' },
     { id: 'about', label: 'About & Meet Preeti', icon: Heart, desc: 'Essence quote, salon story & personal bio' },
+    { id: 'stats', label: 'Stats & Social Proof', icon: Star, desc: 'Years, brides, rating: the numbers quoted site-wide' },
     { id: 'cta', label: 'Booking CTA Banner', icon: Phone, desc: 'Transform banner text & WhatsApp contact' },
   ];
 
   if (loading) {
     return (
-      <div className="py-20 flex flex-col items-center justify-center text-brand-plum">
-        <RefreshCw className="w-8 h-8 animate-spin text-brand-gold mb-3" />
+      <div className="py-20 flex flex-col items-center justify-center text-salon-berry">
+        <RefreshCw className="w-8 h-8 animate-spin text-salon-petal mb-3" />
         <p className="text-sm font-semibold">Loading Website Content Manager...</p>
       </div>
     );
@@ -398,16 +408,16 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
       )}
 
       {/* Header Info */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-blush shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-salon-blush shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-gold/15 text-brand-plum text-[11px] font-bold uppercase tracking-wider mb-2 border border-brand-gold/30">
-            <Sparkles className="w-3.5 h-3.5 text-brand-gold-dark" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-salon-petal/15 text-salon-berry text-[11px] font-bold uppercase tracking-wider mb-2 border border-salon-petal/30">
+            <Sparkles className="w-3.5 h-3.5 text-salon-petal-dark" />
             <span>Zero-Developer Content Management System (CMS)</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-brand-plum">
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-salon-berry">
             Website Content & Photo Studio
           </h2>
-          <p className="text-xs sm:text-sm text-brand-plum/65 mt-1">
+          <p className="text-xs sm:text-sm text-salon-berry/65 mt-1">
             Edit any text, announcement, guarantee, and upload photographs directly from your phone or laptop. Changes reflect instantly on the live website.
           </p>
         </div>
@@ -416,15 +426,15 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 border border-brand-blush text-xs font-bold transition-all shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 border border-salon-blush text-xs font-bold transition-all shrink-0"
         >
-          <ExternalLink className="w-4 h-4 text-brand-gold-dark" />
+          <ExternalLink className="w-4 h-4 text-salon-petal-dark" />
           <span>View Live Website</span>
         </a>
       </div>
 
       {/* Section Navigation Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
         {sectionsList.map((s) => {
           const Icon = s.icon;
           const isActive = activeSection === s.id;
@@ -434,13 +444,13 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
               onClick={() => setActiveSection(s.id)}
               className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                 isActive
-                  ? 'bg-brand-plum text-brand-gold border-brand-gold shadow-md scale-[1.02]'
-                  : 'bg-white hover:bg-brand-ivory text-brand-plum/80 border-brand-blush/60'
+                  ? 'bg-salon-berry text-white border-salon-petal shadow-md scale-[1.02]'
+                  : 'bg-white hover:bg-salon-blush-light text-salon-berry/80 border-salon-blush/60'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-brand-gold' : 'text-brand-plum/60'}`} />
-                {isActive && <span className="w-2 h-2 rounded-full bg-brand-gold"></span>}
+                <Icon className={`w-4 h-4 ${isActive ? 'text-salon-petal' : 'text-salon-text-muted'}`} />
+                {isActive && <span className="w-2 h-2 rounded-full bg-salon-petal"></span>}
               </div>
               <span className="font-bold text-xs leading-tight block">{s.label}</span>
             </button>
@@ -449,24 +459,24 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
       </div>
 
       {/* Editor Container */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-blush shadow-sm">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-salon-blush shadow-sm">
         
         {/* SECTION 1: HERO */}
         {activeSection === 'hero' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Hero Section & Main Bridal Photo
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Controls the first impression on the homepage, including the main model photo.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('hero')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Hero Changes'}</span>
@@ -474,7 +484,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
             </div>
 
             {/* Main Model Photo Upload */}
-            <div className="p-5 rounded-2xl bg-brand-ivory/60 border border-brand-gold/30">
+            <div className="p-5 rounded-2xl bg-salon-blush-light/60 border border-salon-petal/30">
               <ImageFieldUploader
                 label="Main Hero Model Photograph"
                 value={heroData.modelImage}
@@ -486,154 +496,137 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Main Headline Line 1
                 </label>
                 <input
                   type="text"
                   value={heroData.headingLine1}
                   onChange={(e) => setHeroData({ ...heroData, headingLine1: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Main Headline Line 2
                 </label>
                 <input
                   type="text"
                   value={heroData.headingLine2}
                   onChange={(e) => setHeroData({ ...heroData, headingLine2: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Hero Description Paragraph
               </label>
               <textarea
                 rows={3}
                 value={heroData.description}
                 onChange={(e) => setHeroData({ ...heroData, description: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Tagline (Gold Accent Line)
                 </label>
                 <input
                   type="text"
                   value={heroData.tagline}
                   onChange={(e) => setHeroData({ ...heroData, tagline: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Photo Card Tag
                 </label>
                 <input
                   type="text"
                   value={heroData.badgeTitle}
                   onChange={(e) => setHeroData({ ...heroData, badgeTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Photo Card Title
                 </label>
                 <input
                   type="text"
                   value={heroData.badgeService}
                   onChange={(e) => setHeroData({ ...heroData, badgeService: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Photo Card Subtitle
                 </label>
                 <input
                   type="text"
                   value={heroData.badgeSubtitle}
                   onChange={(e) => setHeroData({ ...heroData, badgeSubtitle: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Quick Info: Location
                 </label>
                 <input
                   type="text"
                   value={heroData.quickLocation}
                   onChange={(e) => setHeroData({ ...heroData, quickLocation: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
-                  Quick Info: Hours
-                </label>
-                <input
-                  type="text"
-                  value={heroData.quickHours}
-                  onChange={(e) => setHeroData({ ...heroData, quickHours: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
-                />
-              </div>
+              
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
-                  Quick Info: Phone
-                </label>
-                <input
-                  type="text"
-                  value={heroData.quickPhone}
-                  onChange={(e) => setHeroData({ ...heroData, quickPhone: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
-                />
-              </div>
+              
+              <p className="text-xs text-salon-text-muted bg-salon-blush-light rounded-xl p-3 border border-salon-blush">
+                Opening hours, weekly off day and phone number are shown automatically from the <strong>Settings</strong> tab.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Button 1 Text
                 </label>
                 <input
                   type="text"
                   value={heroData.btnAppointment}
                   onChange={(e) => setHeroData({ ...heroData, btnAppointment: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Button 2 Text
                 </label>
                 <input
                   type="text"
                   value={heroData.btnServices}
                   onChange={(e) => setHeroData({ ...heroData, btnServices: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
@@ -643,19 +636,19 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         {/* SECTION 2: COMMITMENTS RIBBON */}
         {activeSection === 'ribbon' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Commitments & Philosophy Ribbon
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   The four key guarantee badges displayed prominently under the hero.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('ribbon')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Ribbon Changes'}</span>
@@ -664,101 +657,101 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Badge 1 */}
-              <div className="p-4 rounded-2xl bg-brand-ivory/50 border border-brand-blush space-y-3">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark block">
+              <div className="p-4 rounded-2xl bg-salon-blush-light/50 border border-salon-blush space-y-3">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-salon-petal-dark block">
                   Commitment Badge 1
                 </span>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Title</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Title</label>
                   <input
                     type="text"
                     value={ribbonData.item1Title}
                     onChange={(e) => setRibbonData({ ...ribbonData, item1Title: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Subtitle / Details</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Subtitle / Details</label>
                   <input
                     type="text"
                     value={ribbonData.item1Desc}
                     onChange={(e) => setRibbonData({ ...ribbonData, item1Desc: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Badge 2 */}
-              <div className="p-4 rounded-2xl bg-brand-ivory/50 border border-brand-blush space-y-3">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark block">
+              <div className="p-4 rounded-2xl bg-salon-blush-light/50 border border-salon-blush space-y-3">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-salon-petal-dark block">
                   Commitment Badge 2
                 </span>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Title</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Title</label>
                   <input
                     type="text"
                     value={ribbonData.item2Title}
                     onChange={(e) => setRibbonData({ ...ribbonData, item2Title: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Subtitle / Details</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Subtitle / Details</label>
                   <input
                     type="text"
                     value={ribbonData.item2Desc}
                     onChange={(e) => setRibbonData({ ...ribbonData, item2Desc: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Badge 3 */}
-              <div className="p-4 rounded-2xl bg-brand-ivory/50 border border-brand-blush space-y-3">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark block">
+              <div className="p-4 rounded-2xl bg-salon-blush-light/50 border border-salon-blush space-y-3">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-salon-petal-dark block">
                   Commitment Badge 3
                 </span>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Title</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Title</label>
                   <input
                     type="text"
                     value={ribbonData.item3Title}
                     onChange={(e) => setRibbonData({ ...ribbonData, item3Title: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Subtitle / Details</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Subtitle / Details</label>
                   <input
                     type="text"
                     value={ribbonData.item3Desc}
                     onChange={(e) => setRibbonData({ ...ribbonData, item3Desc: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Badge 4 */}
-              <div className="p-4 rounded-2xl bg-brand-ivory/50 border border-brand-blush space-y-3">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-brand-gold-dark block">
+              <div className="p-4 rounded-2xl bg-salon-blush-light/50 border border-salon-blush space-y-3">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-salon-petal-dark block">
                   Commitment Badge 4
                 </span>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Title</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Title</label>
                   <input
                     type="text"
                     value={ribbonData.item4Title}
                     onChange={(e) => setRibbonData({ ...ribbonData, item4Title: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-brand-plum mb-1">Subtitle / Details</label>
+                  <label className="block text-xs font-semibold text-salon-berry mb-1">Subtitle / Details</label>
                   <input
                     type="text"
                     value={ribbonData.item4Desc}
                     onChange={(e) => setRibbonData({ ...ribbonData, item4Desc: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                   />
                 </div>
               </div>
@@ -769,19 +762,19 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         {/* SECTION 3: SIGNATURE MOST LOVED SERVICES */}
         {activeSection === 'signature' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Most Loved Services (Homepage 4 Cards)
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Edit the 4 spotlight service cards on the homepage with custom photos, titles, and descriptions.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('signature')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Services Cards'}</span>
@@ -790,26 +783,26 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Section Eyebrow
                 </label>
                 <input
                   type="text"
                   value={signatureData.eyebrow}
                   onChange={(e) => setSignatureData({ ...signatureData, eyebrow: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Section Title
                 </label>
                 <input
                   type="text"
                   value={signatureData.title}
                   onChange={(e) => setSignatureData({ ...signatureData, title: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
@@ -817,12 +810,12 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
             {/* 4 Cards Editor */}
             <div className="space-y-6 pt-2">
               {signatureData.items.map((item, idx) => (
-                <div key={item.id || idx} className="p-5 rounded-2xl bg-brand-ivory/50 border border-brand-gold/30 space-y-4">
-                  <div className="flex items-center justify-between border-b border-brand-blush/60 pb-2">
-                    <span className="font-serif font-bold text-sm text-brand-plum">
+                <div key={item.id || idx} className="p-5 rounded-2xl bg-salon-blush-light/50 border border-salon-petal/30 space-y-4">
+                  <div className="flex items-center justify-between border-b border-salon-blush/60 pb-2">
+                    <span className="font-serif font-bold text-sm text-salon-berry">
                       Card 0{idx + 1}: {item.name}
                     </span>
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-gold/20 text-brand-plum">
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-salon-petal/20 text-salon-berry">
                       {item.badge}
                     </span>
                   </div>
@@ -840,7 +833,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-brand-plum mb-1">Service Title</label>
+                      <label className="block text-xs font-semibold text-salon-berry mb-1">Service Title</label>
                       <input
                         type="text"
                         value={item.name}
@@ -849,12 +842,12 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
                           updated[idx].name = e.target.value;
                           setSignatureData({ ...signatureData, items: updated });
                         }}
-                        className="w-full px-3 py-1.5 rounded-xl border border-brand-blush text-xs bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl border border-salon-blush text-xs bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-brand-plum mb-1">Category Tag</label>
+                      <label className="block text-xs font-semibold text-salon-berry mb-1">Category Tag</label>
                       <input
                         type="text"
                         value={item.category}
@@ -863,12 +856,12 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
                           updated[idx].category = e.target.value;
                           setSignatureData({ ...signatureData, items: updated });
                         }}
-                        className="w-full px-3 py-1.5 rounded-xl border border-brand-blush text-xs bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl border border-salon-blush text-xs bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-brand-plum mb-1">Top Badge Text</label>
+                      <label className="block text-xs font-semibold text-salon-berry mb-1">Top Badge Text</label>
                       <input
                         type="text"
                         value={item.badge}
@@ -877,13 +870,13 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
                           updated[idx].badge = e.target.value;
                           setSignatureData({ ...signatureData, items: updated });
                         }}
-                        className="w-full px-3 py-1.5 rounded-xl border border-brand-blush text-xs bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-xl border border-salon-blush text-xs bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-brand-plum mb-1">Short Description</label>
+                    <label className="block text-xs font-semibold text-salon-berry mb-1">Short Description</label>
                     <textarea
                       rows={2}
                       value={item.desc}
@@ -892,7 +885,7 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
                         updated[idx].desc = e.target.value;
                         setSignatureData({ ...signatureData, items: updated });
                       }}
-                      className="w-full px-3 py-1.5 rounded-xl border border-brand-blush text-xs bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                      className="w-full px-3 py-1.5 rounded-xl border border-salon-blush text-xs bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                     />
                   </div>
                 </div>
@@ -904,19 +897,19 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         {/* SECTION 4: BRIDAL SPOTLIGHT */}
         {activeSection === 'bridal' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Bridal Feature Spotlight
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Headline, value proposition, and bullet highlights for the bridal feature.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('bridal')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Bridal Changes'}</span>
@@ -924,88 +917,88 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Bridal Section Headline
               </label>
               <input
                 type="text"
                 value={bridalData.title}
                 onChange={(e) => setBridalData({ ...bridalData, title: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Description Paragraph
               </label>
               <textarea
                 rows={3}
                 value={bridalData.description}
                 onChange={(e) => setBridalData({ ...bridalData, description: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Highlight Bullet 1
                 </label>
                 <input
                   type="text"
                   value={bridalData.feature1}
                   onChange={(e) => setBridalData({ ...bridalData, feature1: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Highlight Bullet 2
                 </label>
                 <input
                   type="text"
                   value={bridalData.feature2}
                   onChange={(e) => setBridalData({ ...bridalData, feature2: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Highlight Bullet 3
                 </label>
                 <input
                   type="text"
                   value={bridalData.feature3}
                   onChange={(e) => setBridalData({ ...bridalData, feature3: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Highlight Bullet 4
                 </label>
                 <input
                   type="text"
                   value={bridalData.feature4}
                   onChange={(e) => setBridalData({ ...bridalData, feature4: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Advance Booking Notice Note
               </label>
               <input
                 type="text"
                 value={bridalData.bookingNote}
                 onChange={(e) => setBridalData({ ...bridalData, bookingNote: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
           </div>
@@ -1014,19 +1007,19 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         {/* SECTION 5: BRANDS SHOWCASE */}
         {activeSection === 'brands' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Brands Showcase Titles
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Header text and certification eyebrow for the luxury product brands section.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('brands')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Brands Changes'}</span>
@@ -1034,26 +1027,26 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Section Eyebrow
               </label>
               <input
                 type="text"
                 value={brandsData.eyebrow}
                 onChange={(e) => setBrandsData({ ...brandsData, eyebrow: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Section Main Title
               </label>
               <input
                 type="text"
                 value={brandsData.title}
                 onChange={(e) => setBrandsData({ ...brandsData, title: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
           </div>
@@ -1062,19 +1055,19 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
         {/* SECTION 6: ABOUT & MEET PREETI */}
         {activeSection === 'about' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Studio Essence & Meet Preeti Mandal
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Salon philosophy, signature quote, and Preeti Mandal personal consultation description.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('about')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save About Changes'}</span>
@@ -1083,84 +1076,147 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Essence Tag
                 </label>
                 <input
                   type="text"
                   value={aboutData.essenceTag}
                   onChange={(e) => setAboutData({ ...aboutData, essenceTag: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Salon Signature Quote
                 </label>
                 <input
                   type="text"
                   value={aboutData.quote}
                   onChange={(e) => setAboutData({ ...aboutData, quote: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Salon Essence Story
               </label>
               <textarea
                 rows={3}
                 value={aboutData.essenceStory}
                 onChange={(e) => setAboutData({ ...aboutData, essenceStory: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Meet Preeti Title
               </label>
               <input
                 type="text"
                 value={aboutData.heading}
                 onChange={(e) => setAboutData({ ...aboutData, heading: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Preeti Mandal Consultation Bio
               </label>
               <textarea
                 rows={3}
                 value={aboutData.description}
                 onChange={(e) => setAboutData({ ...aboutData, description: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
           </div>
         )}
 
         {/* SECTION 7: CTA BANNER */}
+        {activeSection === 'stats' && (
+          <div className="space-y-6">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-serif font-bold text-salon-berry">Stats & Social Proof</h3>
+                <p className="text-xs text-salon-text-muted">
+                  These numbers appear in the hero and floating badges. Keep them accurate: clients and Google trust honest figures.
+                </p>
+              </div>
+              <button
+                onClick={() => handleSaveSection('stats')}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                <Save className="w-4 h-4" />
+                <span>{saving ? 'Saving...' : 'Save Stats'}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {statsData.map((st, i) => (
+                <div key={i} className="rounded-2xl border border-salon-blush p-4 space-y-3 bg-salon-blush-light/30">
+                  <span className="text-xs font-bold uppercase tracking-wider text-salon-petal-dark">Stat {i + 1}</span>
+                  <div className="grid grid-cols-3 gap-3">
+                    <label className="block col-span-1">
+                      <span className="block text-xs font-semibold text-salon-berry mb-1">Number</span>
+                      <input
+                        type="text"
+                        value={st.number}
+                        placeholder="1,200+"
+                        onChange={(e) => setStatsData((list) => list.map((x, j) => (j === i ? { ...x, number: e.target.value } : x)))}
+                        className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:outline-none"
+                      />
+                    </label>
+                    <label className="block col-span-2">
+                      <span className="block text-xs font-semibold text-salon-berry mb-1">Label</span>
+                      <input
+                        type="text"
+                        value={st.label}
+                        placeholder="Happy Brides"
+                        onChange={(e) => setStatsData((list) => list.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))}
+                        className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:outline-none"
+                      />
+                    </label>
+                  </div>
+                  <label className="block">
+                    <span className="block text-xs font-semibold text-salon-berry mb-1">Tooltip / detail</span>
+                    <input
+                      type="text"
+                      value={st.sub || ''}
+                      onChange={(e) => setStatsData((list) => list.map((x, j) => (j === i ? { ...x, sub: e.target.value } : x)))}
+                      className="w-full px-3 py-2 rounded-xl border border-salon-blush text-sm bg-white text-salon-berry focus:outline-none"
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-salon-text-muted">
+              Tip: a stat whose label contains “rating” and one containing “brides” are also shown on the hero photo badge.
+            </p>
+          </div>
+        )}
+
         {activeSection === 'cta' && (
           <div className="space-y-6">
-            <div className="border-b border-brand-blush/60 pb-4 flex items-center justify-between">
+            <div className="border-b border-salon-blush/60 pb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-bold text-brand-plum">
+                <h3 className="text-lg font-serif font-bold text-salon-berry">
                   Grand Transformation Booking Banner
                 </h3>
-                <p className="text-xs text-brand-plum/60">
+                <p className="text-xs text-salon-text-muted">
                   Headline, subtext, and quick WhatsApp action buttons on the footer CTA.
                 </p>
               </div>
               <button
                 onClick={() => handleSaveSection('cta')}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-brand-plum bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold text-salon-berry bg-gradient-to-r from-[#FFE4EE] via-[#F2A9C4] to-[#FFE4EE] hover:shadow-luxury transition-all cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? 'Saving...' : 'Save Banner Changes'}</span>
@@ -1168,64 +1224,55 @@ export default function WebsiteContentManager({ token, onContentUpdated }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Banner Headline
               </label>
               <input
                 type="text"
                 value={ctaData.title}
                 onChange={(e) => setCtaData({ ...ctaData, title: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Banner Subtext
               </label>
               <textarea
                 rows={2}
                 value={ctaData.subtext}
                 onChange={(e) => setCtaData({ ...ctaData, subtext: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   Button 1: Online Booking
                 </label>
                 <input
                   type="text"
                   value={ctaData.buttonText}
                   onChange={(e) => setCtaData({ ...ctaData, buttonText: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
-                  WhatsApp Contact Number
-                </label>
-                <input
-                  type="text"
-                  value={ctaData.whatsappNumber}
-                  onChange={(e) => setCtaData({ ...ctaData, whatsappNumber: e.target.value })}
-                  placeholder="918810359438"
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
-                />
+              <div className="text-xs text-salon-text-muted bg-salon-blush-light rounded-xl p-3 border border-salon-blush self-end">
+                WhatsApp number is taken from the <strong>Settings</strong> tab.
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                   WhatsApp Button Text
                 </label>
                 <input
                   type="text"
                   value={ctaData.whatsappText}
                   onChange={(e) => setCtaData({ ...ctaData, whatsappText: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-sm bg-brand-ivory/30 focus:bg-white text-brand-plum focus:ring-1 focus:ring-brand-gold focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-sm bg-salon-blush-light/30 focus:bg-white text-salon-berry focus:ring-1 focus:ring-salon-petal focus:outline-none"
                 />
               </div>
             </div>

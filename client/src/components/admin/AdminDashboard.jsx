@@ -24,9 +24,11 @@ import {
   CheckCircle2,
   RefreshCw,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { formatPhone } from '../../lib/business';
 
 export default function AdminDashboard({ token, admin, onLogout, onBackToSite, onContentUpdated, onTokenRefreshed }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -39,6 +41,8 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
   const [appointments, setAppointments] = useState([]);
   const [appointmentFilter, setAppointmentFilter] = useState('ALL');
   const [appointmentSearch, setAppointmentSearch] = useState('');
+  const [appointmentRange, setAppointmentRange] = useState('all'); // all | today | upcoming
+  const [exporting, setExporting] = useState(false);
   const [servicesCategories, setServicesCategories] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -110,7 +114,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
     try {
       const [dashRes, apptRes, srvRes, galRes, testRes, setRes] = await Promise.all([
         api.getAdminDashboard(token).catch(e => null),
-        api.getAdminAppointments(token, { status: appointmentFilter, search: appointmentSearch }).catch(e => null),
+        api.getAdminAppointments(token, { status: appointmentFilter, search: appointmentSearch, range: appointmentRange }).catch(e => null),
         api.getAdminServices(token).catch(e => null),
         api.getAdminGallery(token).catch(e => null),
         api.getAdminTestimonials(token).catch(e => null),
@@ -135,12 +139,24 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
   }, [token]);
 
   // Handle Appointments Filter / Search
-  const reloadAppointments = async (status = appointmentFilter, search = appointmentSearch) => {
+  const reloadAppointments = async (status = appointmentFilter, search = appointmentSearch, range = appointmentRange) => {
     try {
-      const res = await api.getAdminAppointments(token, { status, search });
+      const res = await api.getAdminAppointments(token, { status, search, range });
       if (res?.data) setAppointments(res.data);
     } catch (err) {
       showToast(err.message || 'Error loading appointments', 'error');
+    }
+  };
+
+  const handleExportCsv = async () => {
+    setExporting(true);
+    try {
+      await api.downloadAppointmentsCsv(token, { status: appointmentFilter, search: appointmentSearch, range: appointmentRange });
+      showToast('Appointments exported');
+    } catch (err) {
+      showToast(err.message || 'Export failed', 'error');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -301,7 +317,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF7FA] text-brand-plum flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FFF7FA] text-salon-berry flex flex-col font-sans">
       
       {/* Toast Notification */}
       {toast && (
@@ -314,7 +330,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
       )}
 
       {/* Top Admin Navigation Header */}
-      <header className="bg-white border-b border-brand-blush/60 sticky top-0 z-30 shadow-sm">
+      <header className="bg-white border-b border-salon-blush/60 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
@@ -323,11 +339,11 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
               className="h-10 w-auto object-contain filter drop-shadow-sm"
             />
             <div>
-              <span className="font-serif text-xl font-bold tracking-tight text-brand-plum block leading-tight">
-                Preeti Makeover <span className="text-xs font-sans font-semibold text-brand-gold-dark bg-brand-blush/40 px-2 py-0.5 rounded-full ml-1">Admin</span>
+              <span className="font-serif text-xl font-bold tracking-tight text-salon-berry block leading-tight">
+                Preeti Makeover <span className="text-xs font-sans font-semibold text-salon-petal-dark bg-salon-blush/40 px-2 py-0.5 rounded-full ml-1">Admin</span>
               </span>
-              <span className="text-[10px] text-brand-plum/60 block">
-                Signed in as: <strong className="font-semibold text-brand-plum">{admin?.name || 'Preeti Mandal'}</strong> ({admin?.email || 'admin@preetimakeover.com'})
+              <span className="text-[11px] text-salon-text-muted block">
+                Signed in as: <strong className="font-semibold text-salon-berry">{admin?.name || 'Preeti Mandal'}</strong> ({admin?.email || 'admin@preetimakeover.com'})
               </span>
             </div>
           </div>
@@ -335,7 +351,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
           <div className="flex items-center gap-3">
             <button
               onClick={onBackToSite}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-brand-plum/80 hover:text-brand-plum bg-brand-ivory hover:bg-brand-blush/40 border border-brand-blush transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-salon-berry/80 hover:text-salon-berry bg-salon-blush-light hover:bg-salon-blush/40 border border-salon-blush transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Live Website</span>
@@ -352,7 +368,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
         </div>
 
         {/* Navigation Tabs Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 py-2 border-t border-brand-blush/30 text-xs font-medium">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 py-2 border-t border-salon-blush/30 text-xs font-medium">
           {[
             { id: 'overview', label: 'Overview', icon: LayoutDashboard },
             { id: 'cms', label: 'Website Content (CMS)', icon: Globe },
@@ -370,15 +386,15 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all shrink-0 ${
                   isActive
-                    ? 'bg-brand-plum text-brand-gold font-bold shadow-sm'
-                    : 'text-brand-plum/70 hover:text-brand-plum hover:bg-brand-ivory'
+                    ? 'bg-salon-berry text-white font-bold shadow-sm'
+                    : 'text-salon-berry/70 hover:text-salon-berry hover:bg-salon-blush-light'
                 }`}
               >
                 <IconComponent className="w-4 h-4" />
                 <span>{tab.label}</span>
                 {tab.badge > 0 && (
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                    isActive ? 'bg-brand-gold text-brand-plum' : 'bg-rose-100 text-rose-800'
+                  <span className={`px-1.5 py-0.2 rounded-full text-[11px] font-bold ${
+                    isActive ? 'bg-salon-petal text-salon-berry' : 'bg-rose-100 text-rose-800'
                   }`}>
                     {tab.badge}
                   </span>
@@ -398,45 +414,58 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
         {activeTab === 'overview' && (
           <div className="space-y-8">
             {/* KPI Cards Grid */}
+            <button
+              type="button"
+              onClick={() => { setActiveTab('appointments'); setAppointmentRange('today'); setAppointmentFilter('ALL'); reloadAppointments('ALL', appointmentSearch, 'today'); }}
+              className="w-full text-left rounded-2xl p-5 bg-gradient-to-r from-salon-berry to-salon-rose-dark text-white shadow-luxury flex items-center justify-between gap-4"
+            >
+              <span>
+                <span className="block text-xs uppercase tracking-[0.18em] text-white/80 font-semibold">Today's visits</span>
+                <span className="block font-serif text-3xl font-bold">{dashboardData?.todayAppointments || 0}</span>
+                <span className="block text-sm text-white/80">Pending, contacted or confirmed for today</span>
+              </span>
+              <span className="text-sm font-semibold underline underline-offset-4">View today →</span>
+            </button>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-2xl p-5 border border-brand-blush/60 shadow-sm">
+              <div className="bg-white rounded-2xl p-5 border border-salon-blush/60 shadow-sm">
                 <span className="text-[11px] uppercase font-bold tracking-wider text-amber-700 block mb-1">
                   Pending Enquiries
                 </span>
-                <div className="text-3xl font-serif font-bold text-brand-plum">
+                <div className="text-3xl font-serif font-bold text-salon-berry">
                   {dashboardData?.pendingEnquiries || 0}
                 </div>
-                <span className="text-[10px] text-brand-plum/60 mt-1 block">Require follow-up</span>
+                <span className="text-[11px] text-salon-text-muted mt-1 block">Require follow-up</span>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-brand-blush/60 shadow-sm">
+              <div className="bg-white rounded-2xl p-5 border border-salon-blush/60 shadow-sm">
                 <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-700 block mb-1">
                   Confirmed Bookings
                 </span>
-                <div className="text-3xl font-serif font-bold text-brand-plum">
+                <div className="text-3xl font-serif font-bold text-salon-berry">
                   {dashboardData?.confirmedAppointments || 0}
                 </div>
-                <span className="text-[10px] text-brand-plum/60 mt-1 block">Scheduled visits</span>
+                <span className="text-[11px] text-salon-text-muted mt-1 block">Scheduled visits</span>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-brand-blush/60 shadow-sm">
-                <span className="text-[11px] uppercase font-bold tracking-wider text-brand-gold-dark block mb-1">
+              <div className="bg-white rounded-2xl p-5 border border-salon-blush/60 shadow-sm">
+                <span className="text-[11px] uppercase font-bold tracking-wider text-salon-petal-dark block mb-1">
                   Active Services
                 </span>
-                <div className="text-3xl font-serif font-bold text-brand-plum">
+                <div className="text-3xl font-serif font-bold text-salon-berry">
                   {dashboardData?.activeServicesCount || 0}
                 </div>
-                <span className="text-[10px] text-brand-plum/60 mt-1 block">Across {dashboardData?.totalCategoriesCount || 5} categories</span>
+                <span className="text-[11px] text-salon-text-muted mt-1 block">Across {dashboardData?.totalCategoriesCount || 0} categories</span>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-brand-blush/60 shadow-sm">
+              <div className="bg-white rounded-2xl p-5 border border-salon-blush/60 shadow-sm">
                 <span className="text-[11px] uppercase font-bold tracking-wider text-purple-700 block mb-1">
                   Total Enquiries
                 </span>
-                <div className="text-3xl font-serif font-bold text-brand-plum">
+                <div className="text-3xl font-serif font-bold text-salon-berry">
                   {dashboardData?.totalEnquiries || 0}
                 </div>
-                <span className="text-[10px] text-brand-plum/60 mt-1 block">All-time received</span>
+                <span className="text-[11px] text-salon-text-muted mt-1 block">All-time received</span>
               </div>
             </div>
 
@@ -444,28 +473,28 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               
               {/* Recent Enquiries List */}
-              <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-8 border border-brand-blush/60 shadow-sm">
+              <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-8 border border-salon-blush/60 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="font-serif text-xl font-bold text-brand-plum">Recent Appointment Enquiries</h3>
-                    <p className="text-xs text-brand-plum/60">Latest submissions from website clients</p>
+                    <h3 className="font-serif text-xl font-bold text-salon-berry">Recent Appointment Enquiries</h3>
+                    <p className="text-xs text-salon-text-muted">Latest submissions from website clients</p>
                   </div>
                   <button
                     onClick={() => setActiveTab('appointments')}
-                    className="text-xs font-bold text-brand-gold-dark hover:text-brand-plum"
+                    className="text-xs font-bold text-salon-petal-dark hover:text-salon-berry"
                   >
                     View All →
                   </button>
                 </div>
 
                 {dashboardData?.recentAppointments?.length > 0 ? (
-                  <div className="divide-y divide-brand-blush/40">
+                  <div className="divide-y divide-salon-blush/40">
                     {dashboardData.recentAppointments.map((app) => (
                       <div key={app.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-sm text-brand-plum">{app.customerName}</h4>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            <h4 className="font-bold text-sm text-salon-berry">{app.customerName}</h4>
+                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                               app.status === 'PENDING' ? 'bg-amber-100 text-amber-800' :
                               app.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-800' :
                               app.status === 'CONTACTED' ? 'bg-blue-100 text-blue-800' :
@@ -474,7 +503,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                               {app.status}
                             </span>
                           </div>
-                          <p className="text-xs text-brand-plum/70 mt-0.5">
+                          <p className="text-xs text-salon-berry/70 mt-0.5">
                             {app.serviceName} • Requested for: <strong className="font-semibold">{new Date(app.preferredDate).toISOString().split('T')[0]}</strong> {app.preferredTime || ''}
                           </p>
                         </div>
@@ -494,7 +523,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                               setSelectedAppointment(app);
                               setActiveTab('appointments');
                             }}
-                            className="px-3 py-1.5 rounded-xl bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 text-xs font-semibold"
+                            className="px-3 py-1.5 rounded-xl bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 text-xs font-semibold"
                           >
                             Manage
                           </button>
@@ -503,7 +532,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     ))}
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-xs text-brand-plum/60">
+                  <div className="py-8 text-center text-xs text-salon-text-muted">
                     No appointment enquiries yet.
                   </div>
                 )}
@@ -511,50 +540,52 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
               {/* Salon Snapshot */}
               <div className="lg:col-span-4 space-y-6">
-                <div className="bg-gradient-to-br from-brand-plum to-brand-plum-deep text-brand-ivory rounded-3xl p-6 sm:p-8 shadow-luxury">
-                  <div className="flex items-center gap-2 mb-4 text-brand-gold text-xs font-semibold uppercase tracking-wider">
+                <div className="bg-gradient-to-br from-salon-berry to-salon-berry-deep text-salon-blush-light rounded-3xl p-6 sm:p-8 shadow-luxury">
+                  <div className="flex items-center gap-2 mb-4 text-salon-petal text-xs font-semibold uppercase tracking-wider">
                     <Sparkles className="w-4 h-4" />
                     <span>Studio Status</span>
                   </div>
-                  <h4 className="font-serif text-xl font-bold mb-2">Preeti Makeover</h4>
-                  <p className="text-xs text-brand-ivory/80 leading-relaxed font-light mb-4">
-                    Prince Colony, Badarpur, New Delhi. Daily 10 AM – 9 PM. Weekly Off on Tuesday.
+                  <h4 className="font-serif text-xl font-bold mb-2">{businessSettings?.businessName || 'Preeti Makeover'}</h4>
+                  <p className="text-xs text-salon-blush-light/80 leading-relaxed mb-4">
+                    {businessSettings?.address || '—'}
+                    <br />
+                    Open {businessSettings?.openingHour || '—'} – {businessSettings?.closingHour || '—'}
                   </p>
 
                   <div className="pt-4 border-t border-white/15 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-brand-ivory/60">Weekly Schedule:</span>
-                      <span className="font-semibold text-rose-300">Tuesday Closed</span>
+                      <span className="text-salon-blush-light/60">Weekly off:</span>
+                      <span className="font-semibold text-rose-300">{businessSettings?.weeklyOffDay || '—'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brand-ivory/60">WhatsApp Bridge:</span>
-                      <span className="font-semibold text-emerald-300">Active (+91 88103 59438)</span>
+                      <span className="text-salon-blush-light/60">Customers WhatsApp you on:</span>
+                      <span className="font-semibold text-emerald-300">{formatPhone(businessSettings?.whatsapp) || '—'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-brand-blush/60 shadow-sm space-y-3">
-                  <h4 className="font-serif font-bold text-sm text-brand-plum">Quick Studio Tools</h4>
+                <div className="bg-white rounded-3xl p-6 border border-salon-blush/60 shadow-sm space-y-3">
+                  <h4 className="font-serif font-bold text-sm text-salon-berry">Quick Studio Tools</h4>
                   <button
                     onClick={() => { setServiceModal({ open: true, mode: 'create', data: null }); }}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 border border-brand-blush flex items-center justify-between"
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 border border-salon-blush flex items-center justify-between"
                   >
                     <span>+ Add New Treatment</span>
-                    <Scissors className="w-4 h-4 text-brand-gold" />
+                    <Scissors className="w-4 h-4 text-salon-petal" />
                   </button>
                   <button
                     onClick={() => { setGalleryModal({ open: true, mode: 'create', data: null }); }}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 border border-brand-blush flex items-center justify-between"
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 border border-salon-blush flex items-center justify-between"
                   >
                     <span>+ Add Portfolio Image</span>
-                    <Image className="w-4 h-4 text-brand-gold" />
+                    <Image className="w-4 h-4 text-salon-petal" />
                   </button>
                   <button
                     onClick={() => setActiveTab('settings')}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 border border-brand-blush flex items-center justify-between"
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 border border-salon-blush flex items-center justify-between"
                   >
                     <span>Update Salon Hours</span>
-                    <Clock className="w-4 h-4 text-brand-gold" />
+                    <Clock className="w-4 h-4 text-salon-petal" />
                   </button>
                 </div>
               </div>
@@ -581,10 +612,10 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
           <div className="space-y-6">
             
             {/* Search & Filter Bar */}
-            <div className="bg-white rounded-2xl p-4 border border-brand-blush/60 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white rounded-2xl p-4 border border-salon-blush/60 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
               
               <div className="relative w-full md:w-80">
-                <Search className="w-4 h-4 text-brand-plum/40 absolute left-3.5 top-3" />
+                <Search className="w-4 h-4 text-salon-text-muted absolute left-3.5 top-3" />
                 <input
                   type="text"
                   placeholder="Search customer name, phone, or service..."
@@ -593,7 +624,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     setAppointmentSearch(e.target.value);
                     reloadAppointments(appointmentFilter, e.target.value);
                   }}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-brand-blush bg-brand-ivory/40 text-xs text-brand-plum placeholder:text-brand-plum/40"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-salon-blush bg-salon-blush-light/40 text-xs text-salon-berry placeholder:text-salon-text-muted"
                 />
               </div>
 
@@ -608,8 +639,8 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       appointmentFilter === st
-                        ? 'bg-brand-plum text-brand-gold shadow-sm'
-                        : 'bg-brand-ivory text-brand-plum/70 hover:text-brand-plum border border-brand-blush'
+                        ? 'bg-salon-berry text-white shadow-sm'
+                        : 'bg-salon-blush-light text-salon-berry/70 hover:text-salon-berry border border-salon-blush'
                     }`}
                   >
                     {st}
@@ -617,21 +648,44 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                 ))}
               </div>
 
-              <button
-                onClick={() => reloadAppointments()}
-                className="p-2 rounded-xl bg-brand-ivory hover:bg-brand-blush/40 text-brand-plum/80 border border-brand-blush shrink-0"
-                title="Refresh"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex rounded-lg border border-salon-blush overflow-hidden" role="group" aria-label="Visit date">
+                  {[['all', 'All dates'], ['today', 'Today'], ['upcoming', 'Upcoming']].map(([val, label]) => (
+                    <button
+                      key={val}
+                      onClick={() => { setAppointmentRange(val); reloadAppointments(appointmentFilter, appointmentSearch, val); }}
+                      aria-pressed={appointmentRange === val}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-colors ${appointmentRange === val ? 'bg-salon-berry text-white' : 'bg-white text-salon-berry hover:bg-salon-blush-light'}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={handleExportCsv}
+                  disabled={exporting}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-salon-berry border border-salon-blush hover:bg-salon-blush-light disabled:opacity-50"
+                  title="Download the filtered list as a spreadsheet (CSV)"
+                >
+                  <Download className="w-3.5 h-3.5" /> {exporting ? 'Exporting…' : 'Export CSV'}
+                </button>
+                <button
+                  onClick={() => reloadAppointments()}
+                  className="p-2 rounded-xl bg-salon-blush-light hover:bg-salon-blush/40 text-salon-berry/80 border border-salon-blush shrink-0"
+                  title="Refresh"
+                  aria-label="Refresh appointments"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Appointments Table */}
-            <div className="bg-white rounded-3xl border border-brand-blush/60 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-3xl border border-salon-blush/60 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-brand-blush/60 bg-brand-ivory/60 text-brand-plum/80 font-serif font-bold uppercase tracking-wider text-[11px]">
+                    <tr className="border-b border-salon-blush/60 bg-salon-blush-light/60 text-salon-berry/80 font-serif font-bold uppercase tracking-wider text-[11px]">
                       <th className="py-4 px-6">Customer</th>
                       <th className="py-4 px-6">Service</th>
                       <th className="py-4 px-6">Requested Date & Time</th>
@@ -640,27 +694,27 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       <th className="py-4 px-6 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-brand-blush/30">
+                  <tbody className="divide-y divide-salon-blush/30">
                     {appointments.length > 0 ? (
                       appointments.map((app) => (
-                        <tr key={app.id} className="hover:bg-brand-ivory/30 transition-colors">
+                        <tr key={app.id} className="hover:bg-salon-blush-light/30 transition-colors">
                           <td className="py-4 px-6">
-                            <span className="font-bold text-sm text-brand-plum block">{app.customerName}</span>
-                            <a href={`tel:${app.phone}`} className="text-brand-gold-dark hover:underline flex items-center gap-1 mt-0.5">
+                            <span className="font-bold text-sm text-salon-berry block">{app.customerName}</span>
+                            <a href={`tel:${app.phone}`} className="text-salon-petal-dark hover:underline flex items-center gap-1 mt-0.5">
                               <Phone className="w-3 h-3" />
                               <span>{app.phone}</span>
                             </a>
                           </td>
 
                           <td className="py-4 px-6">
-                            <span className="font-medium text-brand-plum">{app.serviceName}</span>
+                            <span className="font-medium text-salon-berry">{app.serviceName}</span>
                           </td>
 
                           <td className="py-4 px-6">
-                            <div className="font-medium text-brand-plum">
+                            <div className="font-medium text-salon-berry">
                               {new Date(app.preferredDate).toISOString().split('T')[0]}
                             </div>
-                            <span className="text-[11px] text-brand-plum/60">{app.preferredTime || 'Anytime'}</span>
+                            <span className="text-[11px] text-salon-text-muted">{app.preferredTime || 'Anytime'}</span>
                           </td>
 
                           <td className="py-4 px-6">
@@ -684,7 +738,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           </td>
 
                           <td className="py-4 px-6 max-w-xs">
-                            <span className="text-brand-plum/70 italic truncate block">
+                            <span className="text-salon-berry/70 italic truncate block">
                               {app.adminNotes || app.message || '—'}
                             </span>
                           </td>
@@ -702,7 +756,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
                             <button
                               onClick={() => setSelectedAppointment(app)}
-                              className="inline-flex p-2 rounded-xl bg-brand-ivory text-brand-plum hover:bg-brand-blush/40 transition-colors"
+                              className="inline-flex p-2 rounded-xl bg-salon-blush-light text-salon-berry hover:bg-salon-blush/40 transition-colors"
                               title="Edit Notes & Details"
                             >
                               <Edit className="w-3.5 h-3.5" />
@@ -712,7 +766,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="py-12 text-center text-brand-plum/60 text-xs">
+                        <td colSpan="6" className="py-12 text-center text-salon-text-muted text-xs">
                           No appointment enquiries found matching your criteria.
                         </td>
                       </tr>
@@ -725,45 +779,45 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             {/* Appointment Detail & Notes Modal */}
             {selectedAppointment && (
               <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-5 border border-brand-blush">
+                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-5 border border-salon-blush">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-xl font-bold text-brand-plum">
+                    <h3 className="font-serif text-xl font-bold text-salon-berry">
                       Appointment Details
                     </h3>
                     <button
                       onClick={() => setSelectedAppointment(null)}
-                      className="p-1.5 rounded-full hover:bg-brand-ivory text-brand-plum/60"
+                      className="p-1.5 rounded-full hover:bg-salon-blush-light text-salon-text-muted"
                     >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <div className="space-y-3 bg-brand-ivory rounded-2xl p-4 text-xs">
+                  <div className="space-y-3 bg-salon-blush-light rounded-2xl p-4 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-brand-plum/60">Customer Name:</span>
-                      <span className="font-bold text-brand-plum">{selectedAppointment.customerName}</span>
+                      <span className="text-salon-text-muted">Customer Name:</span>
+                      <span className="font-bold text-salon-berry">{selectedAppointment.customerName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brand-plum/60">Phone:</span>
-                      <span className="font-mono font-semibold text-brand-plum">{selectedAppointment.phone}</span>
+                      <span className="text-salon-text-muted">Phone:</span>
+                      <span className="font-mono font-semibold text-salon-berry">{selectedAppointment.phone}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brand-plum/60">Service:</span>
-                      <span className="font-semibold text-brand-plum">{selectedAppointment.serviceName}</span>
+                      <span className="text-salon-text-muted">Service:</span>
+                      <span className="font-semibold text-salon-berry">{selectedAppointment.serviceName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brand-plum/60">Requested Date:</span>
-                      <span className="font-semibold text-brand-plum">{new Date(selectedAppointment.preferredDate).toISOString().split('T')[0]}</span>
+                      <span className="text-salon-text-muted">Requested Date:</span>
+                      <span className="font-semibold text-salon-berry">{new Date(selectedAppointment.preferredDate).toISOString().split('T')[0]}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brand-plum/60">Client Message:</span>
-                      <span className="font-light text-brand-plum/80">{selectedAppointment.message || 'None provided'}</span>
+                      <span className="text-salon-text-muted">Client Message:</span>
+                      <span className="font-light text-salon-berry/80">{selectedAppointment.message || 'None provided'}</span>
                     </div>
                   </div>
 
                   {/* Admin Notes Form */}
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                       Internal Admin Notes
                     </label>
                     <textarea
@@ -771,14 +825,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       defaultValue={selectedAppointment.adminNotes || ''}
                       id="modalNotesInput"
                       placeholder="e.g. Called client at 2 PM; requested afternoon slot confirmed."
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush bg-brand-ivory/30 text-xs text-brand-plum resize-none"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush bg-salon-blush-light/30 text-xs text-salon-berry resize-none"
                     ></textarea>
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-2">
                     <button
                       onClick={() => setSelectedAppointment(null)}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold text-brand-plum/70 hover:bg-brand-ivory"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold text-salon-berry/70 hover:bg-salon-blush-light"
                     >
                       Cancel
                     </button>
@@ -787,7 +841,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         const notes = document.getElementById('modalNotesInput')?.value;
                         handleUpdateAppointment(selectedAppointment.id, selectedAppointment.status, notes);
                       }}
-                      className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep"
+                      className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep"
                     >
                       Save Notes
                     </button>
@@ -806,15 +860,15 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="font-serif text-2xl font-bold text-brand-plum">Services & Treatment Catalog</h3>
-                <p className="text-xs text-brand-plum/60">Manage salon treatments, duration, and optional pricing</p>
+                <h3 className="font-serif text-2xl font-bold text-salon-berry">Services & Treatment Catalog</h3>
+                <p className="text-xs text-salon-text-muted">Manage salon treatments, duration, and optional pricing</p>
               </div>
 
               <button
                 onClick={() => setServiceModal({ open: true, mode: 'create', data: null })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-sm self-start sm:self-auto"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-sm self-start sm:self-auto"
               >
-                <Plus className="w-4 h-4 text-brand-gold" />
+                <Plus className="w-4 h-4 text-salon-petal" />
                 <span>Add New Treatment</span>
               </button>
             </div>
@@ -822,13 +876,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             {/* Categories & Nested Services List */}
             <div className="space-y-6">
               {servicesCategories.map((cat) => (
-                <div key={cat.id} className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-blush/60 shadow-sm">
-                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-brand-blush/40">
+                <div key={cat.id} className="bg-white rounded-3xl p-6 sm:p-8 border border-salon-blush/60 shadow-sm">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-salon-blush/40">
                     <div>
-                      <h4 className="font-serif text-lg font-bold text-brand-plum">{cat.name}</h4>
-                      <p className="text-xs text-brand-plum/60 font-light">{cat.description}</p>
+                      <h4 className="font-serif text-lg font-bold text-salon-berry">{cat.name}</h4>
+                      <p className="text-xs text-salon-text-muted">{cat.description}</p>
                     </div>
-                    <span className="text-xs font-bold text-brand-gold-dark bg-brand-ivory px-3 py-1 rounded-full border border-brand-blush">
+                    <span className="text-xs font-bold text-salon-petal-dark bg-salon-blush-light px-3 py-1 rounded-full border border-salon-blush">
                       {cat.services?.length || 0} Treatments
                     </span>
                   </div>
@@ -839,30 +893,30 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         key={svc.id}
                         className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
                           svc.isActive 
-                            ? 'bg-[#FFF7FA] border-brand-blush/60 hover:border-brand-gold/50' 
+                            ? 'bg-[#FFF7FA] border-salon-blush/60 hover:border-salon-petal/50' 
                             : 'bg-gray-50 border-gray-200 opacity-60'
                         }`}
                       >
                         <div>
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h5 className="font-serif font-bold text-sm text-brand-plum">{svc.name}</h5>
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                            <h5 className="font-serif font-bold text-sm text-salon-berry">{svc.name}</h5>
+                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                               svc.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                             }`}>
                               {svc.isActive ? 'Active' : 'Inactive'}
                             </span>
                           </div>
                           
-                          <p className="text-[11px] text-brand-plum/60 mb-2">
+                          <p className="text-[11px] text-salon-text-muted mb-2">
                             {svc.startingPrice ? `Starting at ₹${svc.startingPrice}` : 'Price on Consultation'}
                             {svc.durationMinutes ? ` • ${svc.durationMinutes} mins` : ''}
                           </p>
                         </div>
 
-                        <div className="pt-2 border-t border-brand-blush/40 flex items-center justify-between text-xs">
+                        <div className="pt-2 border-t border-salon-blush/40 flex items-center justify-between text-xs">
                           <button
                             onClick={() => api.updateService(token, svc.id, { isActive: !svc.isActive }).then(() => api.getAdminServices(token).then(r => setServicesCategories(r.data)))}
-                            className="text-[10px] font-semibold text-brand-plum/60 hover:text-brand-plum underline"
+                            className="text-[11px] font-semibold text-salon-text-muted hover:text-salon-berry underline"
                           >
                             {svc.isActive ? 'Deactivate' : 'Activate'}
                           </button>
@@ -870,7 +924,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => setServiceModal({ open: true, mode: 'edit', data: { ...svc, categoryId: cat.id } })}
-                              className="p-1.5 rounded-lg hover:bg-white text-brand-plum/70"
+                              className="p-1.5 rounded-lg hover:bg-white text-salon-berry/70"
                               title="Edit Service"
                             >
                               <Edit className="w-3.5 h-3.5" />
@@ -894,14 +948,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             {/* Service Create/Edit Modal */}
             {serviceModal.open && (
               <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-4 border border-brand-blush">
+                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-4 border border-salon-blush">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-xl font-bold text-brand-plum">
+                    <h3 className="font-serif text-xl font-bold text-salon-berry">
                       {serviceModal.mode === 'create' ? 'Add New Treatment' : 'Edit Treatment'}
                     </h3>
                     <button
                       onClick={() => setServiceModal({ open: false, mode: 'create', data: null })}
-                      className="p-1.5 rounded-full hover:bg-brand-ivory text-brand-plum/60"
+                      className="p-1.5 rounded-full hover:bg-salon-blush-light text-salon-text-muted"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -909,14 +963,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
                   <form onSubmit={handleSaveService} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Category <span className="text-rose-500">*</span>
                       </label>
                       <select
                         name="categoryId"
                         required
                         defaultValue={serviceModal.data?.categoryId || servicesCategories[0]?.id || ''}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       >
                         {servicesCategories.map((c) => (
                           <option key={c.id} value={c.id}>{c.name}</option>
@@ -925,7 +979,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Treatment Name <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -934,13 +988,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         required
                         defaultValue={serviceModal.data?.name || ''}
                         placeholder="e.g. Signature Hair Botox"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                           Starting Price (₹)
                         </label>
                         <input
@@ -949,12 +1003,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           name="startingPrice"
                           defaultValue={serviceModal.data?.startingPrice || ''}
                           placeholder="Leave blank for Consultation"
-                          className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                          className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                           Duration (Minutes)
                         </label>
                         <input
@@ -962,13 +1016,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           name="durationMinutes"
                           defaultValue={serviceModal.data?.durationMinutes || ''}
                           placeholder="e.g. 60"
-                          className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                          className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Description / Notes
                       </label>
                       <textarea
@@ -976,7 +1030,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         rows="2"
                         defaultValue={serviceModal.data?.description || ''}
                         placeholder="Brief overview of formula & benefits..."
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40 resize-none"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40 resize-none"
                       ></textarea>
                     </div>
 
@@ -986,7 +1040,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           type="checkbox"
                           name="isActive"
                           defaultChecked={serviceModal.data ? serviceModal.data.isActive : true}
-                          className="rounded text-brand-plum focus:ring-brand-gold"
+                          className="rounded text-salon-berry focus:ring-salon-petal"
                         />
                         <span>Active on Website</span>
                       </label>
@@ -996,23 +1050,23 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           type="checkbox"
                           name="isFeatured"
                           defaultChecked={serviceModal.data ? serviceModal.data.isFeatured : false}
-                          className="rounded text-brand-plum focus:ring-brand-gold"
+                          className="rounded text-salon-berry focus:ring-salon-petal"
                         />
                         <span>Featured Treatment</span>
                       </label>
                     </div>
 
-                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-brand-blush/40">
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-salon-blush/40">
                       <button
                         type="button"
                         onClick={() => setServiceModal({ open: false, mode: 'create', data: null })}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold text-brand-plum/70 hover:bg-brand-ivory"
+                        className="px-4 py-2 rounded-xl text-xs font-semibold text-salon-berry/70 hover:bg-salon-blush-light"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-sm"
+                        className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-sm"
                       >
                         {serviceModal.mode === 'create' ? 'Create Treatment' : 'Save Changes'}
                       </button>
@@ -1032,15 +1086,15 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="font-serif text-2xl font-bold text-brand-plum">Salon Work Gallery</h3>
-                <p className="text-xs text-brand-plum/60">Upload and organize verified transformation photos for public display</p>
+                <h3 className="font-serif text-2xl font-bold text-salon-berry">Salon Work Gallery</h3>
+                <p className="text-xs text-salon-text-muted">Upload and organize verified transformation photos for public display</p>
               </div>
 
               <button
                 onClick={() => setGalleryModal({ open: true, mode: 'create', data: null })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-sm self-start sm:self-auto"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-sm self-start sm:self-auto"
               >
-                <Plus className="w-4 h-4 text-brand-gold" />
+                <Plus className="w-4 h-4 text-salon-petal" />
                 <span>Add Portfolio Image</span>
               </button>
             </div>
@@ -1048,27 +1102,27 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             {/* Gallery Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {galleryImages.map((img) => (
-                <div key={img.id} className="bg-white rounded-3xl overflow-hidden border border-brand-blush/60 shadow-sm flex flex-col justify-between">
-                  <div className="aspect-[4/3] bg-brand-ivory relative overflow-hidden">
+                <div key={img.id} className="bg-white rounded-3xl overflow-hidden border border-salon-blush/60 shadow-sm flex flex-col justify-between">
+                  <div className="aspect-[4/3] bg-salon-blush-light relative overflow-hidden">
                     <img
                       src={img.imageUrl}
                       alt={img.altText || img.title}
                       className="w-full h-full object-cover"
                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500'; }}
                     />
-                    <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-brand-plum shadow-sm">
+                    <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/90 text-salon-berry shadow-sm">
                       {img.category}
                     </span>
                   </div>
 
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="font-serif font-bold text-sm text-brand-plum mb-1">{img.title}</h4>
-                      <p className="text-[11px] text-brand-plum/60 line-clamp-1">{img.altText}</p>
+                      <h4 className="font-serif font-bold text-sm text-salon-berry mb-1">{img.title}</h4>
+                      <p className="text-[11px] text-salon-text-muted line-clamp-1">{img.altText}</p>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-brand-blush/40 flex items-center justify-between">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    <div className="pt-3 mt-3 border-t border-salon-blush/40 flex items-center justify-between">
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                         img.isActive ? 'bg-emerald-50 text-emerald-800' : 'bg-gray-100 text-gray-700'
                       }`}>
                         {img.isActive ? 'Active' : 'Hidden'}
@@ -1077,7 +1131,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => setGalleryModal({ open: true, mode: 'edit', data: img })}
-                          className="p-1.5 rounded-lg hover:bg-brand-ivory text-brand-plum/70"
+                          className="p-1.5 rounded-lg hover:bg-salon-blush-light text-salon-berry/70"
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </button>
@@ -1095,7 +1149,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             </div>
 
             {galleryImages.length === 0 && (
-              <div className="bg-white rounded-3xl p-12 text-center border border-brand-blush/60 text-xs text-brand-plum/60">
+              <div className="bg-white rounded-3xl p-12 text-center border border-salon-blush/60 text-xs text-salon-text-muted">
                 No custom images uploaded yet. The public site will gracefully display verified style compositions until you upload real photos.
               </div>
             )}
@@ -1103,14 +1157,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             {/* Gallery Modal */}
             {galleryModal.open && (
               <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-4 border border-brand-blush">
+                <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-luxury space-y-4 border border-salon-blush">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-xl font-bold text-brand-plum">
+                    <h3 className="font-serif text-xl font-bold text-salon-berry">
                       {galleryModal.mode === 'create' ? 'Add Portfolio Image' : 'Edit Portfolio Image'}
                     </h3>
                     <button
                       onClick={() => setGalleryModal({ open: false, mode: 'create', data: null })}
-                      className="p-1.5 rounded-full hover:bg-brand-ivory text-brand-plum/60"
+                      className="p-1.5 rounded-full hover:bg-salon-blush-light text-salon-text-muted"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -1118,7 +1172,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
                   <form onSubmit={handleSaveGallery} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Image Title <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -1127,19 +1181,19 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         required
                         defaultValue={galleryModal.data?.title || ''}
                         placeholder="e.g. Signature HD Bridal Glow"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Category <span className="text-rose-500">*</span>
                       </label>
                       <select
                         name="category"
                         required
                         defaultValue={galleryModal.data?.category || 'Bridal'}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       >
                         <option value="Bridal">Bridal</option>
                         <option value="Hair">Hair</option>
@@ -1150,7 +1204,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Image URL <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -1159,15 +1213,15 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         required
                         defaultValue={galleryModal.data?.imageUrl || ''}
                         placeholder="https://example.com/photo.jpg or /assets/photo.jpg"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       />
-                      <span className="text-[10px] text-brand-plum/50 mt-1 block">
+                      <span className="text-[11px] text-salon-text-muted mt-1 block">
                         Must be a valid web URL or asset path.
                       </span>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Alt Text (Accessibility)
                       </label>
                       <input
@@ -1175,7 +1229,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         name="altText"
                         defaultValue={galleryModal.data?.altText || ''}
                         placeholder="Descriptive caption for screen readers"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/40"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/40"
                       />
                     </div>
 
@@ -1185,7 +1239,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           type="checkbox"
                           name="isActive"
                           defaultChecked={galleryModal.data ? galleryModal.data.isActive : true}
-                          className="rounded text-brand-plum focus:ring-brand-gold"
+                          className="rounded text-salon-berry focus:ring-salon-petal"
                         />
                         <span>Visible on Website</span>
                       </label>
@@ -1195,7 +1249,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                           type="checkbox"
                           name="isFeatured"
                           defaultChecked={galleryModal.data ? galleryModal.data.isFeatured : false}
-                          className="rounded text-brand-plum focus:ring-brand-gold"
+                          className="rounded text-salon-berry focus:ring-salon-petal"
                         />
                         <span>Featured on Homepage</span>
                       </label>
@@ -1203,17 +1257,17 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
                     <input type="hidden" name="displayOrder" defaultValue={galleryModal.data?.displayOrder || 0} />
 
-                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-brand-blush/40">
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-salon-blush/40">
                       <button
                         type="button"
                         onClick={() => setGalleryModal({ open: false, mode: 'create', data: null })}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold text-brand-plum/70 hover:bg-brand-ivory"
+                        className="px-4 py-2 rounded-xl text-xs font-semibold text-salon-berry/70 hover:bg-salon-blush-light"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-sm"
+                        className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-sm"
                       >
                         Save Image
                       </button>
@@ -1233,31 +1287,31 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-serif text-2xl font-bold text-brand-plum">Client Testimonials Moderation</h3>
-                <p className="text-xs text-brand-plum/60">Strictly review and approve genuine feedback before public display</p>
+                <h3 className="font-serif text-2xl font-bold text-salon-berry">Client Testimonials Moderation</h3>
+                <p className="text-xs text-salon-text-muted">Strictly review and approve genuine feedback before public display</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl border border-brand-blush/60 shadow-sm overflow-hidden">
-              <div className="divide-y divide-brand-blush/30">
+            <div className="bg-white rounded-3xl border border-salon-blush/60 shadow-sm overflow-hidden">
+              <div className="divide-y divide-salon-blush/30">
                 {testimonials.length > 0 ? (
                   testimonials.map((t) => (
                     <div key={t.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="space-y-1 max-w-xl">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-sm text-brand-plum">{t.clientName}</h4>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          <h4 className="font-bold text-sm text-salon-berry">{t.clientName}</h4>
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                             t.isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                           }`}>
                             {t.isApproved ? 'Approved & Live' : 'Pending Approval'}
                           </span>
                         </div>
 
-                        <span className="text-[11px] text-brand-plum/60 block">
+                        <span className="text-[11px] text-salon-text-muted block">
                           Service: {t.serviceName || 'General Consultation'} • Rating: {'★'.repeat(t.rating)}
                         </span>
 
-                        <p className="text-xs text-brand-plum/80 italic font-light pt-1">
+                        <p className="text-xs text-salon-berry/80 italic pt-1">
                           “{t.reviewText}”
                         </p>
                       </div>
@@ -1284,7 +1338,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     </div>
                   ))
                 ) : (
-                  <div className="p-12 text-center text-xs text-brand-plum/60">
+                  <div className="p-12 text-center text-xs text-salon-text-muted">
                     No client reviews submitted yet. The public website currently displays your verified Salon Care Commitments.
                   </div>
                 )}
@@ -1299,16 +1353,16 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
         {activeTab === 'settings' && (
           <div className="max-w-3xl mx-auto space-y-8">
             {businessSettings && (
-              <div className="bg-white rounded-3xl p-8 border border-brand-blush/60 shadow-sm space-y-6">
+              <div className="bg-white rounded-3xl p-8 border border-salon-blush/60 shadow-sm space-y-6">
                 <div>
-                  <h3 className="font-serif text-2xl font-bold text-brand-plum">Salon Settings & Schedule</h3>
-                  <p className="text-xs text-brand-plum/60">Update official contact information, hours, and weekly closure</p>
+                  <h3 className="font-serif text-2xl font-bold text-salon-berry">Salon Settings & Schedule</h3>
+                  <p className="text-xs text-salon-text-muted">Update official contact information, hours, and weekly closure</p>
                 </div>
 
                 <form onSubmit={handleSaveSettings} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Business Name
                       </label>
                       <input
@@ -1316,12 +1370,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         name="businessName"
                         required
                         defaultValue={businessSettings.businessName}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Owner Name
                       </label>
                       <input
@@ -1329,13 +1383,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         name="ownerName"
                         required
                         defaultValue={businessSettings.ownerName}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       Tagline
                     </label>
                     <input
@@ -1343,13 +1397,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       name="tagline"
                       required
                       defaultValue={businessSettings.tagline}
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Phone Number
                       </label>
                       <input
@@ -1357,12 +1411,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         name="phone"
                         required
                         defaultValue={businessSettings.phone}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         WhatsApp Number
                       </label>
                       <input
@@ -1370,13 +1424,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         name="whatsapp"
                         required
                         defaultValue={businessSettings.whatsapp}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       Studio Email
                     </label>
                     <input
@@ -1384,12 +1438,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       name="email"
                       required
                       defaultValue={businessSettings.email}
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       Full Physical Address
                     </label>
                     <input
@@ -1397,13 +1451,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       name="address"
                       required
                       defaultValue={businessSettings.address}
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Opening Time
                       </label>
                       <input
@@ -1412,12 +1466,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         required
                         defaultValue={businessSettings.openingHour}
                         placeholder="10:00 AM"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Closing Time
                       </label>
                       <input
@@ -1426,18 +1480,18 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                         required
                         defaultValue={businessSettings.closingHour}
                         placeholder="09:00 PM"
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                         Weekly Off Day
                       </label>
                       <select
                         name="weeklyOffDay"
                         defaultValue={businessSettings.weeklyOffDay || 'Tuesday'}
-                        className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                        className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                       >
                         <option value="Tuesday">Tuesday</option>
                         <option value="Monday">Monday</option>
@@ -1447,7 +1501,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       Google Maps URL
                     </label>
                     <input
@@ -1455,14 +1509,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       name="googleMapsUrl"
                       defaultValue={businessSettings.googleMapsUrl || ''}
                       placeholder="https://maps.google.com/..."
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30"
                     />
                   </div>
 
-                  <div className="pt-4 border-t border-brand-blush/40 flex justify-end">
+                  <div className="pt-4 border-t border-salon-blush/40 flex justify-end">
                     <button
                       type="submit"
-                      className="px-6 py-3 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-luxury"
+                      className="px-6 py-3 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-luxury"
                     >
                       Save Business Settings
                     </button>
@@ -1472,14 +1526,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
             )}
 
             {/* Admin Password & Security Card */}
-            <div className="bg-white rounded-3xl p-8 border border-brand-blush/60 shadow-sm space-y-6">
+            <div className="bg-white rounded-3xl p-8 border border-salon-blush/60 shadow-sm space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-brand-plum/5 text-brand-plum flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-5 h-5 text-brand-gold-dark" />
+                <div className="w-10 h-10 rounded-2xl bg-salon-berry/5 text-salon-berry flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-salon-petal-dark" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-2xl font-bold text-brand-plum">Admin Password & Security</h3>
-                  <p className="text-xs text-brand-plum/60">
+                  <h3 className="font-serif text-2xl font-bold text-salon-berry">Admin Password & Security</h3>
+                  <p className="text-xs text-salon-text-muted">
                     Update your administrator credentials with server-side bcrypt authorization
                   </p>
                 </div>
@@ -1502,7 +1556,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
 
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                     Current Password
                   </label>
                   <input
@@ -1511,13 +1565,13 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                     placeholder="Enter current password to verify identity"
-                    className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30 focus:outline-none focus:border-brand-plum"
+                    className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30 focus:outline-none focus:border-salon-berry"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       New Password
                     </label>
                     <input
@@ -1527,12 +1581,12 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                       placeholder="Minimum 8 characters"
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30 focus:outline-none focus:border-brand-plum"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30 focus:outline-none focus:border-salon-berry"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1">
                       Confirm New Password
                     </label>
                     <input
@@ -1542,14 +1596,14 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                       placeholder="Re-enter new password"
-                      className="w-full px-4 py-2.5 rounded-xl border border-brand-blush text-xs text-brand-plum bg-brand-ivory/30 focus:outline-none focus:border-brand-plum"
+                      className="w-full px-4 py-2.5 rounded-xl border border-salon-blush text-xs text-salon-berry bg-salon-blush-light/30 focus:outline-none focus:border-salon-berry"
                     />
                   </div>
                 </div>
 
-                <div className="bg-brand-ivory/40 p-3 rounded-2xl border border-brand-blush/40 text-[11px] text-brand-plum/70 space-y-1">
-                  <p className="font-semibold text-brand-plum flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-brand-gold-dark" /> Security Guarantee
+                <div className="bg-salon-blush-light/40 p-3 rounded-2xl border border-salon-blush/40 text-[11px] text-salon-berry/70 space-y-1">
+                  <p className="font-semibold text-salon-berry flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-salon-petal-dark" /> Security Guarantee
                   </p>
                   <p>
                     Passwords are never saved in plain text. They are hashed using 12 salt rounds of bcrypt and stored in an isolated database record. Never share your credentials.
@@ -1560,7 +1614,7 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
                   <button
                     type="submit"
                     disabled={passwordLoading}
-                    className="px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-brand-plum hover:bg-brand-plum-deep shadow-luxury flex items-center gap-2 disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-salon-berry hover:bg-salon-berry-deep shadow-luxury flex items-center gap-2 disabled:opacity-50"
                   >
                     {passwordLoading ? (
                       <>
@@ -1585,23 +1639,23 @@ export default function AdminDashboard({ token, admin, onLogout, onBackToSite, o
       {/* Confirmation Dialog for Destructive Actions */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 border border-brand-blush shadow-luxury">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 border border-salon-blush shadow-luxury">
             <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
 
-            <h4 className="font-serif font-bold text-lg text-brand-plum">
+            <h4 className="font-serif font-bold text-lg text-salon-berry">
               Confirm Delete
             </h4>
 
-            <p className="text-xs text-brand-plum/70 font-light">
-              Are you sure you want to delete <strong className="font-semibold text-brand-plum">{deleteConfirm.name}</strong>? This action cannot be undone.
+            <p className="text-xs text-salon-berry/70">
+              Are you sure you want to delete <strong className="font-semibold text-salon-berry">{deleteConfirm.name}</strong>? This action cannot be undone.
             </p>
 
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-brand-plum/70 hover:bg-brand-ivory"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-salon-berry/70 hover:bg-salon-blush-light"
               >
                 Cancel
               </button>

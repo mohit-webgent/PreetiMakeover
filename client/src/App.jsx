@@ -1,50 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
-import MobileQuickBar from './components/layout/MobileQuickBar';
-import ScrollToTop from './components/common/ScrollToTop';
-import FloatingWhatsApp from './components/common/FloatingWhatsApp';
-import ScrollProgress from './components/common/ScrollProgress';
-import BackToTop from './components/common/BackToTop';
-import FloatingPetals from './components/common/FloatingPetals';
-import PageTransition from './components/common/PageTransition';
-import useAutoReveal from './components/common/useAutoReveal';
 import { AnimatePresence } from 'framer-motion';
 
-
-// Multi-Page Routes
-import HomePage from './pages/HomePage';
-import ServicesPage from './pages/ServicesPage';
-import BridalPage from './pages/BridalPage';
-import GalleryPage from './pages/GalleryPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
-
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import MobileTabBar from './components/layout/MobileTabBar';
+import ScrollToTop from './components/common/ScrollToTop';
+import FloatingWhatsApp from './components/common/FloatingWhatsApp';
+import PageTransition from './components/common/PageTransition';
+import ServerWakeNotice from './components/common/ServerWakeNotice';
+import { ArchDefs } from './components/common/Arch';
+import { SiteDataProvider, useSiteData } from './context/SiteDataContext';
 import { api } from './services/api';
 
-function AppLayout({ 
-  siteContent,
-  onContentUpdated,
-  categories, 
-  servicesLoading, 
-  servicesError, 
-  testimonials, 
-  galleryImages, 
-  selectedService, 
-  setSelectedService,
-  adminToken,
-  adminUser,
-  handleLoginSuccess,
-  handleLogout
-}) {
+import HomePage from './pages/HomePage';
+
+// Home is in the main bundle (first paint); every other page loads on demand.
+const pageImports = {
+  services: () => import('./pages/ServicesPage'),
+  bridal: () => import('./pages/BridalPage'),
+  gallery: () => import('./pages/GalleryPage'),
+  about: () => import('./pages/AboutPage'),
+  contact: () => import('./pages/ContactPage')
+};
+const ServicesPage = lazy(pageImports.services);
+const BridalPage = lazy(pageImports.bridal);
+const GalleryPage = lazy(pageImports.gallery);
+const AboutPage = lazy(pageImports.about);
+const ContactPage = lazy(pageImports.contact);
+// The admin panel is large and only for the owner: never downloaded by visitors.
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+
+/** Warm the page chunks once the browser is idle so navigation feels instant. */
+function usePrefetchPages() {
+  useEffect(() => {
+    const run = () => Object.values(pageImports).forEach((load) => load().catch(() => {}));
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(run, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = setTimeout(run, 2500);
+    return () => clearTimeout(t);
+  }, []);
+}
+
+function PageFallback() {
+  return (
+    <div className="flex min-h-[70vh] items-center justify-center">
+      <div className="h-9 w-9 animate-spin rounded-full border-2 border-rose-deep border-t-wine" aria-label="Loading" />
+    </div>
+  );
+}
+
+/** Admin session kept in sessionStorage so it ends when the browser tab closes. */
+function useAdminSession() {
+  const [token, setToken] = useState(() => sessionStorage.getItem('pm_admin_token'));
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('pm_admin_user') || 'null');
+    } catch {
+      return null;
+    }
+  });
+
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    sessionStorage.removeItem('pm_admin_token');
+    sessionStorage.removeItem('pm_admin_user');
+  }, []);
+
+  const login = useCallback((newToken, newUser) => {
+    setToken(newToken);
+    setUser(newUser);
+    sessionStorage.setItem('pm_admin_token', newToken);
+    sessionStorage.setItem('pm_admin_user', JSON.stringify(newUser));
+  }, []);
+
+  // Validate a stored token once on load
+  useEffect(() => {
+    if (!token) return;
+    api.getAdminMe(token)
+      .then((res) => {
+        if (res?.data) {
+          setUser(res.data);
+          sessionStorage.setItem('pm_admin_user', JSON.stringify(res.data));
+        } else {
+          logout();
+        }
+      })
+      .catch(logout);
+  }, [token, logout]);
+
+  return { token, user, login, logout };
+}
+
+function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  useAutoReveal();
+  const admin = useAdminSession();
+  const { refreshContent, refreshSettings } = useSiteData();
+  usePrefetchPages();
 
-  // Handle legacy hash migration (#admin -> /admin)
+  // Legacy hash link (#admin → /admin)
   useEffect(() => {
     if (window.location.hash === '#admin') {
       window.location.hash = '';
@@ -52,108 +111,56 @@ function AppLayout({
     }
   }, [navigate]);
 
-  return (
-    <div className="min-h-screen flex flex-col text-salon-text font-sans antialiased selection:bg-salon-rose/30 selection:text-salon-maroon">
-      <ScrollToTop />
-      {/* Global Botanical Watermarks across all pages */}
-      
+  const onContentUpdated = useCallback(() => {
+    refreshContent();
+    refreshSettings();
+  }, [refreshContent, refreshSettings]);
 
-      {/* Public Header Navigation (Hidden on Admin portal for clean workspace) */}
-      {!isAdminRoute && <ScrollProgress />}
-      {!isAdminRoute && <FloatingPetals />}
+  return (
+    <div className="flex min-h-screen flex-col">
+      <ArchDefs />
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[200] btn-primary">
+        Skip to content
+      </a>
+      <ScrollToTop />
       {!isAdminRoute && <Navbar />}
 
-      {/* Main Multi-page Routes */}
-      <main className="relative z-[1] flex-1 pb-20 md:pb-0">
+      <main id="main" className="flex-1">
         <AnimatePresence mode="wait">
-        <PageTransition key={isAdminRoute ? 'admin' : location.pathname}>
-        <Routes location={location}>
-          <Route 
-            path="/" 
-            element={
-              <HomePage 
-                siteContent={siteContent}
-                categories={categories} 
-                testimonials={testimonials} 
-                galleryImages={galleryImages} 
-                onSelectService={(s) => setSelectedService(s)} 
-              />
-            } 
-          />
-
-          <Route 
-            path="/services" 
-            element={
-              <ServicesPage 
-                categories={categories} 
-                loading={servicesLoading} 
-                error={servicesError} 
-                onSelectService={(s) => setSelectedService(s)} 
-              />
-            } 
-          />
-
-          <Route 
-            path="/bridal-makeup" 
-            element={
-              <BridalPage 
-                onSelectService={(s) => setSelectedService(s)} 
-              />
-            } 
-          />
-
-          <Route 
-            path="/gallery" 
-            element={
-              <GalleryPage 
-                galleryImages={galleryImages} 
-              />
-            } 
-          />
-
-          <Route 
-            path="/about" 
-            element={<AboutPage />} 
-          />
-
-          <Route 
-            path="/contact" 
-            element={
-              <ContactPage 
-                categories={categories} 
-                selectedService={selectedService} 
-                onClearSelectedService={() => setSelectedService(null)} 
-              />
-            } 
-          />
-
-          <Route 
-            path="/admin/*" 
-            element={
-              <AdminPage 
-                onContentUpdated={onContentUpdated}
-                adminToken={adminToken} 
-                adminUser={adminUser} 
-                onLoginSuccess={handleLoginSuccess} 
-                onLogout={handleLogout} 
-              />
-            } 
-          />
-
-          {/* Catch-all redirect to Home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </PageTransition>
+          <PageTransition key={isAdminRoute ? 'admin' : location.pathname}>
+            <Suspense fallback={<PageFallback />}>
+              <Routes location={location}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/services" element={<ServicesPage />} />
+                <Route path="/bridal-makeup" element={<BridalPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route
+                  path="/admin/*"
+                  element={
+                    <AdminPage
+                      onContentUpdated={onContentUpdated}
+                      adminToken={admin.token}
+                      adminUser={admin.user}
+                      onLoginSuccess={admin.login}
+                      onLogout={admin.logout}
+                    />
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </PageTransition>
         </AnimatePresence>
       </main>
 
-      {/* Public Footer & Floating Mobile Bar */}
       {!isAdminRoute && (
         <>
           <Footer />
-          <MobileQuickBar />
+          <MobileTabBar />
           <FloatingWhatsApp />
-          <BackToTop />
+          <ServerWakeNotice />
         </>
       )}
     </div>
@@ -161,140 +168,11 @@ function AppLayout({
 }
 
 export default function App() {
-  // Admin Auth State
-  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem('pm_admin_token'));
-  const [adminUser, setAdminUser] = useState(() => {
-    try {
-      const stored = sessionStorage.getItem('pm_admin_user');
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-
-    // CMS Site Content State
-  const [siteContent, setSiteContent] = useState({});
-
-  const refreshSiteContent = () => {
-    api.getContent()
-      .then((res) => {
-        if (res?.data) {
-          setSiteContent(res.data);
-        }
-      })
-      .catch((err) => console.log('Site content refresh:', err.message));
-  };
-
-  // Public Catalog & Content State
-  const [categories, setCategories] = useState([]);
-  const [servicesLoading, setServicesLoading] = useState(true);
-  const [servicesError, setServicesError] = useState(null);
-
-  const [testimonials, setTestimonials] = useState([]);
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [selectedService, setSelectedService] = useState(null);
-
-  // Validate existing admin token on mount
-  useEffect(() => {
-    if (adminToken) {
-      api.getAdminMe(adminToken)
-        .then((res) => {
-          if (res?.data) {
-            setAdminUser(res.data);
-            sessionStorage.setItem('pm_admin_user', JSON.stringify(res.data));
-          } else {
-            handleLogout();
-          }
-        })
-        .catch(() => {
-          handleLogout();
-        });
-    }
-  }, [adminToken]);
-
-  // Fetch Public Catalog Data from API
-  useEffect(() => {
-    let isMounted = true;
-
-    // Load CMS Site Content
-    api.getContent()
-      .then((res) => {
-        if (isMounted && res?.data) {
-          setSiteContent(res.data);
-        }
-      })
-      .catch((err) => console.log('Site content fetch:', err.message));
-
-    // Load Services
-    api.getServices()
-      .then((res) => {
-        if (isMounted && res?.data) {
-          setCategories(res.data);
-          setServicesLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setServicesError(err.message);
-          setServicesLoading(false);
-        }
-      });
-
-    // Load Approved Testimonials
-    api.getTestimonials()
-      .then((res) => {
-        if (isMounted && res?.data) {
-          setTestimonials(res.data);
-        }
-      })
-      .catch((err) => console.log('Testimonials fetch:', err.message));
-
-    // Load Active Gallery Images
-    api.getGallery()
-      .then((res) => {
-        if (isMounted && res?.data) {
-          setGalleryImages(res.data);
-        }
-      })
-      .catch((err) => console.log('Gallery fetch:', err.message));
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Admin Auth Handlers
-  const handleLoginSuccess = (token, user) => {
-    setAdminToken(token);
-    setAdminUser(user);
-    sessionStorage.setItem('pm_admin_token', token);
-    sessionStorage.setItem('pm_admin_user', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setAdminToken(null);
-    setAdminUser(null);
-    sessionStorage.removeItem('pm_admin_token');
-    sessionStorage.removeItem('pm_admin_user');
-  };
-
   return (
     <BrowserRouter>
-      <AppLayout 
-        siteContent={siteContent}
-        onContentUpdated={refreshSiteContent}
-        categories={categories}
-        servicesLoading={servicesLoading}
-        servicesError={servicesError}
-        testimonials={testimonials}
-        galleryImages={galleryImages}
-        selectedService={selectedService}
-        setSelectedService={setSelectedService}
-        adminToken={adminToken}
-        adminUser={adminUser}
-        handleLoginSuccess={handleLoginSuccess}
-        handleLogout={handleLogout}
-      />
+      <SiteDataProvider>
+        <AppLayout />
+      </SiteDataProvider>
     </BrowserRouter>
   );
 }

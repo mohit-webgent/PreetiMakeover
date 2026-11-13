@@ -2,232 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────────────
+   Base: calm paper, comfortable reading sizes
+   ───────────────────────────────────────────────────────────── */
 @layer base {
   html {
-    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem; /* anchor jumps clear the sticky header */
   }
 
   body {
-    @apply bg-salon-blush-light text-salon-text antialiased font-sans selection:bg-salon-rose/30 selection:text-salon-maroon-deep;
-    background-image:
-      radial-gradient(1200px 600px at 100% -10%, rgba(201, 179, 242, 0.18), transparent 60%),
-      radial-gradient(900px 500px at -10% 30%, rgba(255, 201, 181, 0.16), transparent 60%);
-    background-attachment: fixed;
+    @apply bg-paper font-sans text-body text-ink antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4 {
-    font-family: 'Playfair Display', Georgia, serif;
-    letter-spacing: -0.01em;
-    font-weight: 700;
-  }
-  h5, h6 { letter-spacing: -0.01em; font-weight: 600; }
+  /* Rozha One ships one weight: never let the browser fake a bold version */
+  h1, h2, .font-display, .font-serif { font-synthesis: none; }
+  h1, h2 { @apply font-display font-normal text-ink; text-wrap: balance; }
+  h3, h4, h5, h6 { @apply font-sans font-semibold text-ink; text-wrap: balance; }
+  p { text-wrap: pretty; }
 
-  /* Italic emphasis inside headings becomes a soft gradient script */
-  h1 em, h2 em, h3 em {
-    font-style: italic;
-    background: linear-gradient(100deg, #A3245E 0%, #E0608F 45%, #B48CE6 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
+  ::selection { background: #E3CCD2; color: #2A1C24; }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-salon-rose ring-offset-2 ring-offset-salon-blush-light;
+    outline: 2px solid #7D2E4A;
+    outline-offset: 3px;
+    border-radius: 6px;
   }
 
-  /* Pretty scrollbar */
-  ::-webkit-scrollbar { width: 10px; }
-  ::-webkit-scrollbar-track { background: #FFF4F8; }
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #F8BCD2, #EE7FA8, #C9B3F2);
-    border-radius: 999px;
-    border: 2px solid #FFF4F8;
-  }
+  input, select, textarea, button { font: inherit; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #FAF6F5; }
+  ::-webkit-scrollbar-thumb { background: #E3CCD2; border-radius: 999px; border: 2px solid #FAF6F5; }
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Components: the whole public site is built from these
+   ───────────────────────────────────────────────────────────── */
 @layer components {
-  /* Primary CTA: berry → rose gradient with travelling shimmer */
-  .btn-primary {
-    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white transition-all duration-300;
-    box-shadow: 0 10px 30px -8px rgba(238, 127, 168, 0.55);
-    background: linear-gradient(110deg, #A3245E 0%, #D9578A 45%, #EE7FA8 70%, #C2477F 100%);
-    background-size: 200% 100%;
-  }
-  .btn-primary:hover { background-position: 100% 0; transform: translateY(-2px); box-shadow: 0 16px 36px -10px rgba(217, 87, 138, 0.6); }
-  .btn-primary:active { transform: scale(0.97); }
-  .btn-primary::after {
-    content: '';
-    position: absolute; inset: 0; width: 40%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
-    animation: shimmer 2.8s ease-in-out infinite;
-    pointer-events: none;
-  }
+  .container-x { @apply mx-auto w-full max-w-content px-5 sm:px-8 lg:px-10; }
+  .section { @apply py-14 sm:py-20 lg:py-24; }
 
-  .btn-soft {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-salon-rose/30 bg-white/80 px-6 py-3 text-sm font-semibold text-salon-maroon backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-salon-rose hover:bg-white active:scale-95;
-  }
+  .title { @apply font-display text-h2 text-ink; }
+  .lead { @apply max-w-prose text-lead text-ink-soft; }
+  .muted { @apply text-ink-soft; }
 
-  .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-salon-rose/30 bg-white/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-salon-maroon backdrop-blur;
+  /* Buttons: pills, 48px tall (comfortable thumb targets), colour-only hover */
+  .btn {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-base font-semibold leading-none transition-colors duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
   }
+  .btn-primary { @apply btn bg-wine text-white hover:bg-wine-deep; }
+  .btn-secondary { @apply btn border border-line bg-card text-wine hover:border-rose-deep hover:bg-rose-light; }
+  .btn-wa { @apply btn bg-wa text-white hover:bg-wa-deep; }
+  .btn-ghost { @apply btn px-4 text-ink-soft hover:bg-rose-light hover:text-wine; }
+  .btn-sm { @apply min-h-[40px] px-4 text-small; }
+  .btn-icon { @apply inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors; }
 
-  .card-petal {
-    @apply rounded-3xl border border-white/70 bg-white/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-1.5;
-    box-shadow: 0 20px 40px -15px rgba(163, 36, 94, 0.14);
+  .link { @apply font-semibold text-wine underline decoration-rose-deep decoration-2 underline-offset-4 transition-colors hover:decoration-wine; }
+
+  /* Filter chips */
+  .chip {
+    @apply inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full border border-line bg-card px-4 text-small font-medium text-ink-soft transition-colors hover:border-rose-deep;
   }
+  .chip[aria-pressed='true'], .chip[aria-selected='true'] { @apply border-wine bg-wine text-white; }
+
+  .card { @apply rounded-card border border-line bg-card; }
+
+  .field {
+    @apply w-full rounded-field border border-line bg-card px-4 py-3 text-body text-ink placeholder:text-ink-faint transition-colors focus:border-wine focus:outline-none focus:ring-4 focus:ring-rose-accent/25;
+  }
+  .field[aria-invalid='true'] { @apply border-red-700 focus:ring-red-200; }
+
+  .breadcrumb { @apply flex flex-wrap items-center gap-2 text-small text-ink-soft; }
+  .breadcrumb a { @apply hover:text-wine; }
+
+  /* Small star rating row */
+  .stars { @apply inline-flex items-center gap-0.5 text-gold; }
 }
 
-@layer utilities {
-  .text-gradient-rose {
-    background: linear-gradient(100deg, #A3245E 0%, #E0608F 45%, #B48CE6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .bg-petal-gradient { background: linear-gradient(135deg, #FFF4F8 0%, #FDE6EF 45%, #EFE6FD 100%); }
-  .bg-berry-gradient { background: linear-gradient(135deg, #4A0E30 0%, #6B1442 45%, #A3245E 100%); }
-
-  .arch-frame { border-top-left-radius: 9999px; border-top-right-radius: 9999px; }
-  .text-shadow-subtle { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.12); }
-  .text-shadow-luxury { text-shadow: 0 4px 14px rgba(74, 14, 48, 0.45); }
-  .bg-radial-glow { background: radial-gradient(circle at center, rgba(238, 127, 168, 0.2) 0%, transparent 70%); }
-  .bg-rose-glow { background: radial-gradient(circle at center, rgba(201, 179, 242, 0.25) 0%, transparent 70%); }
-  .glass-card { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-  .glass-maroon { background: rgba(107, 20, 66, 0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+/* ─────────────────────────────────────────────────────────────
+   Signature: Mughal jharokha (multifoil) arch photo frame.
+   The clip path itself is defined once in <ArchDefs/>.
+   ───────────────────────────────────────────────────────────── */
+.arch-clip {
+  -webkit-clip-path: url(#jharokha-arch);
+  clip-path: url(#jharokha-arch);
 }
 
-/* ── Keyframes used by plain CSS classes ── */
-@keyframes shimmer { 0% { transform: translateX(-120%) skewX(-20deg); } 100% { transform: translateX(320%) skewX(-20deg); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* The one orchestrated motion moment: hero entrance */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes unveil { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+.enter { animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.enter-photo { animation: unveil 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Feedback for opened dialogs / panels */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pulseGold { 0%, 100% { box-shadow: 0 0 15px rgba(238,127,168,0.25); } 50% { box-shadow: 0 0 32px rgba(238,127,168,0.55); } }
-@keyframes petalFall {
-  0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
-  10%  { opacity: 0.9; }
-  100% { transform: translate3d(var(--drift, 60px), 110vh, 0) rotate(540deg); opacity: 0; }
+@keyframes sheetUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.animate-fade-in { animation: fadeIn 0.2s ease-out both; }
+.animate-fade-in-up { animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Horizontal swipe rows (chips, cards, date pickers) */
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.fade-edge-x {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent 100%);
 }
-
-.animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-.animate-pulse-gold { animation: pulseGold 3s infinite ease-in-out; }
-
-/* ── Site-wide scroll reveal (applied by useAutoReveal) ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(34px) scale(0.985);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-.reveal.is-visible { opacity: 1; transform: none; }
-
-/* Stagger direct grid children of revealed sections */
-.reveal .grid > * { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
-.reveal.is-visible .grid > * { opacity: 1; transform: none; }
-.reveal.is-visible .grid > *:nth-child(2) { transition-delay: 0.08s; }
-.reveal.is-visible .grid > *:nth-child(3) { transition-delay: 0.16s; }
-.reveal.is-visible .grid > *:nth-child(4) { transition-delay: 0.24s; }
-.reveal.is-visible .grid > *:nth-child(5) { transition-delay: 0.32s; }
-.reveal.is-visible .grid > *:nth-child(6) { transition-delay: 0.4s; }
-.reveal.is-visible .grid > *:nth-child(n+7) { transition-delay: 0.46s; }
-
-/* Gentle hover lift for images inside cards */
-main img { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease; }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
-  .reveal, .reveal .grid > * { opacity: 1 !important; transform: none !important; }
-}
-
-.btn-soft:hover { box-shadow: 0 0 30px -5px rgba(238, 127, 168, 0.45); }
-.card-petal:hover { box-shadow: 0 28px 60px -15px rgba(163, 36, 94, 0.25); }
-
-/* ───────── Page hero banners (About, Bridal, Gallery, Contact, Services) ───────── */
-.page-hero {
-  position: relative;
-  overflow: hidden;
-  padding: 3.5rem 0 4.5rem;
-  background: linear-gradient(135deg, rgba(255,244,248,0.9) 0%, rgba(253,230,239,0.9) 50%, rgba(239,230,253,0.9) 100%);
-  border-bottom-left-radius: 2.5rem;
-  border-bottom-right-radius: 2.5rem;
-  box-shadow: 0 24px 50px -30px rgba(163, 36, 94, 0.35);
-  margin-bottom: 1rem;
-}
-.page-hero::before,
-.page-hero::after {
-  content: '';
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(50px);
-  pointer-events: none;
-  animation: blob 18s ease-in-out infinite;
-}
-.page-hero::before { width: 340px; height: 340px; top: -120px; right: -60px; background: rgba(238, 127, 168, 0.35); }
-.page-hero::after  { width: 300px; height: 300px; bottom: -140px; left: 10%; background: rgba(201, 179, 242, 0.45); animation-delay: -8s; }
-.page-hero > * { position: relative; z-index: 1; }
-.page-hero h1 { font-size: clamp(2.3rem, 5vw, 4rem); line-height: 1.08; }
-@keyframes blob { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-30px) scale(1.08); } 66% { transform: translate(-20px,20px) scale(0.95); } }
-
-/* Breadcrumbs as a soft pill */
-nav[aria-label="Breadcrumb"] {
-  display: inline-flex !important;
-  padding: 0.4rem 0.95rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(238, 127, 168, 0.25);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 18px -10px rgba(163, 36, 94, 0.3);
-}
-
-/* ───────── Cards: lift, glow & image zoom everywhere ───────── */
-main .grid > .rounded-2xl,
-main .grid > .rounded-3xl,
-main .grid > a.rounded-2xl,
-main .grid > div > .rounded-3xl {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.5s ease;
-}
-@media (hover: hover) {
-  main .grid > .rounded-2xl:hover,
-  main .grid > .rounded-3xl:hover,
-  main .grid > a.rounded-2xl:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 26px 50px -20px rgba(163, 36, 94, 0.32), 0 0 0 1px rgba(238, 127, 168, 0.25);
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
-  main .group:hover img:not([alt*="logo" i]):not([alt*="crest" i]) { transform: scale(1.06); }
-  main .group:hover svg.lucide { animation: wiggle 0.6s ease; }
-}
-@keyframes wiggle { 0%,100% { transform: rotate(0); } 30% { transform: rotate(-10deg) scale(1.1); } 60% { transform: rotate(8deg); } }
-
-/* Soft rounded imagery */
-main img.object-cover { border-radius: inherit; }
-
-/* ───────── Form fields: pink focus glow ───────── */
-main input:not([type="checkbox"]):not([type="radio"]),
-main select,
-main textarea {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-}
-main input:not([type="checkbox"]):not([type="radio"]):focus,
-main select:focus,
-main textarea:focus {
-  border-color: #EE7FA8 !important;
-  box-shadow: 0 0 0 4px rgba(238, 127, 168, 0.18) !important;
-  background-color: #fff;
-  outline: none;
 }
 
-/* ───────── Section headings get a tiny flourish ───────── */
-main h2.font-serif::after,
-main section h2::after {
-  content: '';
-  display: block;
-  width: 56px;
-  height: 3px;
-  margin-top: 0.75rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #A3245E, #EE7FA8, #C9B3F2);
-}
-main .text-center h2::after,
-main h2.text-center::after { margin-left: auto; margin-right: auto; }
-
-/* Infinite marquee (content is rendered 3x, so shift by one third) */
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
-.animate-marquee { animation: marquee 30s linear infinite; }
+/* ─────────────────────────────────────────────────────────────
+   Admin panel: keep its layout, use the calm text face throughout
+   ───────────────────────────────────────────────────────────── */
+.admin-scope { @apply font-sans text-base; }
+.admin-scope h1, .admin-scope h2, .admin-scope h3, .admin-scope h4,
+.admin-scope .font-serif, .admin-scope .font-display { font-family: Mukta, system-ui, sans-serif; }

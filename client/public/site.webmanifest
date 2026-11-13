@@ -1,0 +1,10 @@
+{
+  "name": "Preeti Makeover",
+  "short_name": "Preeti Makeover",
+  "description": "Bridal makeup & beauty salon in Badarpur, New Delhi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF6F5",
+  "theme_color": "#7D2E4A",
+  "icons": [{ "src": "/pm_logo.png", "sizes": "any", "type": "image/png" }]
+}

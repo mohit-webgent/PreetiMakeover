@@ -42,7 +42,7 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
         <div className="mb-6">
           <button
             onClick={onBackToSite}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-plum/70 hover:text-brand-plum transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-salon-berry/70 hover:text-salon-berry transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Public Website</span>
@@ -58,17 +58,17 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
               className="h-16 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(229,143,176,0.45)]"
             />
           </div>
-          <h2 className="font-serif text-3xl font-bold text-brand-plum tracking-tight">
+          <h2 className="font-serif text-3xl font-bold text-salon-berry tracking-tight">
             Salon Management Portal
           </h2>
-          <p className="mt-2 text-xs text-brand-plum/60">
+          <p className="mt-2 text-xs text-salon-text-muted">
             Sign in to manage appointments, services, gallery, and salon schedule.
           </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-luxury rounded-3xl sm:px-10 border border-brand-blush/60">
+        <div className="bg-white py-8 px-6 shadow-luxury rounded-3xl sm:px-10 border border-salon-blush/60">
           
           <form className="space-y-5" onSubmit={handleSubmit}>
             {error && (
@@ -79,11 +79,11 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
             )}
 
             <div>
-              <label htmlFor="adminEmail" className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label htmlFor="adminEmail" className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Admin Email
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-3.5 text-brand-plum/40">
+                <span className="absolute left-3.5 top-3.5 text-salon-text-muted">
                   <Mail className="w-4 h-4" />
                 </span>
                 <input
@@ -94,17 +94,17 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
                   placeholder="admin@preetimakeover.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-brand-blush/80 focus:border-brand-gold bg-brand-ivory/40 text-sm text-brand-plum placeholder:text-brand-plum/30 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-salon-blush/80 focus:border-salon-petal bg-salon-blush-light/40 text-sm text-salon-berry placeholder:text-salon-berry/30 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="adminPassword" className="block text-xs font-bold uppercase tracking-wider text-brand-plum mb-1.5">
+              <label htmlFor="adminPassword" className="block text-xs font-bold uppercase tracking-wider text-salon-berry mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-3.5 text-brand-plum/40">
+                <span className="absolute left-3.5 top-3.5 text-salon-text-muted">
                   <Lock className="w-4 h-4" />
                 </span>
                 <input
@@ -115,12 +115,12 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-brand-blush/80 focus:border-brand-gold bg-brand-ivory/40 text-sm text-brand-plum placeholder:text-brand-plum/30 transition-colors"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-salon-blush/80 focus:border-salon-petal bg-salon-blush-light/40 text-sm text-salon-berry placeholder:text-salon-berry/30 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3.5 text-brand-plum/40 hover:text-brand-plum"
+                  className="absolute right-3.5 top-3.5 text-salon-text-muted hover:text-salon-berry"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -132,16 +132,16 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-brand-plum to-brand-plum-light hover:from-brand-plum-deep hover:to-brand-plum shadow-luxury flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-salon-berry to-salon-berry-light hover:from-salon-berry-deep hover:to-salon-berry shadow-luxury flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-brand-gold border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-salon-petal border-t-transparent rounded-full animate-spin"></div>
                     <span>Verifying Credentials...</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-4 h-4 text-brand-gold" />
+                    <ShieldCheck className="w-4 h-4 text-salon-petal" />
                     <span>Secure Sign In</span>
                   </>
                 )}
@@ -149,8 +149,8 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
             </div>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-brand-blush/40 text-center">
-            <span className="text-[11px] text-brand-plum/50">
+          <div className="mt-6 pt-6 border-t border-salon-blush/40 text-center">
+            <span className="text-[11px] text-salon-text-muted">
               Protected by server-side JWT authentication & bcrypt encryption.
             </span>
           </div>

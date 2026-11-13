@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const prisma = require('../db');
+const { DEV_JWT_SECRET } = require('../config/env');
 
 /**
- * Get JWT Secret safely, failing in production if not configured
+ * Get JWT Secret safely, failing in production if not configured.
+ * Read at call time (not from the frozen config) so a missing secret can never silently fall back in production.
  */
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -10,7 +12,7 @@ function getJwtSecret() {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('FATAL: JWT_SECRET environment variable is missing in production mode. Refusing to operate insecurely.');
     }
-    return 'dev-only-local-secret-do-not-use-in-production-123456789';
+    return DEV_JWT_SECRET;
   }
   return secret;
 }

@@ -30,7 +30,8 @@ async function getDashboardSummary(req, res, next) {
       totalCategoriesCount,
       totalGalleryCount,
       pendingTestimonialsCount,
-      recentAppointments
+      recentAppointments,
+      todayCount
     ] = await Promise.all([
       prisma.appointment.count({ where: { status: 'PENDING' } }),
       prisma.appointment.count({ where: { status: 'CONFIRMED' } }),
@@ -42,7 +43,8 @@ async function getDashboardSummary(req, res, next) {
       prisma.appointment.findMany({
         take: 5,
         orderBy: { createdAt: 'desc' }
-      })
+      }),
+      prisma.appointment.count({ where: { preferredDate: istToday(), status: { in: ['PENDING', 'CONTACTED', 'CONFIRMED'] } } })
     ]);
 
     res.status(200).json({
@@ -55,7 +57,8 @@ async function getDashboardSummary(req, res, next) {
         totalCategoriesCount,
         totalGalleryCount,
         pendingTestimonialsCount,
-        recentAppointments
+        recentAppointments,
+        todayAppointments: todayCount
       }
     });
   } catch (error) {
@@ -67,34 +70,55 @@ async function getDashboardSummary(req, res, next) {
 // 2. APPOINTMENTS MANAGEMENT
 // =========================================================================
 
+/** Today's date in India as a UTC-noon Date (matches how preferredDate is stored). */
+function istToday() {
+  const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return new Date(Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate(), 12));
+}
+
+/** Build the Prisma `where` for appointment list/export from query params. */
+function buildAppointmentWhere({ status, search, range } = {}) {
+  const where = {};
+
+  if (typeof status === 'string' && ['PENDING', 'CONTACTED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(status.toUpperCase())) {
+    where.status = status.toUpperCase();
+  }
+
+  if (typeof search === 'string' && search.trim()) {
+    const query = search.trim();
+    where.OR = [
+      { customerName: { contains: query, mode: 'insensitive' } },
+      { phone: { contains: query } },
+      { serviceName: { contains: query, mode: 'insensitive' } }
+    ];
+  }
+
+  // range=today → visits scheduled today; range=upcoming → today onwards
+  if (range === 'today') where.preferredDate = istToday();
+  else if (range === 'upcoming') where.preferredDate = { gte: istToday() };
+
+  return where;
+}
+
 async function getAppointments(req, res, next) {
   try {
-    const { status, search, page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20, range } = req.query;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const take = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const skip = (pageNum - 1) * take;
 
-    const where = {};
-
-    if (status && ['PENDING', 'CONTACTED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'].includes(status.toUpperCase())) {
-      where.status = status.toUpperCase();
-    }
-
-    if (search && search.trim()) {
-      const query = search.trim();
-      where.OR = [
-        { customerName: { contains: query, mode: 'insensitive' } },
-        { phone: { contains: query } },
-        { serviceName: { contains: query, mode: 'insensitive' } }
-      ];
-    }
+    const where = buildAppointmentWhere(req.query);
+    // Date views read best in visit order; the inbox view reads best newest-first.
+    const orderBy = range === 'today' || range === 'upcoming'
+      ? [{ preferredDate: 'asc' }, { preferredTime: 'asc' }]
+      : { createdAt: 'desc' };
 
     const [total, appointments] = await Promise.all([
       prisma.appointment.count({ where }),
       prisma.appointment.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip,
         take,
         include: {
@@ -115,6 +139,50 @@ async function getAppointments(req, res, next) {
         totalPages: Math.ceil(total / take)
       }
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** CSV download of appointments matching the current filters (max 5000 rows). Opens cleanly in Excel. */
+async function exportAppointmentsCsv(req, res, next) {
+  try {
+    const rows = await prisma.appointment.findMany({
+      where: buildAppointmentWhere(req.query),
+      orderBy: { createdAt: 'desc' },
+      take: 5000
+    });
+
+    // Quote every cell; neutralise spreadsheet formula injection (=, +, -, @ prefixes).
+    const cell = (v) => {
+      let s = v === null || v === undefined ? '' : String(v);
+      if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+    const header = ['Reference', 'Requested On', 'Customer', 'Mobile (+91)', 'Service', 'Visit Date', 'Visit Time', 'Status', 'Customer Notes', 'Admin Notes'];
+    // Phones are stored as +91XXXXXXXXXX; export "98765 43210" so spreadsheets keep it as text (no formula, no sci-notation)
+    const localPhone = (p) => {
+      const d = String(p || '').replace(/\D/g, '').slice(-10);
+      return d.length === 10 ? `${d.slice(0, 5)} ${d.slice(5)}` : String(p || '');
+    };
+    const lines = rows.map((a) => [
+      a.id.slice(0, 8).toUpperCase(),
+      a.createdAt.toISOString().slice(0, 16).replace('T', ' '),
+      a.customerName,
+      localPhone(a.phone),
+      a.serviceName,
+      a.preferredDate.toISOString().slice(0, 10),
+      a.preferredTime || '',
+      a.status,
+      a.message || '',
+      a.adminNotes || ''
+    ].map(cell).join(','));
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="appointments-${stamp}.csv"`);
+    // BOM so Excel detects UTF-8 (names with ₹, Hindi, emoji)
+    res.send(`﻿${[header.map(cell).join(','), ...lines].join('\r\n')}`);
   } catch (error) {
     next(error);
   }
@@ -663,6 +731,7 @@ module.exports = {
   createTestimonial,
   getDashboardSummary,
   getAppointments,
+  exportAppointmentsCsv,
   updateAppointmentStatus,
   getAdminServices,
   createService,

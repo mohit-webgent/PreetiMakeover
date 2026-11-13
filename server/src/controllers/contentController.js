@@ -1,4 +1,5 @@
 const prisma = require('../db');
+const cache = require('../services/cache');
 const { HttpError, asyncHandler } = require('../utils/httpError');
 
 const ALLOWED_TYPES = new Set(['text', 'textarea', 'image', 'json']);
@@ -32,7 +33,7 @@ function upsert(rec) {
 
 /** Public: all CMS content grouped by section ({ hero: { headingLine1: '...' } }). JSON types are parsed. */
 const getPublicContent = asyncHandler(async (req, res) => {
-  const items = await prisma.siteContent.findMany();
+  const items = await cache.remember('content:all', 5 * 60 * 1000, () => prisma.siteContent.findMany());
   const structured = {};
   const rawMap = {};
 

@@ -40,6 +40,23 @@ const config = {
   },
   salon: {
     whatsapp: process.env.SALON_WHATSAPP || '+918810359438'
+  },
+  // Owner alerts for new booking requests. Each channel is optional and enabled only when fully configured.
+  notify: {
+    adminUrl: (process.env.ADMIN_PANEL_URL || '').trim(),
+    email: {
+      host: process.env.SMTP_HOST || '',
+      port: int(process.env.SMTP_PORT, 465),
+      secure: (process.env.SMTP_SECURE || '').toLowerCase() !== 'false',
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
+      from: process.env.SMTP_FROM || process.env.SMTP_USER || '',
+      to: process.env.NOTIFY_EMAIL_TO || ''
+    },
+    telegram: {
+      botToken: process.env.TELEGRAM_BOT_TOKEN || '',
+      chatId: process.env.TELEGRAM_CHAT_ID || ''
+    }
   }
 };
 
@@ -54,6 +71,10 @@ function assertProductionConfig() {
   }
   if (config.jwt.secret.length < 32) {
     throw new Error('FATAL: JWT_SECRET must be at least 32 characters in production.');
+  }
+  const { email, telegram } = config.notify;
+  if (!(email.host && email.user && email.pass && email.to) && !(telegram.botToken && telegram.chatId)) {
+    console.warn('[config] No owner notification channel configured (SMTP_* or TELEGRAM_*): new bookings will only appear in the admin panel.');
   }
   if (!config.uploads.cloudinaryUrl) {
     console.warn('[config] CLOUDINARY_URL not set: uploaded images will be stored on local disk and lost on redeploy.');

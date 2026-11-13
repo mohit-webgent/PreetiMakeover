@@ -1,66 +1,43 @@
 const prisma = require('../db');
+const cache = require('../services/cache');
+const { HttpError, asyncHandler } = require('../utils/httpError');
 
-/**
- * Get all active categories with their services
- */
-async function getAllServices(req, res, next) {
-  try {
-    const categories = await prisma.serviceCategory.findMany({
+const TTL = 5 * 60 * 1000;
+
+/** All active categories with their active services (cached until an admin edit). */
+const getAllServices = asyncHandler(async (req, res) => {
+  const categories = await cache.remember('services:all', TTL, () =>
+    prisma.serviceCategory.findMany({
       where: { isActive: true },
       orderBy: { displayOrder: 'asc' },
-      include: {
-        services: {
-          where: { isActive: true },
-          orderBy: { displayOrder: 'asc' }
-        }
-      }
-    });
+      include: { services: { where: { isActive: true }, orderBy: { displayOrder: 'asc' } } }
+    })
+  );
 
-    res.status(200).json({
-      success: true,
-      data: categories,
-      meta: {
-        totalCategories: categories.length,
-        totalServices: categories.reduce((acc, cat) => acc + cat.services.length, 0)
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-/**
- * Get single service by slug
- */
-async function getServiceBySlug(req, res, next) {
-  try {
-    const { slug } = req.params;
-    const service = await prisma.service.findUnique({
-      where: { slug },
-      include: {
-        category: {
-          select: { id: true, name: true, slug: true }
-        }
-      }
-    });
-
-    if (!service || !service.isActive) {
-      return res.status(404).json({
-        success: false,
-        message: 'Service not found or is currently inactive.'
-      });
+  res.set('Cache-Control', 'public, max-age=60');
+  res.json({
+    success: true,
+    data: categories,
+    meta: {
+      totalCategories: categories.length,
+      totalServices: categories.reduce((acc, cat) => acc + cat.services.length, 0)
     }
+  });
+});
 
-    res.status(200).json({
-      success: true,
-      data: service
-    });
-  } catch (error) {
-    next(error);
-  }
-}
+/** Single active service by slug. */
+const getServiceBySlug = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+  const service = await cache.remember(`services:${slug}`, TTL, () =>
+    prisma.service.findUnique({
+      where: { slug },
+      include: { category: { select: { id: true, name: true, slug: true } } }
+    })
+  );
 
-module.exports = {
-  getAllServices,
-  getServiceBySlug
-};
+  if (!service || !service.isActive) throw new HttpError(404, 'Service not found or is currently inactive.');
+  res.set('Cache-Control', 'public, max-age=60');
+  res.json({ success: true, data: service });
+});
+
+module.exports = { getAllServices, getServiceBySlug };

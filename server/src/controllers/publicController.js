@@ -1,20 +1,29 @@
 const prisma = require('../db');
+const cache = require('../services/cache');
 const { HttpError, asyncHandler } = require('../utils/httpError');
 const { sanitizeText, toInt } = require('../utils/validators');
 
+const TTL = 5 * 60 * 1000;
+
 const getApprovedTestimonials = asyncHandler(async (req, res) => {
-  const data = await prisma.testimonial.findMany({
-    where: { isApproved: true },
-    orderBy: [{ displayOrder: 'asc' }, { createdAt: 'desc' }]
-  });
+  const data = await cache.remember('testimonials:approved', TTL, () =>
+    prisma.testimonial.findMany({
+      where: { isApproved: true },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'desc' }]
+    })
+  );
+  res.set('Cache-Control', 'public, max-age=60');
   res.json({ success: true, data });
 });
 
 const getActiveGallery = asyncHandler(async (req, res) => {
-  const data = await prisma.galleryImage.findMany({
-    where: { isActive: true },
-    orderBy: [{ displayOrder: 'asc' }, { createdAt: 'desc' }]
-  });
+  const data = await cache.remember('gallery:active', TTL, () =>
+    prisma.galleryImage.findMany({
+      where: { isActive: true },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'desc' }]
+    })
+  );
+  res.set('Cache-Control', 'public, max-age=60');
   res.json({ success: true, data });
 });
 

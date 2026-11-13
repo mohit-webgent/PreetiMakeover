@@ -6,6 +6,7 @@ const { adminLogin, getAdminProfile, changePassword } = require('../controllers/
 const { listContent, updateContentItem, saveContentBatch } = require('../controllers/contentController');
 const { uploadImage } = require('../controllers/uploadController');
 const admin = require('../controllers/adminController');
+const cache = require('../services/cache');
 
 const router = express.Router();
 
@@ -15,6 +16,16 @@ router.post('/login', loginLimiter, adminLogin);
 // Everything below requires a valid admin session
 router.use(authenticateAdmin);
 
+// Any successful admin write invalidates the public read cache so the live site updates immediately.
+router.use((req, res, next) => {
+  if (req.method !== 'GET') {
+    res.on('finish', () => {
+      if (res.statusCode < 400) cache.clear();
+    });
+  }
+  next();
+});
+
 // Session
 router.get('/me', getAdminProfile);
 router.post('/change-password', changePassword);
@@ -22,6 +33,7 @@ router.get('/dashboard', admin.getDashboardSummary);
 
 // Appointments
 router.get('/appointments', admin.getAppointments);
+router.get('/appointments/export.csv', admin.exportAppointmentsCsv);
 router.patch('/appointments/:id/status', admin.updateAppointmentStatus);
 
 // Services & categories

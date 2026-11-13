@@ -128,17 +128,30 @@ async function runTests() {
       'POST /api/appointments rejects invalid phone with HTTP 400');
 
     // Test 8: Accept Valid Appointment (next Wednesday)
-    const res8 = await request('POST', '/api/appointments', {
+    // Unique phone per run so the duplicate-request guard never interferes with repeated test runs
+    const TEST_PHONE = `9${String(Date.now()).slice(-9)}`;
+    const bookingPayload = {
       customerName: 'Simran Kaur',
-      phone: '9810359438',
+      phone: TEST_PHONE,
       preferredDate: NEXT_WEDNESDAY,
       preferredTime: '11:30 AM',
       serviceName: 'Casmara Luxury Algae Facial',
       message: 'Need consultation for sensitive skin.'
-    });
+    };
+    const res8 = await request('POST', '/api/appointments', bookingPayload);
     const createdAppointmentId = res8.body.data?.id;
-    assert(res8.status === 201 && res8.body.isConfirmed === false && res8.body.data.whatsappUrl.includes('https://wa.me/'), 
+    assert(res8.status === 201 && res8.body.isConfirmed === false && res8.body.data.whatsappUrl.includes('https://wa.me/'),
       'POST /api/appointments creates enquiry with HTTP 201, explicit pending status & WhatsApp URL');
+
+    // Test 8b: Same person, same service, same day → existing request returned, no duplicate row
+    const res8b = await request('POST', '/api/appointments', bookingPayload);
+    assert(res8b.status === 200 && res8b.body.duplicate === true && res8b.body.data?.id === createdAppointmentId,
+      'POST /api/appointments is idempotent for duplicate requests (same phone, service and date)');
+
+    // Test 8c: Time outside opening hours is rejected
+    const res8c = await request('POST', '/api/appointments', { ...bookingPayload, preferredTime: '11:30 PM', serviceName: 'Hair Spa' });
+    assert(res8c.status === 400 && res8c.body.field === 'preferredTime',
+      'POST /api/appointments rejects a time outside opening hours');
 
     // Test 9: Honeypot Spam Trap (Silent 200 without creating DB entry)
     const res9 = await request('POST', '/api/appointments', {
@@ -190,8 +203,16 @@ async function runTests() {
     const res15 = await request('GET', '/api/admin/dashboard', null, {
       'Authorization': `Bearer ${adminToken}`
     });
-    assert(res15.status === 200 && typeof res15.body.data.pendingEnquiries === 'number', 
+    assert(res15.status === 200 && typeof res15.body.data.pendingEnquiries === 'number' && typeof res15.body.data.todayAppointments === 'number',
       'GET /api/admin/dashboard returns operational metrics');
+
+    // Test 15b: Date-range filter and CSV export
+    const resUpcoming = await request('GET', '/api/admin/appointments?range=upcoming', null, { 'Authorization': `Bearer ${adminToken}` });
+    assert(resUpcoming.status === 200 && resUpcoming.body.data.some((a) => a.id === createdAppointmentId),
+      'GET /api/admin/appointments?range=upcoming includes future visits');
+    const resCsv = await request('GET', `/api/admin/appointments/export.csv?search=${TEST_PHONE}`, null, { 'Authorization': `Bearer ${adminToken}` });
+    assert(resCsv.status === 200 && String(resCsv.headers['content-type']).includes('text/csv') && String(resCsv.body).includes('Simran Kaur'),
+      'GET /api/admin/appointments/export.csv downloads matching appointments as CSV');
 
     // Test 16: Admin Update Appointment Status & Notes
     if (createdAppointmentId) {

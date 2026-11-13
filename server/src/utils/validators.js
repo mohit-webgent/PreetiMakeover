@@ -38,11 +38,12 @@ function validateIndianPhone(phone) {
  * Validate appointment date
  * - Must be valid YYYY-MM-DD
  * - Cannot be in the past
- * - Cannot be Tuesday (weekly off day)
+ * - Cannot fall on the salon's weekly off day
  * @param {string} dateStr YYYY-MM-DD
- * @returns {{ isValid: boolean, parsedDate?: Date, error?: string, isTuesday?: boolean, isPast?: boolean }}
+ * @param {{ offDayIndex?: number, offDayName?: string }} [opts] weekly off day (0=Sun … 6=Sat, -1 = none). Defaults to Tuesday.
+ * @returns {{ isValid: boolean, parsedDate?: Date, isToday?: boolean, error?: string, isClosedDay?: boolean, isTuesday?: boolean, isPast?: boolean }}
  */
-function validateAppointmentDate(dateStr) {
+function validateAppointmentDate(dateStr, { offDayIndex = 2, offDayName = 'Tuesday' } = {}) {
   if (!dateStr || typeof dateStr !== 'string') {
     return { isValid: false, error: 'Preferred date is required.' };
   }
@@ -82,19 +83,27 @@ function validateAppointmentDate(dateStr) {
     };
   }
 
-  // Check if Tuesday (day 2: 0=Sun, 1=Mon, 2=Tue, ...)
-  if (targetDate.getUTCDay() === 2) {
+  // Weekly off day (0=Sun, 1=Mon, 2=Tue, ...)
+  if (offDayIndex >= 0 && targetDate.getUTCDay() === offDayIndex) {
     return {
       isValid: false,
-      isTuesday: true,
-      error: 'Preeti Makeover is closed on Tuesdays (weekly off). Please choose another day.'
+      isClosedDay: true,
+      isTuesday: offDayIndex === 2,
+      error: `Preeti Makeover is closed on ${offDayName}s (weekly off). Please choose another day.`
     };
   }
 
   return {
     isValid: true,
-    parsedDate: targetDate
+    parsedDate: targetDate,
+    isToday: targetDate.getTime() === todayIstDateOnly.getTime()
   };
+}
+
+/** Minutes after midnight right now in India (IST, UTC+5:30). */
+function nowIstMinutes() {
+  const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return ist.getUTCHours() * 60 + ist.getUTCMinutes();
 }
 
 /**
@@ -111,6 +120,7 @@ function sanitizeText(str, maxLen = 500) {
 module.exports = {
   validateIndianPhone,
   validateAppointmentDate,
+  nowIstMinutes,
   sanitizeText
 };
 
